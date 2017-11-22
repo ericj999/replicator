@@ -1,0 +1,630 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#ifndef APSTUDIO_INVOKED
+#include "targetver.h"
+#endif
+#include "afxres.h"
+#include "verrsrc.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#ifndef APSTUDIO_INVOKED\r\n"
+    "#include ""targetver.h""\r\n"
+    "#endif\r\n"
+    "#include ""afxres.h""\r\n"
+    "#include ""verrsrc.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#include ""res\\Replicator.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""      // Standard components\r\n"
+    "#if !defined(_AFXDLL)\r\n"
+    "#include ""afxprint.rc""        // printing/print preview resources\r\n"
+    "#include ""afxribbon.rc""        // MFC ribbon and control bar resources\r\n"
+    "#endif\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\Replicator.ico"
+
+IDR_ReplicatorTYPE      ICON                    "res\\ReplicatorDoc.ico"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDR_MAINFRAME           BITMAP                  "res\\Toolbar.bmp"
+
+IDR_MAINFRAME_256       BITMAP                  "res\\Toolbar256.bmp"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_MAINFRAME TOOLBAR 16, 15
+BEGIN
+    BUTTON      ID_TASK_RUN
+    BUTTON      ID_TASK_STOP
+    SEPARATOR
+    BUTTON      ID_TASK_NEW
+    BUTTON      ID_TASK_EDIT
+    BUTTON      ID_TASK_DELETE
+    SEPARATOR
+    BUTTON      ID_APP_ABOUT
+END
+
+IDR_MAINFRAME_256 TOOLBAR 16, 15
+BEGIN
+    BUTTON      ID_TASK_RUN
+    BUTTON      ID_TASK_STOP
+    SEPARATOR
+    BUTTON      ID_TASK_NEW
+    BUTTON      ID_TASK_EDIT
+    BUTTON      ID_TASK_DELETE
+    SEPARATOR
+    BUTTON      ID_APP_ABOUT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAINFRAME MENU
+BEGIN
+    POPUP "&Task"
+    BEGIN
+        MENUITEM "&Run",                        ID_TASK_RUN
+        MENUITEM "&Stop",                       ID_TASK_STOP
+        MENUITEM SEPARATOR
+        MENUITEM "&New...",                     ID_TASK_NEW
+        MENUITEM "&Edit...",                    ID_TASK_EDIT
+        MENUITEM "&Delete",                     ID_TASK_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_APP_EXIT
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&About Replicator...",        ID_APP_ABOUT
+    END
+END
+
+IDR_HELP_MENU MENU
+BEGIN
+    MENUITEM "&About Replicator...",        ID_APP_ABOUT
+END
+
+IDR_TASK_POPUP_MENU MENU
+BEGIN
+    POPUP "Task"
+    BEGIN
+        MENUITEM "Run",                         ID_TASK_RUN
+        MENUITEM "Stop",                        ID_TASK_STOP
+        MENUITEM SEPARATOR
+        MENUITEM "New...",                      ID_TASK_NEW
+        MENUITEM "Edit...",                     ID_TASK_EDIT
+        MENUITEM "Delete",                      ID_TASK_DELETE
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_MAINFRAME ACCELERATORS
+BEGIN
+    VK_F6,          ID_NEXT_PANE,           VIRTKEY, NOINVERT
+    VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 170, 62
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About Replicator"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,14,14,20,20
+    LTEXT           "Replicator, Version 1.1",IDC_STATIC,42,14,114,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2014-2017",IDC_STATIC,42,26,114,8
+    DEFPUSHBUTTON   "OK",IDOK,113,41,50,14,WS_GROUP
+END
+
+IDD_EASYDUPL_FORM DIALOGEX 0, 0, 424, 275
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_TAB_TASK_DETAIL,"SysTabControl32",0x0,0,0,423,274
+    LTEXT           "Static",IDC_TAB_INNER,6,18,409,249,NOT WS_VISIBLE | WS_DISABLED
+END
+
+IDD_GENERALPAGE DIALOGEX 0, 0, 409, 249
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD | WS_DISABLED | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    LTEXT           "",IDC_GENERAL_INFO,7,7,395,235
+END
+
+IDD_SETTINGSPAGE DIALOGEX 0, 0, 409, 249
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD | WS_DISABLED | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    LTEXT           "Settings",IDC_STATIC,179,118,27,8
+END
+
+IDD_HISTORYPAGE DIALOGEX 0, 0, 409, 249
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD | WS_DISABLED | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    LTEXT           "History",IDC_STATIC,179,119,24,8
+    LISTBOX         IDC_HISTORY_LIST,7,7,395,235,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+END
+
+IDD_NEW_TASK DIALOGEX 0, 0, 357, 184
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "New Task"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Task &Name:",IDC_STATIC,7,10,38,8
+    EDITTEXT        IDC_NEW_TASK_NAME,48,7,275,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME,7,27,343,1,WS_EX_STATICEDGE
+    LTEXT           "&Replicate files from",IDC_STATIC,7,32,62,8
+    CONTROL         "",IDC_NEW_TASK_SOURCE,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_EDITLABELS | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,44,316,38
+    PUSHBUTTON      "+",IDC_NEW_TASK_ADD_SRC,325,44,25,14
+    PUSHBUTTON      "-",IDC_NEW_TASK_REMOVE_SRC,325,60,25,14,WS_DISABLED
+    LTEXT           "&to",IDC_STATIC,7,87,8,8
+    EDITTEXT        IDC_NEW_TASK_DESTINATION,7,100,316,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_NEW_TASK_BROWSE_DEST,325,100,25,14
+    CONTROL         "Include &sub-folders",IDC_NEW_TASK_INCLUDE_SUB,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,136,81,10
+    PUSHBUTTON      "&Create",IDC_NEW_TASK_CREATE,126,163,50,14,WS_DISABLED
+    PUSHBUTTON      "Cancel",IDCANCEL,180,163,50,14
+    LTEXT           "Options",IDC_STATIC,7,121,26,8
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,38,126,312,1
+    PUSHBUTTON      "Advanced options",IDC_NEW_TASK_ADV_OPTIONS,264,133,86,14
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,8,155,342,1
+END
+
+IDD_ADVANCED_OPTIONS DIALOGEX 0, 0, 306, 228
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Advanced Options"
+FONT 10, "MS Shell Dlg", 400, 0, 0x0
+BEGIN
+    LTEXT           "Files",IDC_STATIC,8,5,18,8
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,28,9,272,1
+    CONTROL         "&All files",IDC_NEW_TASK_ALL_FILES,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,11,17,33,8
+    CONTROL         "&Include the following file types",IDC_NEW_TASK_INCLUSION,
+                    "Button",BS_AUTORADIOBUTTON,11,30,115,8
+    CONTROL         "&Exclude the following file types",IDC_NEW_TASK_EXCLUSION,
+                    "Button",BS_AUTORADIOBUTTON,11,43,119,8
+    EDITTEXT        IDC_AO_FILTERS,18,55,282,12,ES_AUTOHSCROLL | WS_GROUP
+    LTEXT           "( Specify one or more file extensions to be included or excluded; separate with semi-colons if more than one. ex. jpg;bmp )",IDC_NEW_TASK_FILTERS_INFO,18,70,282,17
+    LTEXT           "Destination Folders",IDC_STATIC,8,90,38,8
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,49,94,252,1
+    CONTROL         "&Use same folder structure starting from the selected source folder",IDC_DESTINATION_SAME_FROM_SELECT,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,11,104,235,8
+    CONTROL         "Use &same folder structure starting from the root of the selected source folder",IDC_DESTINATION_SAME_FROM_ROOT,
+                    "Button",BS_AUTORADIOBUTTON,11,117,269,10
+    CONTROL         "&Group files by date using the following format",IDC_DESTINATION_GROUP,
+                    "Button",BS_AUTORADIOBUTTON,11,132,163,8
+    EDITTEXT        IDC_AO_DESTINATION_FORMAT,18,146,235,12,ES_AUTOHSCROLL | WS_GROUP
+    PUSHBUTTON      "&Edit",IDC_AO_EDIT_FORMAT,258,146,43,12
+    LTEXT           "( Example: Specify $(YYYY)\\$(MMMM) to group the files created in Janurary 2017  into <destination folder>\\2017\\Janurary )",IDC_AO_DESTINATION_FORMAT_EXAMPLE,19,160,280,16
+    LTEXT           "&Choose action when file already exists in destination folder",IDC_ACTION_TEXT,18,180,213,8
+    COMBOBOX        IDC_AO_UPDATE_OPTION,18,192,282,62,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "OK",IDOK,108,211,43,12
+    PUSHBUTTON      "Cancel",IDCANCEL,155,211,43,12
+END
+
+IDD_FOLDER_FORMATTER DIALOGEX 0, 0, 367, 217
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Format"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,316,7,44,14
+    PUSHBUTTON      "Cancel",IDCANCEL,316,24,44,14
+    EDITTEXT        IDC_AF_FORMAT,7,7,306,14,ES_AUTOHSCROLL | ES_NOHIDESEL
+    LTEXT           "Static",IDC_AF_FORMAT_EXAMPLE,45,27,266,8
+    LTEXT           "Example:",IDC_STATIC,7,27,30,8
+    CONTROL         "",IDC_AF_MACROS,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,42,306,154
+    PUSHBUTTON      "&Insert",IDC_AF_INSERT,316,41,44,14,WS_DISABLED
+    LTEXT           "Note: '/' and '\\' are used as folder separators.",IDC_STATIC,7,200,306,11
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,1,0,1
+ PRODUCTVERSION 1,1,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "CompanyName", "Eric C."
+            VALUE "FileDescription", "File Replicator"
+            VALUE "FileVersion", "1.1.0.1"
+            VALUE "InternalName", "Replicator.exe"
+            VALUE "LegalCopyright", "(c) Eric Chen.  All rights reserved."
+            VALUE "OriginalFilename", "Replicator.exe"
+            VALUE "ProductName", "Replicator"
+            VALUE "ProductVersion", "1.1.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 163
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 55
+    END
+
+    IDD_EASYDUPL_FORM, DIALOG
+    BEGIN
+        RIGHTMARGIN, 423
+        BOTTOMMARGIN, 274
+    END
+
+    IDD_GENERALPAGE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 402
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 242
+    END
+
+    IDD_SETTINGSPAGE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 402
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 241
+    END
+
+    IDD_HISTORYPAGE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 402
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 242
+    END
+
+    IDD_NEW_TASK, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 350
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 177
+    END
+
+    IDD_ADVANCED_OPTIONS, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 213
+    END
+
+    IDD_FOLDER_FORMATTER, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 360
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 210
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_ADVANCED_OPTIONS AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_FOLDER_FORMATTER AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_NEW_TASK AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_ABOUTBOX AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_HISTORYPAGE AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDP_OLE_INIT_FAILED     "OLE initialization failed.  Make sure that the OLE libraries are the correct version."
+    IDS_TAB_GENERAL         "Detail"
+    IDS_TAB_SETTINGS        "Settings"
+    IDS_TAB_HISTORY         "History"
+END
+
+STRINGTABLE
+BEGIN
+    IDR_MAINFRAME           "Replicator\n\nReplicator\n\n\nReplicator.Document\nReplicator.Document"
+END
+
+STRINGTABLE
+BEGIN
+    AFX_IDS_APP_TITLE       "Easy Duplicate"
+    AFX_IDS_IDLEMESSAGE     "Ready"
+    IDS_DELETE_CONFIRMATION "Are you sure that you want to delete the task?"
+    IDS_INVALID_TASKID      "Invalid task ID!"
+    IDS_STOP_CONFIRMATION   "Are you sure that you want to stop the task?"
+END
+
+STRINGTABLE
+BEGIN
+    ID_INDICATOR_EXT        "EXT"
+    ID_INDICATOR_CAPS       "CAP"
+    ID_INDICATOR_NUM        "NUM"
+    ID_INDICATOR_SCRL       "SCRL"
+    ID_INDICATOR_OVR        "OVR"
+    ID_INDICATOR_REC        "REC"
+END
+
+STRINGTABLE
+BEGIN
+    ID_APP_ABOUT            "Display program information, version number and copyright\nAbout"
+    ID_APP_EXIT             "Quit the application; prompts to save documents\nExit"
+END
+
+STRINGTABLE
+BEGIN
+    ID_NEXT_PANE            "Switch to the next window pane\nNext Pane"
+    ID_PREV_PANE            "Switch back to the previous window pane\nPrevious Pane"
+END
+
+STRINGTABLE
+BEGIN
+    ID_WINDOW_SPLIT         "Split the active window into panes\nSplit"
+END
+
+STRINGTABLE
+BEGIN
+    ID_VIEW_STATUS_BAR      "Show or hide the status bar\nToggle Status Bar"
+END
+
+STRINGTABLE
+BEGIN
+    AFX_IDS_SCSIZE          "Change the window size"
+    AFX_IDS_SCMOVE          "Change the window position"
+    AFX_IDS_SCMINIMIZE      "Reduce the window to an icon"
+    AFX_IDS_SCMAXIMIZE      "Enlarge the window to full size"
+    AFX_IDS_SCNEXTWINDOW    "Switch to the next document window"
+    AFX_IDS_SCPREVWINDOW    "Switch to the previous document window"
+    AFX_IDS_SCCLOSE         "Close the active window and prompts to save the documents"
+END
+
+STRINGTABLE
+BEGIN
+    AFX_IDS_SCRESTORE       "Restore the window to normal size"
+    AFX_IDS_SCTASKLIST      "Activate Task List"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_STATUS_PANE1        "Pane 1"
+    IDS_STATUS_PANE2        "Pane 2"
+    IDS_TOOLBAR_STANDARD    "Standard"
+    IDS_TOOLBAR_CUSTOMIZE   "Customize..."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_EDIT_MENU           "Edit"
+    IDS_TASK_MENU           "Task"
+    IDS_EDIT_TASK           "Edit Task"
+    IDS_UPDATE              "&Update"
+END
+
+STRINGTABLE
+BEGIN
+    ID_TASK_DELETE          "Delete the selected task\nDelete"
+    ID_TASK_NEW             "Create a new task\nNew"
+    ID_TASK_RUN             "Run the selected task\nRun"
+    ID_TASK_EDIT            "Configure the selected task\nEdit"
+    ID_TASK_STOP            "Stop the selected task\nStop"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_LIST_NAME           "Name"
+    IDS_LIST_STATUS         "Latest Status"
+    IDS_LIST_LAST_RUN       "Last Run"
+    IDS_LIST_SCHEDULE       "Schedule"
+    IDS_LIST_TASKID         "Task ID"
+    IDS_LIST_LAST_SUCCESSFUL_RUN "Last Successful Run"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_ERROR_SAME_NAME     "Same task name already exists in database. Please specify a different task name."
+    IDS_ERROR_CREATE_PROCESS "Failed to run '%s'."
+    IDS_FILTER_IS_EMPTY     "There is no file type specified."
+    IDS_FOLDER_FORMAT_IS_EMPTY 
+                            "There is no format specified for the destination folders."
+    IDS_PROMPT_CANCEL_JOB   "There is task running. Do you want to abort?"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_TASK_INFO_TEMPLATE  "Task:\n\t%s\n\nCreated:\n\t%s\n\nSource:\n%s\nDestination:\n\t%s\n\nConditions:\n%s"
+    IDS_CHILD_FOLDER        "Include children folders"
+    IDS_ALL_FILES           "Include all files"
+    IDS_FILES_MATCHING      "Include file types matching "
+    IDS_FILES_NOT_MATCHING  "Include file types not matching "
+    IDS_WARN_OVERWRITE      "A custom destination folder format has been specified. Files may be overwriiten by the files from different source folders with same names or not be replicated. Do you want to continue?"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_UPDATE_ACTION_NEWER "Update the destination file if source file is newer"
+    IDS_UPDATE_ACTION_KEEP_BOTH "Keep both files in the destination folder"
+    IDS_UPDATE_ACTION_DO_NOTHING "Do nothing"
+    IDS_SYNC_ACTION_KEEP    "Keep the file in the destination folder"
+    IDS_SYNC_ACTION_REMOVE  "Remove the file from the destination folder"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_DEST_FOLDER_OPTION_SAME "Use same folder structures in destination"
+    IDS_DEST_FOLDER_OPTION_GROUP_BY_DATE 
+                            "Group files by date using the following format in destination"
+    IDS_TASK_RUNNING        "Running..."
+    IDS_RESULT_FORMAT       "%s Duration: %s. %d discovered, %d added, %d updated, %d ou-to-date. "
+    IDS_ABORTED             "Aborted."
+    IDS_COMPLETED           "Completed."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_FF_DAY              "Day of month in numeric format"
+    IDS_FF_DAY_2D           "Day of month in 2-digit numeric format"
+    IDS_FF_DAY_ALT          "Day of month using locale's alternative representation"
+    IDS_FF_WEEK_SHORT       "Abbreviated weekday name"
+    IDS_FF_WEEK_LONG        "Full weekday name"
+    IDS_FF_MONTH            "Month in numeric format"
+    IDS_FF_MONTH_2D         "Month in 2-digit numeric format"
+    IDS_FF_MONTH_SHORT      "Abbreviated month name"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_FF_MONTH_LONG       "Full month name"
+    IDS_FF_YEAR_2D          "Year in 2-digit numeric format"
+    IDS_FF_YEAR_4D          "Year in numeric format"
+    IDS_FF_YEAR_ALT         "Year in locale's alternative format"
+END
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE 9, 1
+#include "res\Replicator.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"      // Standard components
+#if !defined(_AFXDLL)
+#include "afxprint.rc"        // printing/print preview resources
+#include "afxribbon.rc"        // MFC ribbon and control bar resources
+#endif
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
