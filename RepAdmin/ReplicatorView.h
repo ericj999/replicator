@@ -25,7 +25,7 @@ public:
 
 // Operations
 public:
-	void Refresh(int taskID, bool force);
+	void Refresh(int taskID, DWORD refresh, bool force);
 // Overrides
 public:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);

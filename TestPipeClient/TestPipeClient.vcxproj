@@ -22,6 +22,7 @@
     <ProjectGuid>{E3C53ECE-B670-488C-8150-6E790823CAA5}</ProjectGuid>
     <RootNamespace>TestPipeClient</RootNamespace>
     <Keyword>MFCProj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

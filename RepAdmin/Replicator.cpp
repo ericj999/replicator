@@ -176,10 +176,6 @@ protected:
 // Implementation
 protected:
 	DECLARE_MESSAGE_MAP()
-public:
-//	afx_msg void OnUpdateTaskNew(CCmdUI *pCmdUI);
-//	afx_msg void OnUpdateTaskDelete(CCmdUI *pCmdUI);
-//	afx_msg void OnUpdateTaskRun(CCmdUI *pCmdUI);
 };
 
 CAboutDlg::CAboutDlg() : CDialogEx(CAboutDlg::IDD)
@@ -192,9 +188,6 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
-//	ON_UPDATE_COMMAND_UI(ID_TASK_NEW, &CAboutDlg::OnUpdateTaskNew)
-//	ON_UPDATE_COMMAND_UI(ID_TASK_DELETE, &CAboutDlg::OnUpdateTaskDelete)
-//	ON_UPDATE_COMMAND_UI(ID_TASK_RUN, &CAboutDlg::OnUpdateTaskRun)
 END_MESSAGE_MAP()
 
 // App command to run the dialog
@@ -235,7 +228,7 @@ void CReplicatorApp::CreateDB(const StringT& db)
 	m_database.Connect(db);
 
 	m_database.Exec("CREATE TABLE Tasks(" \
-		"TaskID INTEGER PRIMARY KEY," \
+		"TaskID INTEGER PRIMARY KEY AUTOINCREMENT," \
 		"Name TEXT NOT NULL," \
 		"CreatedTime DATETIME DEFAULT CURRENT_TIMESTAMP," \
 		"Source TEXT NOT NULL," \
@@ -265,9 +258,9 @@ void CReplicatorApp::CreateDB(const StringT& db)
 		");");
 */
 	m_database.Exec("CREATE TABLE History(" \
-		"ID INTEGER PRIMARY KEY," \
+		"rid INTEGER PRIMARY KEY AUTOINCREMENT," \
 		"TaskID INT NOT NULL," \
-		"StartedTime DATETIME NOT NULL," \
+		"StartTime DATETIME NOT NULL," \
 		"EndTime DATETIME," \
 		"Result TEXT" \
 		");");

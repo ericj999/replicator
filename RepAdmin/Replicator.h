@@ -12,6 +12,10 @@
 #include "DBDef.h"
 #include "StringT.h"
 
+#define REFRESH_GENERAL 0x01
+#define REFRESH_HISTORY 0x02
+#define REFRESH_ALL (REFRESH_GENERAL | REFRESH_HISTORY)
+
 // CReplicatorApp:
 // See Replicator.cpp for the implementation of this class
 //

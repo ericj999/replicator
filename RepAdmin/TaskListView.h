@@ -43,6 +43,7 @@ public:
 	// member functions
 	bool IsBusy() { return m_tasks.size();  }
 	BOOL IsSelectedTaskRunning();
+	void StopAllTasks();
 
 	// callback
 	static void EventCallback(CTaskListView* _This, int taskId, RunnerState state, LPCTSTR message);

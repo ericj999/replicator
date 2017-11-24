@@ -25,6 +25,9 @@
 #define REGSTR_VALUE_TOP	_T("Top")
 #define REGSTR_VALUE_BOTTOM	_T("Bottom")
 
+#define ABORT_WAIT_ELAPSE_TIME	1000	// 1 second
+#define IDT_WAIT_EXIT			1000
+
 // CMainFrame
 
 IMPLEMENT_DYNCREATE(CMainFrame, CFrameWndEx)
@@ -46,6 +49,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_WM_CLOSE()
 	ON_COMMAND(ID_TASK_STOP, &CMainFrame::OnTaskStop)
 	ON_UPDATE_COMMAND_UI(ID_TASK_STOP, &CMainFrame::OnUpdateTaskStop)
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -58,13 +62,19 @@ static UINT indicators[] =
 
 // CMainFrame construction/destruction
 
-CMainFrame::CMainFrame()
+CMainFrame::CMainFrame() :
+	m_waitDialog(NULL), m_timerId(0)
 {
 	// TODO: add member initialization code here
 }
 
 CMainFrame::~CMainFrame()
 {
+	if (m_waitDialog)
+	{
+		m_waitDialog->DestroyWindow();
+		delete m_waitDialog;
+	}
 }
 
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
@@ -260,11 +270,11 @@ void CMainFrame::OnUpdateTaskDelete(CCmdUI *pCmdUI)
 	}
 }
 
-void CMainFrame::Refresh(int taskID, bool force /*=false*/)
+void CMainFrame::Refresh(int taskID, DWORD refresh, bool force /*=false*/)
 {
 	CReplicatorView* pView = static_cast<CReplicatorView*>(m_wndSplitter.GetPane(1, 0));
 	if (pView)
-		pView->Refresh(taskID, force);
+		pView->Refresh(taskID, refresh, force);
 }
 
 
@@ -380,8 +390,18 @@ void CMainFrame::OnClose()
 				return;
 			else
 			{
-				// cancel jobs...
+				m_waitDialog = new WaitDialog(this);
 
+				EnableWindow(FALSE);
+				pView->StopAllTasks();
+
+				m_timerId = SetTimer(IDT_WAIT_EXIT, ABORT_WAIT_ELAPSE_TIME, NULL);
+				if (m_timerId)
+				{
+					m_waitDialog->Create(WaitDialog::IDD);
+					m_waitDialog->ShowWindow(SW_SHOWNORMAL);
+					return;
+				}
 			}
 		}
 	}
@@ -404,4 +424,24 @@ void CMainFrame::OnUpdateTaskStop(CCmdUI *pCmdUI)
 		CTaskListView* pView = static_cast<CTaskListView*>(m_wndSplitter.GetPane(0, 0));
 		pCmdUI->Enable((pView && pView->IsSelectedTaskRunning()) ? TRUE : FALSE);
 	}
+}
+
+
+void CMainFrame::OnTimer(UINT_PTR nIDEvent)
+{
+	if (nIDEvent == m_timerId)
+	{
+		CTaskListView* pView = static_cast<CTaskListView*>(m_wndSplitter.GetPane(0, 0));
+		if (pView)
+		{
+			if (!pView->IsBusy())
+			{
+				KillTimer(m_timerId);
+				m_timerId = 0;
+				CFrameWndEx::OnClose();
+			}
+		}
+		return;
+	}
+	CFrameWndEx::OnTimer(nIDEvent);
 }

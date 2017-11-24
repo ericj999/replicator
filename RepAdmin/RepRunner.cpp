@@ -100,14 +100,13 @@ void RepRunner::Run()
 		// discovering....
 		for (auto&& src : sources)
 		{
+			PathT srcPath{ src };
+			repSources.push_back(GetSource(srcPath, flags, matchExtension, filterRegex, fileCount));
 			if (m_abort)
 			{
 				WriteLog(Log::LogLevel::Info, _T("Replication was aborted."));
 				break;
 			}
-
-			PathT srcPath{ src };
-			repSources.push_back(GetSource(srcPath, flags, matchExtension, filterRegex, fileCount));
 		}
 
 		int updated = 0, skipped = 0, added = 0;
@@ -339,6 +338,7 @@ RepSource RepRunner::GetSource(const PathT& path, int flags, bool matchExtension
 		RecursiveDirectoryIteratorT dit(srcPath);
 		for (; dit != RecursiveDirectoryIteratorT(); ++dit)
 		{
+			if (m_abort) break;
 			AddPath(dit->path(), source, flags, matchExtension, filterRegex, fileCount);
 		}
 	}
@@ -347,6 +347,7 @@ RepSource RepRunner::GetSource(const PathT& path, int flags, bool matchExtension
 		DirectoryIteratorT dit(srcPath);
 		for (; dit != DirectoryIteratorT(); ++dit)
 		{
+			if (m_abort) break;
 			AddPath(dit->path(), source, flags, matchExtension, filterRegex, fileCount);
 		}
 	}

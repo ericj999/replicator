@@ -16,7 +16,7 @@
 
 #define HISTORY_TABLE			_T("History")
 #define HISTORY_COL_TASKID		TASKS_COL_TASKID
-#define HISTORY_COL_START_TIME	_T("StartedTime")
+#define HISTORY_COL_START_TIME	_T("StartTime")
 #define HISTORY_COL_END_TIME	_T("EndTime")
 #define HISTORY_COL_RESULT		_T("Result")
 

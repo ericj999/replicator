@@ -8,7 +8,7 @@ namespace Util
 	PathT GetConfigPath()
 	{
 		TCHAR szPath[MAX_PATH];
-		SHGetFolderPath(NULL, CSIDL_COMMON_APPDATA | CSIDL_FLAG_CREATE, NULL, 0, szPath);
+		SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA | CSIDL_FLAG_CREATE, NULL, 0, szPath);
 
 		PathT path = szPath;
 		if (!path.empty())

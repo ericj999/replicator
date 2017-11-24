@@ -89,7 +89,7 @@ CTaskListView::~CTaskListView()
 BOOL CTaskListView::PreCreateWindow(CREATESTRUCT& cs)
 {
 	cs.style &= ~(LVS_ICON | LVS_SMALLICON | LVS_LIST);
-	cs.style |= LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SINGLESEL;
+	cs.style |= LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SINGLESEL | LVS_NOSORTHEADER;
 
 	return CListView::PreCreateWindow(cs);
 }
@@ -217,7 +217,7 @@ void CTaskListView::OnLvnItemchanged(NMHDR *pNMHDR, LRESULT *pResult)
 	{
 		LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
 		CMainFrame* pMain = static_cast<CMainFrame*>(theApp.GetMainWnd());
-		pMain->Refresh(taskId);
+		pMain->Refresh(taskId, REFRESH_ALL);
 	}
 	*pResult = 0;
 }
@@ -348,7 +348,7 @@ void CTaskListView::OnTaskEdit()
 				GetListCtrl().SetItemText(item, 0, dlg.GetNewTaskName());
 
 				CMainFrame* pMain = static_cast<CMainFrame*>(theApp.GetMainWnd());
-				pMain->Refresh(taskId, true);
+				pMain->Refresh(taskId, REFRESH_GENERAL, true);
 			}
 		}
 	}
@@ -392,6 +392,9 @@ LRESULT CTaskListView::OnTaskDone(WPARAM wParam, LPARAM lParam)
 			GetListCtrl().SetItemText(item, LIST_COL_STATUS, rs->GetColumnStr(LIST_COL_STATUS).c_str());
 		}
 	}
+
+	CMainFrame* pMain = static_cast<CMainFrame*>(theApp.GetMainWnd());
+	pMain->Refresh(taskId, REFRESH_HISTORY, true);
 	return 0;
 }
 
@@ -500,8 +503,16 @@ BOOL CTaskListView::IsSelectedTaskRunning()
 	return FALSE;
 }
 
-
 void CTaskListView::OnUpdateTaskStop(CCmdUI *pCmdUI)
 {
 	pCmdUI->Enable(IsSelectedTaskRunning());
+}
+
+void CTaskListView::StopAllTasks()
+{
+	std::lock_guard<std::mutex> lock{ m_tasksLock };
+	for (auto&& it : m_tasks)
+	{
+		it.second->Abort();
+	}
 }

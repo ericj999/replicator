@@ -35,6 +35,10 @@
 #define IDR_TASK_POPUP_MENU             314
 #define IDD_ADVANCED_OPTIONS            315
 #define IDD_FOLDER_FORMATTER            317
+#define IDD_WAITING                     323
+#define IDS_HP_COL_START_TIME           400
+#define IDS_HP_COL_END_TIME             401
+#define IDS_HP_COL_RESULT               402
 #define IDC_TAB_TASK_DETAIL             1000
 #define IDS_ERROR_SAME_NAME             1000
 #define IDC_TAB_INNER                   1001
@@ -106,6 +110,8 @@
 #define IDS_FF_YEAR_2D                  2209
 #define IDS_FF_YEAR_4D                  2210
 #define IDS_FF_YEAR_ALT                 2211
+#define IDS_FF_WEEK_OF_YEAR             2212
+#define IDS_FF_WEEK_OF_YEAR_ALT         2213
 #define ID_TASK_DELETE                  32771
 #define ID_TASK_NEW                     32772
 #define ID_Menu                         32773
@@ -121,7 +127,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        323
+#define _APS_NEXT_RESOURCE_VALUE        325
 #define _APS_NEXT_COMMAND_VALUE         32781
 #define _APS_NEXT_CONTROL_VALUE         1042
 #define _APS_NEXT_SYMED_VALUE           313

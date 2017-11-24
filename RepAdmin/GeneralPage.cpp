@@ -62,7 +62,7 @@ END_MESSAGE_MAP()
 // CGeneralPage message handlers
 void CGeneralPage::Refresh(int newTask, bool force)
 {
-	if ((newTask != m_CurrentTask) || force)
+	if ((newTask != m_CurrentTask) || (force && (newTask != m_CurrentTask)))
 	{
 		CString str;
 		if (newTask > 0)

@@ -215,8 +215,7 @@ IDD_HISTORYPAGE DIALOGEX 0, 0, 409, 249
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD | WS_DISABLED | WS_SYSMENU
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "History",IDC_STATIC,179,119,24,8
-    LISTBOX         IDC_HISTORY_LIST,7,7,395,235,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "",IDC_HISTORY_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | LVS_OWNERDATA | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,7,395,235
 END
 
 IDD_NEW_TASK DIALOGEX 0, 0, 357, 184
@@ -287,6 +286,13 @@ BEGIN
     CONTROL         "",IDC_AF_MACROS,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,42,306,154
     PUSHBUTTON      "&Insert",IDC_AF_INSERT,316,41,44,14,WS_DISABLED
     LTEXT           "Note: '/' and '\\' are used as folder separators.",IDC_STATIC,7,200,306,11
+END
+
+IDD_WAITING DIALOGEX 0, 0, 153, 37
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP
+FONT 10, "Microsoft Sans Serif", 400, 0, 0x0
+BEGIN
+    CTEXT           "Waiting...",IDC_STATIC,7,12,139,8
 END
 
 
@@ -395,6 +401,14 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 210
     END
+
+    IDD_WAITING, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 146
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 30
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -425,6 +439,11 @@ BEGIN
 END
 
 IDD_HISTORYPAGE AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_WAITING AFX_DIALOG_LAYOUT
 BEGIN
     0
 END
@@ -576,7 +595,7 @@ BEGIN
     IDS_DEST_FOLDER_OPTION_GROUP_BY_DATE 
                             "Group files by date using the following format in destination"
     IDS_TASK_RUNNING        "Running..."
-    IDS_RESULT_FORMAT       "%s Duration: %s. %d discovered, %d added, %d updated, %d ou-to-date. "
+    IDS_RESULT_FORMAT       "%s Duration: %s. %d discovered, %d added, %d updated, %d up-to-date. "
     IDS_ABORTED             "Aborted."
     IDS_COMPLETED           "Completed."
 END
@@ -599,6 +618,15 @@ BEGIN
     IDS_FF_YEAR_2D          "Year in 2-digit numeric format"
     IDS_FF_YEAR_4D          "Year in numeric format"
     IDS_FF_YEAR_ALT         "Year in locale's alternative format"
+    IDS_FF_WEEK_OF_YEAR     "Week of year in 2-digit numeric format"
+    IDS_FF_WEEK_OF_YEAR_ALT "Week of year in locale's format"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_HP_COL_START_TIME   "Start"
+    IDS_HP_COL_END_TIME     "End"
+    IDS_HP_COL_RESULT       "Result"
 END
 
 #endif    // English (United States) resources

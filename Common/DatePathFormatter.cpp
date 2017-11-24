@@ -35,16 +35,19 @@ void DatePathFormatter::SetFormat(const StringT& format)
 		posCurrent = pos + STR_MACRO_LEFT.length();
 
 		std::string::size_type posR = format.find(STR_MACRO_RIGHT, posCurrent);
-		if (posR == std::string::npos)
+		if (posR != std::string::npos)
 		{
-			throw std::runtime_error("Invalid format string.");
+			m_funcs.push_back(std::bind(&DatePathFormatter::GetTimeFormatedString, this,
+				GetMacroFormatTemplate(format.substr(posCurrent, posR - posCurrent)), std::placeholders::_1));
+
+			posCurrent = posR + STR_MACRO_RIGHT.length();
+			pos = format.find(STR_MACRO_LEFT, posCurrent);
 		}
-
-		m_funcs.push_back(std::bind(&DatePathFormatter::GetTimeFormatedString, this,
-			GetMacroFormatTemplate(format.substr(posCurrent, posR - posCurrent)), std::placeholders::_1));
-
-		posCurrent = posR + STR_MACRO_RIGHT.length();
-		pos = format.find(STR_MACRO_LEFT, posCurrent);
+		else
+		{
+			posCurrent -= STR_MACRO_LEFT.length();
+			break;
+		}
 	}
 
 	if (posCurrent < format.length())
@@ -77,6 +80,8 @@ const StringT DatePathFormatter::GetMacroFormatTemplate(const StringT& macro)
 		(macro.compare(STR_FF_DAY_ALT) == 0) ? _T("%Ed") :
 		(macro.compare(STR_FF_WEEK_SHORT) == 0) ? _T("%a") :
 		(macro.compare(STR_FF_WEEK_LONG) == 0) ? _T("%A") : 
+		(macro.compare(STR_FF_WEEK_OF_YEAR) == 0) ? _T("%U") :
+		(macro.compare(STR_FF_WEEK_OF_YEAR_ALT) == 0) ? _T("%OU") :
 		(macro.compare(STR_FF_MONTH_2D) == 0) ? _T("%m") :
 		(macro.compare(STR_FF_MONTH_SHORT) == 0) ? _T("%b") : 
 		(macro.compare(STR_FF_MONTH_LONG) == 0) ? _T("%B") : 

@@ -139,10 +139,24 @@ void CReplicatorView::OnSize(UINT nType, int cx, int cy)
 
 	if (m_tab.GetSafeHwnd())
 	{
-		CRect rc;
+		CRect rect;
 
-		GetClientRect(&rc);
-		m_tab.SetWindowPos(NULL, 0, 0, rc.Width(), rc.Height(), SWP_NOMOVE | SWP_NOZORDER);
+		GetClientRect(&rect);
+		m_tab.MoveWindow(&rect, TRUE);
+		m_tab.AdjustRect(FALSE, &rect);
+
+		if (m_pageHistory.GetSafeHwnd())
+		{
+			CRect rc;
+			CWnd* ph = GetDlgItem(IDC_TAB_INNER);
+			ph->GetWindowRect(&rc);
+
+			ClientToScreen(&rect);
+			int cx = rc.left - rect.left;
+
+			rect.DeflateRect(cx, cx);
+			m_pageHistory.SetWindowPos(NULL, 0, 0, rect.Width(), rect.Height(), SWP_NOZORDER | SWP_NOMOVE);
+		}
 	}
 }
 
@@ -166,7 +180,8 @@ void CReplicatorView::OnSelchangeTabTaskDetail(NMHDR *pNMHDR, LRESULT *pResult)
 	*pResult = 0;
 }
 
-void CReplicatorView::Refresh(int taskID, bool force)
+void CReplicatorView::Refresh(int taskID, DWORD refresh, bool force)
 {
-	m_pageGeneral.Refresh(taskID, force);
+	if(refresh & REFRESH_GENERAL) m_pageGeneral.Refresh(taskID, force);
+	if(refresh & REFRESH_HISTORY) m_pageHistory.Refresh(taskID, force);
 }

@@ -3,6 +3,7 @@
 //
 
 #pragma once
+#include "WaitDialog.h"
 
 class CReplicatorView;
 
@@ -20,7 +21,7 @@ public:
 
 // Operations
 public:
-	void Refresh(int taskID, bool force = false);
+	void Refresh(int taskID, DWORD refresh, bool force = false);
 	void LoadSettings();
 	void SaveSettings();
 
@@ -46,6 +47,9 @@ protected:  // control bar embedded members
 	CMFCStatusBar     m_wndStatusBar;
 	CMFCToolBarImages m_UserImages;
 
+	WaitDialog* m_waitDialog;
+	INT_PTR m_timerId;
+
 // Generated message map functions
 protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
@@ -63,6 +67,7 @@ public:
 	afx_msg void OnClose();
 	afx_msg void OnTaskStop();
 	afx_msg void OnUpdateTaskStop(CCmdUI *pCmdUI);
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };
 
 
