@@ -14,10 +14,17 @@
 #include <iostream>
 #include "util.h"
 #include "CRepCommandLineInfo.h"
+#include "Table.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+
+#define REGSTR_KEY_CONFIG_ROOT		_T("SOFTWARE\\Replicator\\Config")
+#define REGSTR_VALUE_HISTORY_DAYS	_T("HistoryDays")
+#define REGSTR_VALUE_SETTING_FLAGS	_T("Flags")
+
+#define STR_LOG_FILENAME			_T("Replicator.log")
 
 // CReplicatorApp
 
@@ -30,7 +37,8 @@ END_MESSAGE_MAP()
 // CReplicatorApp construction
 
 CReplicatorApp::CReplicatorApp() :
-	m_verbose{ false }, m_testRun{ false }
+	m_verbose{ false }, m_testRun{ false }, m_historyDays{ DEFAULT_HISTORY_DAYS },
+	m_settingFlags{ 0 }
 {
 	m_bHiColorIcons = TRUE;
 
@@ -63,11 +71,18 @@ BOOL CReplicatorApp::InitInstance()
 
 	CWinAppEx::InitInstance();
 
+	PathT logPath = Util::GetConfigPath();
+	logPath /= STR_LOG_FILENAME;
+
+	m_log.setPath(logPath);
+	m_log.info(_T("Program started."));
+
 
 	// Initialize OLE libraries
 	if (!AfxOleInit())
 	{
 		AfxMessageBox(IDP_OLE_INIT_FAILED);
+		m_log.error(_T("Failed to initialize COM."));
 		return FALSE;
 	}
 
@@ -86,6 +101,7 @@ BOOL CReplicatorApp::InitInstance()
 	// TODO: You should modify this string to be something appropriate
 	// such as the name of your company or organization
 	SetRegistryKey(_T("Replicator"));
+	ReadConfig();
 
 	InitContextMenuManager();
 
@@ -107,9 +123,12 @@ BOOL CReplicatorApp::InitInstance()
 			m_database.Connect(dbPath.wstring());
 		else
 			CreateDB(dbPath.wstring());
+
+		MaintainDB();
 	}
 	catch (std::exception e)
 	{
+		m_log.error(_T("Failed to connect to the database!"));
 		return FALSE;
 	}
 
@@ -146,6 +165,7 @@ BOOL CReplicatorApp::InitInstance()
 	m_pMainWnd->ShowWindow(SW_SHOW);
 	m_pMainWnd->UpdateWindow();
 
+	m_log.info(_T("Initializing instance completed"));
 	return TRUE;
 }
 
@@ -153,7 +173,7 @@ int CReplicatorApp::ExitInstance()
 {
 	//TODO: handle additional resources you may have added
 	AfxOleTerm(FALSE);
-
+	m_log.info(_T("Exit instance."));
 	return CWinAppEx::ExitInstance();
 }
 
@@ -227,6 +247,8 @@ void CReplicatorApp::CreateDB(const StringT& db)
 {
 	m_database.Connect(db);
 
+//	m_database.Exec("PRAGMA auto_vacuum=1;");
+
 	m_database.Exec("CREATE TABLE Tasks(" \
 		"TaskID INTEGER PRIMARY KEY AUTOINCREMENT," \
 		"Name TEXT NOT NULL," \
@@ -284,3 +306,72 @@ void CReplicatorApp::WriteLog(int taskID, LogLevel level, const StringT& msg)
 	}
 }
 */
+
+void CReplicatorApp::MaintainDB()
+{
+	Database::Table history{ GetDB() , HISTORY_TABLE };
+	if (m_settingFlags & SETTINGFLAGS_DELETE_OLDER_HISTORY)
+	{
+		StringStreamT condition;
+		
+		condition << HISTORY_COL_START_TIME << " < date('now', '-" << m_historyDays << " day')";
+
+		m_log.info(StringT(_T("Deleting history older than ")) + ToStringT(m_historyDays) + StringT(_T(" day(s)")));
+		history.Delete(condition.str());
+		m_log.info(_T("Done deleting old history"));
+	}
+}
+
+
+void CReplicatorApp::ReadConfig()
+{
+	CRegKey regKey;
+
+	if (regKey.Create(HKEY_CURRENT_USER, REGSTR_KEY_CONFIG_ROOT) == ERROR_SUCCESS)
+	{
+		DWORD days = DEFAULT_HISTORY_DAYS;
+		if ((regKey.QueryDWORDValue(REGSTR_VALUE_HISTORY_DAYS, days) == ERROR_SUCCESS) &&
+			(days >= HISTORY_DAYS_MIN) && (days <= HISTORY_DAYS_MAX))
+		{
+			m_historyDays = static_cast<int>(days);
+		}
+
+		DWORD flags = 0;
+		if (regKey.QueryDWORDValue(REGSTR_VALUE_SETTING_FLAGS, flags) == ERROR_SUCCESS)
+			m_settingFlags = flags;
+	}
+}
+
+void CReplicatorApp::setHistoryDays(int days)
+{
+	if (m_historyDays != days)
+	{
+		CRegKey regKey;
+
+		if (regKey.Create(HKEY_CURRENT_USER, REGSTR_KEY_CONFIG_ROOT) == ERROR_SUCCESS)
+		{
+			m_historyDays = days;
+			if (regKey.SetDWORDValue(REGSTR_VALUE_HISTORY_DAYS, m_historyDays) != ERROR_SUCCESS)
+			{
+				m_log.error(StringT(_T("Failed to update history registry setting. Code:")) + ToStringT(GetLastError()));
+			}
+		}
+	}
+}
+
+void CReplicatorApp::setSettingFlags(DWORD flags)
+{
+	if (m_settingFlags != flags)
+	{
+		CRegKey regKey;
+
+		if (regKey.Create(HKEY_CURRENT_USER, REGSTR_KEY_CONFIG_ROOT) == ERROR_SUCCESS)
+		{
+			m_settingFlags = flags;
+			if (regKey.SetDWORDValue(REGSTR_VALUE_SETTING_FLAGS, m_settingFlags) != ERROR_SUCCESS)
+			{
+				m_log.error(StringT(_T("Failed to update settings registry. Code:")) + ToStringT(GetLastError()));
+			}
+		}
+	}
+}

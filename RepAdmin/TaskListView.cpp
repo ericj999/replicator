@@ -268,6 +268,8 @@ void CTaskListView::OnTaskRun()
 		int item = GetListCtrl().GetNextSelectedItem(pos);
 		int taskId = static_cast<int>(GetListCtrl().GetItemData(item));
 
+		theApp.getLog().info(StringT(_T("Run task ")) + ToStringT(taskId));
+
 		CString state;
 		state.LoadString(IDS_TASK_RUNNING);
 		GetListCtrl().SetItemText(item, LIST_COL_LAST_RUN, state);
@@ -290,13 +292,16 @@ void CTaskListView::OnTaskDelete()
 	if (pos)
 	{
 		int item = GetListCtrl().GetNextSelectedItem(pos);
+		int taskId = static_cast<int>(GetListCtrl().GetItemData(item));
 
 		if (AfxMessageBox(IDS_DELETE_CONFIRMATION, MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2) == IDYES)
 		{
 			Database::Table tb{ theApp.GetDB(), TASKS_TABLE };
-			StringT condition = _T("TaskID=") + ToStringT(GetListCtrl().GetItemData(item));
+			StringT condition = _T("TaskID=") + ToStringT(taskId);
 			try
 			{
+				theApp.getLog().info(StringT(_T("Delete task ")) + ToStringT(taskId));
+
 				tb.Delete(condition);
 				GetListCtrl().DeleteItem(item);
 			}
@@ -331,6 +336,8 @@ void CTaskListView::OnTaskEdit()
 	{
 		int item = GetListCtrl().GetNextSelectedItem(pos);
 		int taskId = static_cast<int>(GetListCtrl().GetItemData(item));
+
+		theApp.getLog().info(StringT(_T("Edit task ")) + ToStringT(taskId));
 
 		Database::Table tb{ theApp.GetDB(), TASKS_TABLE };
 		StringT condition = _T("TaskID=") + ToStringT(taskId);
@@ -485,7 +492,10 @@ void CTaskListView::OnTaskStop()
 			std::lock_guard<std::mutex> lock{ m_tasksLock };
 			auto it = m_tasks.find(taskId);
 			if (it != m_tasks.end())
+			{
 				it->second->Abort();
+				theApp.getLog().info(StringT(_T("Abort task ")) + ToStringT(taskId));
+			}
 		}
 	}
 }
@@ -510,6 +520,7 @@ void CTaskListView::OnUpdateTaskStop(CCmdUI *pCmdUI)
 
 void CTaskListView::StopAllTasks()
 {
+	theApp.getLog().info(_T("Stop all tasks."));
 	std::lock_guard<std::mutex> lock{ m_tasksLock };
 	for (auto&& it : m_tasks)
 	{

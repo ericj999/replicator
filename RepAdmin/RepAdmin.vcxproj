@@ -217,6 +217,7 @@
     <ClInclude Include="NewTaskDialog.h" />
     <ClInclude Include="RepRunner.h" />
     <ClInclude Include="RepSource.h" />
+    <ClInclude Include="SettingsDialog.h" />
     <ClInclude Include="Task.h" />
     <ClInclude Include="TaskListView.h" />
     <ClInclude Include="MainFrm.h" />
@@ -238,6 +239,7 @@
     <ClCompile Include="NewTaskDialog.cpp" />
     <ClCompile Include="RepRunner.cpp" />
     <ClCompile Include="RepSource.cpp" />
+    <ClCompile Include="SettingsDialog.cpp" />
     <ClCompile Include="TaskListView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="stdafx.cpp">

@@ -31,6 +31,11 @@ namespace Log
 		void setLevel(LogLevel level) { m_logLevel = level; }
 
 		// methods
+		void info(const StringT& msg) { Write(LogLevel::Info, msg); }
+		void error(const StringT& msg) { Write(LogLevel::Error, msg); }
+		void warn(const StringT& msg) { Write(LogLevel::Warning, msg); }
+		void verbose(const StringT& msg) { Write(LogLevel::Verbose, msg); }
+
 		void Write(LogLevel level, const StringT& msg);
 //		void Roll(bool force = false);
 		void Roll();

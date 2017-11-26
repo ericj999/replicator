@@ -36,6 +36,7 @@
 #define IDD_ADVANCED_OPTIONS            315
 #define IDD_FOLDER_FORMATTER            317
 #define IDD_WAITING                     323
+#define IDD_SETTINGS                    325
 #define IDS_HP_COL_START_TIME           400
 #define IDS_HP_COL_END_TIME             401
 #define IDS_HP_COL_RESULT               402
@@ -81,6 +82,8 @@
 #define IDC_DESTINATION_SAME_FROM_ROOT  1040
 #define IDC_LIST1                       1041
 #define IDC_HISTORY_LIST                1041
+#define IDC_EDIT_HISTORY_DAYS           1042
+#define IDC_REMOVE_OLDER_HISTORY        1043
 #define IDS_TASK_INFO_TEMPLATE          2000
 #define IDS_CHILD_FOLDER                2001
 #define IDS_ALL_FILES                   2002
@@ -119,6 +122,7 @@
 #define ID_TASK_UPDATE                  32777
 #define ID_TASK_EDIT                    32778
 #define ID_TASK_STOP                    32780
+#define ID_TOOLS_SETTINGS               32781
 #define IDS_DELETE_CONFIRMATION         57346
 #define IDS_INVALID_TASKID              57347
 #define IDS_STOP_CONFIRMATION           57348
@@ -127,9 +131,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        325
-#define _APS_NEXT_COMMAND_VALUE         32781
-#define _APS_NEXT_CONTROL_VALUE         1042
+#define _APS_NEXT_RESOURCE_VALUE        327
+#define _APS_NEXT_COMMAND_VALUE         32782
+#define _APS_NEXT_CONTROL_VALUE         1044
 #define _APS_NEXT_SYMED_VALUE           313
 #endif
 #endif

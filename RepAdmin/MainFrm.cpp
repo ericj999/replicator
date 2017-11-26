@@ -15,6 +15,8 @@
 #include "Table.h"
 #include "Property.h"
 
+#include "SettingsDialog.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -27,6 +29,7 @@
 
 #define ABORT_WAIT_ELAPSE_TIME	1000	// 1 second
 #define IDT_WAIT_EXIT			1000
+#define WAIT_EXIT_COUNTER		60		// 60 seconds
 
 // CMainFrame
 
@@ -50,6 +53,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_COMMAND(ID_TASK_STOP, &CMainFrame::OnTaskStop)
 	ON_UPDATE_COMMAND_UI(ID_TASK_STOP, &CMainFrame::OnUpdateTaskStop)
 	ON_WM_TIMER()
+	ON_COMMAND(ID_TOOLS_SETTINGS, &CMainFrame::OnToolsSettings)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -63,7 +67,7 @@ static UINT indicators[] =
 // CMainFrame construction/destruction
 
 CMainFrame::CMainFrame() :
-	m_waitDialog(NULL), m_timerId(0)
+	m_waitDialog(NULL), m_timerId(0), m_waitExitCounter(0)
 {
 	// TODO: add member initialization code here
 }
@@ -398,6 +402,7 @@ void CMainFrame::OnClose()
 				m_timerId = SetTimer(IDT_WAIT_EXIT, ABORT_WAIT_ELAPSE_TIME, NULL);
 				if (m_timerId)
 				{
+					m_waitExitCounter = 0;
 					m_waitDialog->Create(WaitDialog::IDD);
 					m_waitDialog->ShowWindow(SW_SHOWNORMAL);
 					return;
@@ -431,17 +436,31 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 {
 	if (nIDEvent == m_timerId)
 	{
+		++m_waitExitCounter;
 		CTaskListView* pView = static_cast<CTaskListView*>(m_wndSplitter.GetPane(0, 0));
-		if (pView)
+		bool busy = (pView && pView->IsBusy()) ? true : false;
+		if(!busy || (m_waitExitCounter > WAIT_EXIT_COUNTER))
 		{
-			if (!pView->IsBusy())
-			{
-				KillTimer(m_timerId);
-				m_timerId = 0;
-				CFrameWndEx::OnClose();
-			}
+			KillTimer(m_timerId);
+			m_timerId = 0;
+			CFrameWndEx::OnClose();
 		}
 		return;
 	}
 	CFrameWndEx::OnTimer(nIDEvent);
+}
+
+
+void CMainFrame::OnToolsSettings()
+{
+	SettingsDialog dialog(this);
+
+	dialog.m_historyDays = theApp.getHistoryDays();
+	dialog.m_flags = theApp.getSettingFlags();
+
+	if (dialog.DoModal() == IDOK)
+	{
+		theApp.setHistoryDays(dialog.m_historyDays);
+		theApp.setSettingFlags(dialog.m_flags);
+	}
 }

@@ -135,6 +135,10 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "E&xit",                       ID_APP_EXIT
     END
+    POPUP "T&ools"
+    BEGIN
+        MENUITEM "&Settings...",                ID_TOOLS_SETTINGS
+    END
     POPUP "&Help"
     BEGIN
         MENUITEM "&About Replicator...",        ID_APP_ABOUT
@@ -234,21 +238,21 @@ BEGIN
     EDITTEXT        IDC_NEW_TASK_DESTINATION,7,100,316,14,ES_AUTOHSCROLL
     PUSHBUTTON      "...",IDC_NEW_TASK_BROWSE_DEST,325,100,25,14
     CONTROL         "Include &sub-folders",IDC_NEW_TASK_INCLUDE_SUB,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,136,81,10
-    PUSHBUTTON      "&Create",IDC_NEW_TASK_CREATE,126,163,50,14,WS_DISABLED
-    PUSHBUTTON      "Cancel",IDCANCEL,180,163,50,14
+    PUSHBUTTON      "&Create",IDC_NEW_TASK_CREATE,248,163,50,14,WS_DISABLED
+    PUSHBUTTON      "Cancel",IDCANCEL,301,163,50,14
     LTEXT           "Options",IDC_STATIC,7,121,26,8
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,38,126,312,1
     PUSHBUTTON      "Advanced options",IDC_NEW_TASK_ADV_OPTIONS,264,133,86,14
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,8,155,342,1
 END
 
-IDD_ADVANCED_OPTIONS DIALOGEX 0, 0, 306, 228
+IDD_ADVANCED_OPTIONS DIALOGEX 0, 0, 306, 232
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Advanced Options"
 FONT 10, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    LTEXT           "Files",IDC_STATIC,8,5,18,8
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,28,9,272,1
+    LTEXT           "Files",IDC_STATIC,5,5,18,8
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,25,9,275,1
     CONTROL         "&All files",IDC_NEW_TASK_ALL_FILES,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,11,17,33,8
     CONTROL         "&Include the following file types",IDC_NEW_TASK_INCLUSION,
                     "Button",BS_AUTORADIOBUTTON,11,30,115,8
@@ -256,8 +260,8 @@ BEGIN
                     "Button",BS_AUTORADIOBUTTON,11,43,119,8
     EDITTEXT        IDC_AO_FILTERS,18,55,282,12,ES_AUTOHSCROLL | WS_GROUP
     LTEXT           "( Specify one or more file extensions to be included or excluded; separate with semi-colons if more than one. ex. jpg;bmp )",IDC_NEW_TASK_FILTERS_INFO,18,70,282,17
-    LTEXT           "Destination Folders",IDC_STATIC,8,90,38,8
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,49,94,252,1
+    LTEXT           "Destination Folders",IDC_STATIC,5,90,38,8
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,45,94,256,1
     CONTROL         "&Use same folder structure starting from the selected source folder",IDC_DESTINATION_SAME_FROM_SELECT,
                     "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,11,104,235,8
     CONTROL         "Use &same folder structure starting from the root of the selected source folder",IDC_DESTINATION_SAME_FROM_ROOT,
@@ -269,23 +273,24 @@ BEGIN
     LTEXT           "( Example: Specify $(YYYY)\\$(MMMM) to group the files created in Janurary 2017  into <destination folder>\\2017\\Janurary )",IDC_AO_DESTINATION_FORMAT_EXAMPLE,19,160,280,16
     LTEXT           "&Choose action when file already exists in destination folder",IDC_ACTION_TEXT,18,180,213,8
     COMBOBOX        IDC_AO_UPDATE_OPTION,18,192,282,62,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    DEFPUSHBUTTON   "OK",IDOK,108,211,43,12
-    PUSHBUTTON      "Cancel",IDCANCEL,155,211,43,12
+    DEFPUSHBUTTON   "OK",IDOK,213,214,43,12
+    PUSHBUTTON      "Cancel",IDCANCEL,258,214,43,12
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,5,210,296,1
 END
 
-IDD_FOLDER_FORMATTER DIALOGEX 0, 0, 367, 217
+IDD_FOLDER_FORMATTER DIALOGEX 0, 0, 319, 245
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Format"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,316,7,44,14
-    PUSHBUTTON      "Cancel",IDCANCEL,316,24,44,14
-    EDITTEXT        IDC_AF_FORMAT,7,7,306,14,ES_AUTOHSCROLL | ES_NOHIDESEL
+    DEFPUSHBUTTON   "OK",IDOK,222,224,44,14
+    PUSHBUTTON      "Cancel",IDCANCEL,269,224,44,14
+    EDITTEXT        IDC_AF_FORMAT,7,7,259,14,ES_AUTOHSCROLL | ES_NOHIDESEL
     LTEXT           "Static",IDC_AF_FORMAT_EXAMPLE,45,27,266,8
     LTEXT           "Example:",IDC_STATIC,7,27,30,8
-    CONTROL         "",IDC_AF_MACROS,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,42,306,154
-    PUSHBUTTON      "&Insert",IDC_AF_INSERT,316,41,44,14,WS_DISABLED
-    LTEXT           "Note: '/' and '\\' are used as folder separators.",IDC_STATIC,7,200,306,11
+    CONTROL         "",IDC_AF_MACROS,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,42,305,154
+    PUSHBUTTON      "&Insert",IDC_AF_INSERT,269,7,44,14,WS_DISABLED
+    LTEXT           "Select the macro from the list to insert the macro at the cursor position of the format string in the edit box. Use '\\' as the folder separator.",IDC_STATIC,7,200,305,20
 END
 
 IDD_WAITING DIALOGEX 0, 0, 153, 37
@@ -293,6 +298,21 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP
 FONT 10, "Microsoft Sans Serif", 400, 0, 0x0
 BEGIN
     CTEXT           "Waiting...",IDC_STATIC,7,12,139,8
+END
+
+IDD_SETTINGS DIALOGEX 0, 0, 255, 98
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Settings"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,146,77,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,199,77,50,14
+    EDITTEXT        IDC_EDIT_HISTORY_DAYS,123,19,26,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "days",IDC_STATIC,154,21,16,8
+    LTEXT           "History",IDC_STATIC,7,7,24,8
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,36,11,212,1
+    CONTROL         "&Remove history older than",IDC_REMOVE_OLDER_HISTORY,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,23,21,98,10
 END
 
 
@@ -391,15 +411,17 @@ BEGIN
 
     IDD_ADVANCED_OPTIONS, DIALOG
     BEGIN
-        BOTTOMMARGIN, 213
+        LEFTMARGIN, 5
+        RIGHTMARGIN, 301
+        BOTTOMMARGIN, 226
     END
 
     IDD_FOLDER_FORMATTER, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 360
+        RIGHTMARGIN, 312
         TOPMARGIN, 7
-        BOTTOMMARGIN, 210
+        BOTTOMMARGIN, 238
     END
 
     IDD_WAITING, DIALOG
@@ -408,6 +430,14 @@ BEGIN
         RIGHTMARGIN, 146
         TOPMARGIN, 7
         BOTTOMMARGIN, 30
+    END
+
+    IDD_SETTINGS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 248
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 91
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -444,6 +474,11 @@ BEGIN
 END
 
 IDD_WAITING AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_SETTINGS AFX_DIALOG_LAYOUT
 BEGIN
     0
 END
@@ -548,6 +583,7 @@ BEGIN
     ID_TASK_RUN             "Run the selected task\nRun"
     ID_TASK_EDIT            "Configure the selected task\nEdit"
     ID_TASK_STOP            "Stop the selected task\nStop"
+    ID_TOOLS_SETTINGS       "Configure program settings...\nSettings"
 END
 
 STRINGTABLE

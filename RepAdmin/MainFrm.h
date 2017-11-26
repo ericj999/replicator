@@ -49,6 +49,7 @@ protected:  // control bar embedded members
 
 	WaitDialog* m_waitDialog;
 	INT_PTR m_timerId;
+	int m_waitExitCounter;
 
 // Generated message map functions
 protected:
@@ -68,6 +69,7 @@ public:
 	afx_msg void OnTaskStop();
 	afx_msg void OnUpdateTaskStop(CCmdUI *pCmdUI);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg void OnToolsSettings();
 };
 
 

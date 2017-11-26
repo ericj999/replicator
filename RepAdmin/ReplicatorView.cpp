@@ -66,6 +66,7 @@ BOOL CReplicatorView::PreCreateWindow(CREATESTRUCT& cs)
 void CReplicatorView::OnInitialUpdate()
 {
 	CFormView::OnInitialUpdate();
+//	EnableScrollBarCtrl(SB_BOTH, FALSE);
 	GetParentFrame()->RecalcLayout();
 	ResizeParentToFit();
 
@@ -145,18 +146,20 @@ void CReplicatorView::OnSize(UINT nType, int cx, int cy)
 		m_tab.MoveWindow(&rect, TRUE);
 		m_tab.AdjustRect(FALSE, &rect);
 
+		CRect rc;
+		CWnd* ph = GetDlgItem(IDC_TAB_INNER);
+		ph->GetWindowRect(&rc);
+
+		ClientToScreen(&rect);
+		int cx = rc.left - rect.left;
+
+		rect.DeflateRect(cx, cx);
+
+		if (m_pageGeneral.GetSafeHwnd())
+			m_pageGeneral.SetWindowPos(NULL, 0, 0, rect.Width(), rect.Height(), SWP_NOZORDER | SWP_NOMOVE);
+
 		if (m_pageHistory.GetSafeHwnd())
-		{
-			CRect rc;
-			CWnd* ph = GetDlgItem(IDC_TAB_INNER);
-			ph->GetWindowRect(&rc);
-
-			ClientToScreen(&rect);
-			int cx = rc.left - rect.left;
-
-			rect.DeflateRect(cx, cx);
 			m_pageHistory.SetWindowPos(NULL, 0, 0, rect.Width(), rect.Height(), SWP_NOZORDER | SWP_NOMOVE);
-		}
 	}
 }
 
