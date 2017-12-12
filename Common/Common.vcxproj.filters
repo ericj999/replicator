@@ -72,6 +72,18 @@
     <ClInclude Include="MD5Hash.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ComInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ComMemObj.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellFolder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileTime.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -117,6 +129,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MD5Hash.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ComInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellFolder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileTime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

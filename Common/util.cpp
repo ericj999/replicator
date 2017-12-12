@@ -5,6 +5,8 @@
 
 namespace Util
 {
+#define BUFSIZE (16 * 1024)
+
 	PathT GetConfigPath()
 	{
 		TCHAR szPath[MAX_PATH];
@@ -15,8 +17,8 @@ namespace Util
 		{
 			path /= STR_PRODUCT_NAME;
 
-			if (!std::tr2::sys::exists(path))
-				std::tr2::sys::create_directories(path);
+			if (!std::experimental::filesystem::exists(path))
+				std::experimental::filesystem::create_directories(path);
 		}
 		else
 		{
@@ -141,5 +143,67 @@ namespace Util
 			iRet = static_cast<int>(GetLastError());
 		}
 		return iRet;
+	}
+
+	bool CopyStreamToFile(ShellWrapper::ShellItem& shellItem, const std::wstring& dest)
+	{
+		bool ret = false;
+		HRESULT hr = E_FAIL;
+		BYTE rgbFile[BUFSIZE];
+		DWORD cbRead = 0;
+
+		HANDLE hFile = CreateFile(dest.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+
+		if (hFile != INVALID_HANDLE_VALUE)
+		{
+			try
+			{
+				ShellWrapper::BindCtx bindCtx{ STGM_READ | STGM_SHARE_DENY_NONE };
+				ShellWrapper::Stream stream;
+
+				if (SUCCEEDED(hr = shellItem->BindToHandler(bindCtx.Get(), BHID_Stream, IID_IStream, (void**)&stream)))
+				{
+					ret = true;
+					while (SUCCEEDED(hr = stream->Read(rgbFile, BUFSIZE, &cbRead)))
+					{
+						DWORD written = 0;
+						if (cbRead == 0)
+							break;
+
+						if (!WriteFile(hFile, rgbFile, cbRead, &written, NULL) || (cbRead != written))
+						{
+							ret = false;
+							break;
+						}
+
+						if (hr == S_FALSE)
+							break;
+					}
+				}
+			}
+			catch (...)
+			{
+				ret = false;
+			}
+			if (ret)
+			{
+				FILETIME createTime, accessTime, writeTime;
+
+				FILETIME* pWriteTime = SUCCEEDED(shellItem->GetFileTime(PKEY_DateModified, &writeTime)) ? &writeTime : nullptr;
+				FILETIME* pCreateTime = SUCCEEDED(shellItem->GetFileTime(PKEY_DateCreated, &createTime)) ? &createTime : pWriteTime;
+				FILETIME* pAccessTime = SUCCEEDED(shellItem->GetFileTime(PKEY_DateAccessed, &accessTime)) ? &accessTime : pWriteTime;
+
+				if (pWriteTime)
+				{
+					if (!SetFileTime(hFile, pCreateTime, pAccessTime, pWriteTime))
+					{
+						DWORD err = GetLastError();
+
+					}
+				}
+			}
+			CloseHandle(hFile);
+		}
+		return ret;
 	}
 }

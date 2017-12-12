@@ -283,6 +283,7 @@ void CTaskListView::OnTaskRun()
 
 		m_tasks.insert(std::pair<int, std::shared_ptr<RepRunner>>( taskId, runner));
 		runner->AsyncRun();
+//		runner->Run();
 	}
 }
 
@@ -323,6 +324,7 @@ struct tagEditColumnDef
 	{ TASKS_COL_TASKID, Database::PT_INT64 },
 	{ TASKS_COL_NAME, Database::PT_TEXT },
 	{ TASKS_COL_SOURCE, Database::PT_TEXT },
+	{ TASKS_COL_SOURCE_PARSING, Database::PT_TEXT },
 	{ TASKS_COL_DESTINATION, Database::PT_TEXT },
 	{ TASKS_COL_FLASGS, Database::PT_INT },
 	{ TASKS_COL_FILTERS, Database::PT_TEXT },

@@ -100,12 +100,23 @@ namespace String
 	StringT StringToStringT(const std::string& str)
 	{
 		size_t size;
-		mbstowcs_s(&size, nullptr, 0, str.c_str(), str.length());
+		mbstowcs_s(&size, nullptr, 0, str.c_str(), 0);
 		wchar_t* wcs = new wchar_t[size + 1];
-		mbstowcs_s(&size, wcs, size, str.c_str(), str.length());
+		mbstowcs_s(&size, wcs, size + 1, str.c_str(), size);
 		StringT wstr{ wcs };
 		delete[] wcs;
 		return wstr;
+	}
+
+	std::string StringTToString(const StringT& str)
+	{
+		size_t size;
+		wcstombs_s(&size, nullptr, 0, str.c_str(), 0);
+		char* mbcs = new char[size + 1];
+		wcstombs_s(&size, mbcs, size + 1, str.c_str(), size);
+		std::string mbcsstr{ mbcs };
+		delete[] mbcs;
+		return mbcsstr;
 	}
 #endif
 }

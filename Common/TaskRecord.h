@@ -18,6 +18,7 @@ public:
 	int getTaskID() { return m_taskID; }
 	const StringT& getName() { return m_name;  }
 	const StringT& getSource() { return m_source; }
+	const StringT& getParsingSource() { return m_parsingSource; }
 	const StringT& getDestination() { return m_destination;  }
 	const StringT& getDestinationFolderFormat() { return m_destinationFolderFormat; }
 	int getFlags() { return m_flags; }
@@ -27,6 +28,7 @@ protected:
 	int m_taskID;
 	StringT m_name;
 	StringT m_source;
+	StringT m_parsingSource;
 	StringT m_destination;
 	int m_flags;
 	StringT m_filters;

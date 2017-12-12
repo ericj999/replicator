@@ -40,7 +40,9 @@ namespace String
 	StringT GetFiltersExp(const StringT& filters);
 #ifdef _UNICODE
 	StringT StringToStringT(const std::string& str);
+	std::string StringTToString(const StringT& str);
 #else
 	inline StringT StringToStringT(const std::string& str) { return str; }
+	inline std::string StringTToString(const StringT& str) { return str; }
 #endif
 }

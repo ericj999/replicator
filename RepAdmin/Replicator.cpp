@@ -37,8 +37,7 @@ END_MESSAGE_MAP()
 // CReplicatorApp construction
 
 CReplicatorApp::CReplicatorApp() :
-	m_verbose{ false }, m_testRun{ false }, m_historyDays{ DEFAULT_HISTORY_DAYS },
-	m_settingFlags{ 0 }
+	m_verbose{ false }, m_testRun{ false }, m_historyDays{ DEFAULT_HISTORY_DAYS }
 {
 	m_bHiColorIcons = TRUE;
 
@@ -79,12 +78,7 @@ BOOL CReplicatorApp::InitInstance()
 
 
 	// Initialize OLE libraries
-	if (!AfxOleInit())
-	{
-		AfxMessageBox(IDP_OLE_INIT_FAILED);
-		m_log.error(_T("Failed to initialize COM."));
-		return FALSE;
-	}
+	CoInitialize(NULL);
 
 	AfxEnableControlContainer();
 
@@ -119,7 +113,7 @@ BOOL CReplicatorApp::InitInstance()
 
 		PathT dbPath{ Util::GetDatabasePath() };
 
-		if (std::tr2::sys::exists(dbPath))
+		if (std::experimental::filesystem::exists(dbPath))
 			m_database.Connect(dbPath.wstring());
 		else
 			CreateDB(dbPath.wstring());
@@ -172,7 +166,7 @@ BOOL CReplicatorApp::InitInstance()
 int CReplicatorApp::ExitInstance()
 {
 	//TODO: handle additional resources you may have added
-	AfxOleTerm(FALSE);
+	CoUninitialize();
 	m_log.info(_T("Exit instance."));
 	return CWinAppEx::ExitInstance();
 }
@@ -254,6 +248,7 @@ void CReplicatorApp::CreateDB(const StringT& db)
 		"Name TEXT NOT NULL," \
 		"CreatedTime DATETIME DEFAULT CURRENT_TIMESTAMP," \
 		"Source TEXT NOT NULL," \
+		"SourceParsing TEXT," \
 		"Destination TEXT NOT NULL," \
 		"Flags INT DEFAULT 0," \
 		"Filters TEXT," \
@@ -309,9 +304,9 @@ void CReplicatorApp::WriteLog(int taskID, LogLevel level, const StringT& msg)
 
 void CReplicatorApp::MaintainDB()
 {
-	Database::Table history{ GetDB() , HISTORY_TABLE };
-	if (m_settingFlags & SETTINGFLAGS_DELETE_OLDER_HISTORY)
+	if (m_historyDays > HISTORY_DAYS_MIN)
 	{
+		Database::Table history{ GetDB() , HISTORY_TABLE };
 		StringStreamT condition;
 		
 		condition << HISTORY_COL_START_TIME << " < date('now', '-" << m_historyDays << " day')";
@@ -335,10 +330,6 @@ void CReplicatorApp::ReadConfig()
 		{
 			m_historyDays = static_cast<int>(days);
 		}
-
-		DWORD flags = 0;
-		if (regKey.QueryDWORDValue(REGSTR_VALUE_SETTING_FLAGS, flags) == ERROR_SUCCESS)
-			m_settingFlags = flags;
 	}
 }
 
@@ -354,23 +345,6 @@ void CReplicatorApp::setHistoryDays(int days)
 			if (regKey.SetDWORDValue(REGSTR_VALUE_HISTORY_DAYS, m_historyDays) != ERROR_SUCCESS)
 			{
 				m_log.error(StringT(_T("Failed to update history registry setting. Code:")) + ToStringT(GetLastError()));
-			}
-		}
-	}
-}
-
-void CReplicatorApp::setSettingFlags(DWORD flags)
-{
-	if (m_settingFlags != flags)
-	{
-		CRegKey regKey;
-
-		if (regKey.Create(HKEY_CURRENT_USER, REGSTR_KEY_CONFIG_ROOT) == ERROR_SUCCESS)
-		{
-			m_settingFlags = flags;
-			if (regKey.SetDWORDValue(REGSTR_VALUE_SETTING_FLAGS, m_settingFlags) != ERROR_SUCCESS)
-			{
-				m_log.error(StringT(_T("Failed to update settings registry. Code:")) + ToStringT(GetLastError()));
 			}
 		}
 	}

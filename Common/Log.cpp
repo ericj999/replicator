@@ -73,8 +73,8 @@ namespace Log
 	{
 		if (!m_path.empty())
 		{
-			if (!std::tr2::sys::exists(m_path.parent_path()))
-				std::tr2::sys::create_directories(m_path.parent_path());
+			if (!std::experimental::filesystem::exists(m_path.parent_path()))
+				std::experimental::filesystem::create_directories(m_path.parent_path());
 		}
 	}
 
@@ -83,21 +83,21 @@ namespace Log
 		PathT oldLog{ m_path };
 		oldLog.concat(_T(".old"));
 		
-		if (std::tr2::sys::exists(oldLog))
-			std::tr2::sys::remove(oldLog);
+		if (std::experimental::filesystem::exists(oldLog))
+			std::experimental::filesystem::remove(oldLog);
 
-		std::tr2::sys::rename(m_path, oldLog);
+		std::experimental::filesystem::rename(m_path, oldLog);
 	}
 #if 0
 	void Log::Roll(bool force /*= false*/)
 	{
-		if (!m_path.empty() && (m_maxFiles > 1) && std::tr2::sys::exists(m_path) && (force || (std::tr2::sys::file_size(m_path) >= m_maxSize)))
+		if (!m_path.empty() && (m_maxFiles > 1) && std::experimental::filesystem::exists(m_path) && (force || (std::experimental::filesystem::file_size(m_path) >= m_maxSize)))
 		{
 			PathT log{ m_path.parent_path() };
 			log /= m_path.filename().wstring() + ToStringT(m_maxFiles - 1);
 
-			if (std::tr2::sys::exists(log))
-				std::tr2::sys::remove(log);
+			if (std::experimental::filesystem::exists(log))
+				std::experimental::filesystem::remove(log);
 
 			int i;
 			for (i = m_maxFiles - 2; i > 0; --i)
@@ -108,11 +108,11 @@ namespace Log
 				src /= m_path.filename().wstring() + ToStringT(i);
 				dest /= m_path.filename().wstring() + ToStringT(i + 1);
 
-				std::tr2::sys::rename(src, dest);
+				std::experimental::filesystem::rename(src, dest);
 			}
 			log = m_path.parent_path();
 			log /= m_path.filename().wstring() + ToStringT(i);
-			std::tr2::sys::rename(m_path, log);
+			std::experimental::filesystem::rename(m_path, log);
 		}
 	}
 #endif

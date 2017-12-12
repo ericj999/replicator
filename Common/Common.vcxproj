@@ -138,14 +138,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\SQLite\sqlite3.h" />
+    <ClInclude Include="ComInterface.h" />
+    <ClInclude Include="ComMemObj.h" />
     <ClInclude Include="Database.h" />
     <ClInclude Include="DBDef.h" />
     <ClInclude Include="DatePathFormatter.h" />
+    <ClInclude Include="FileTime.h" />
     <ClInclude Include="GlobDef.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="MD5Hash.h" />
     <ClInclude Include="NamedPipe.h" />
     <ClInclude Include="PipeServerThread.h" />
+    <ClInclude Include="ShellFolder.h" />
     <ClInclude Include="util.h" />
     <ClInclude Include="Property.h" />
     <ClInclude Include="Recordset.h" />
@@ -164,14 +168,17 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="ComInterface.cpp" />
     <ClCompile Include="Database.cpp" />
     <ClCompile Include="DatePathFormatter.cpp" />
+    <ClCompile Include="FileTime.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="MD5Hash.cpp" />
     <ClCompile Include="NamedPipe.cpp" />
     <ClCompile Include="PipeServerThread.cpp" />
     <ClCompile Include="Property.cpp" />
     <ClCompile Include="Recordset.cpp" />
+    <ClCompile Include="ShellFolder.cpp" />
     <ClCompile Include="Statement.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

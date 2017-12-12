@@ -14,6 +14,7 @@ enum
 {
 	UpdateOptionUpdateNewer = 0,
 	UpdateOptionKeepBoth,
+	UpdateOptionOverwrite,
 	UpdateOptionDoNothing,
 	UpdateOptionMax
 };
@@ -22,6 +23,7 @@ int UpdateOptionID[UpdateOptionMax] =
 {
 	IDS_UPDATE_ACTION_NEWER,
 	IDS_UPDATE_ACTION_KEEP_BOTH,
+	IDS_UPDATE_ACTION_OVERWRITE,
 	IDS_UPDATE_ACTION_DO_NOTHING,
 };
 
@@ -133,6 +135,8 @@ BOOL CAdvancedOptionsDlg::OnInitDialog()
 		m_cbUpdateOptions.SetCurSel(UpdateOptionKeepBoth);
 	else if (m_flags & TASKS_FLAGS_UPDATE_DO_NOTHING)
 		m_cbUpdateOptions.SetCurSel(UpdateOptionDoNothing);
+	else if (m_flags & TASKS_FLAGS_UPDATE_OVERWRITE)
+		m_cbUpdateOptions.SetCurSel(UpdateOptionOverwrite);
 	else
 		m_cbUpdateOptions.SetCurSel(UpdateOptionUpdateNewer);
 
@@ -209,6 +213,8 @@ void CAdvancedOptionsDlg::OnBnClickedOk()
 		int sel = m_cbUpdateOptions.GetCurSel();
 		if (sel == UpdateOptionKeepBoth)
 			m_flags |= TASKS_FLAGS_UPDATE_KEEP_BOTH;
+		else if (sel == UpdateOptionOverwrite)
+			m_flags |= TASKS_FLAGS_UPDATE_OVERWRITE;
 		else if (sel == UpdateOptionDoNothing)
 			m_flags |= TASKS_FLAGS_UPDATE_DO_NOTHING;
 		else

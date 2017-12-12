@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <chrono>
 #include <time.h>
+#include "ShellFolder.h"
 
 namespace Util
 {
@@ -16,4 +17,5 @@ namespace Util
 	StringT GetIsoTimeString(time_t tt);
 	StringT FormatTimeString(int year, int month, int day, int hour, int min, int sec);
 	int CreateProcess(const PathT& program, const StringT& parameters, HANDLE* pHandle = NULL);
+	bool CopyStreamToFile(ShellWrapper::ShellItem& shellItem, const std::wstring& dest);
 }

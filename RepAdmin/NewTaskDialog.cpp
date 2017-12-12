@@ -2,6 +2,8 @@
 //
 
 #include "stdafx.h"
+#include <Shobjidl.h>
+
 #include "Replicator.h"
 #include "NewTaskDialog.h"
 #include "afxdialogex.h"
@@ -10,19 +12,22 @@
 #include "DBDef.h"
 
 #include "AdvancedOptionsDlg.h"
+#include "ComInterface.h"
 
 // CNewTaskDialog dialog
 
 IMPLEMENT_DYNAMIC(CNewTaskDialog, CDialogEx)
 
 CNewTaskDialog::CNewTaskDialog(CWnd* pParent /*=NULL*/)
-: CDialogEx(CNewTaskDialog::IDD, pParent), m_update{ false }, m_AdvnacedOptionsFlags{ TASKS_FLAGS_UPDATE_NEWER }, m_changed{ false }, m_ready{ false }
+	: CDialogEx(CNewTaskDialog::IDD, pParent), m_update{ false }, m_AdvnacedOptionsFlags{ TASKS_FLAGS_UPDATE_NEWER },
+	m_changed{ false }, m_ready{ false }, m_portableSource{ false }
 {
 
 }
 
 CNewTaskDialog::CNewTaskDialog(const Database::PropertyList& props, CWnd* pParent /*=NULL*/)
-	: CDialogEx(CNewTaskDialog::IDD, pParent), m_update{ true }, m_props(props), m_AdvnacedOptionsFlags{ TASKS_FLAGS_UPDATE_NEWER }, m_changed{ false }, m_ready{ false }
+	: CDialogEx(CNewTaskDialog::IDD, pParent), m_update{ true }, m_props(props), m_AdvnacedOptionsFlags{ TASKS_FLAGS_UPDATE_NEWER }, 
+	m_changed{ false }, m_ready{ false }, m_portableSource{ false }
 {
 
 }
@@ -35,23 +40,22 @@ CNewTaskDialog::~CNewTaskDialog()
 void CNewTaskDialog::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_NEW_TASK_SOURCE, m_listSources);
+	DDX_Control(pDX, IDC_NEW_TASK_SOURCE, m_editSource);
 	DDX_Control(pDX, IDC_NEW_TASK_NAME, m_editName);
 	DDX_Control(pDX, IDC_NEW_TASK_DESTINATION, m_editDest);
 }
 
 
 BEGIN_MESSAGE_MAP(CNewTaskDialog, CDialogEx)
-	ON_BN_CLICKED(IDC_NEW_TASK_ADD_SRC, &CNewTaskDialog::OnBnClickedNewtaskAddSrc)
-	ON_BN_CLICKED(IDC_NEW_TASK_REMOVE_SRC, &CNewTaskDialog::OnBnClickedNewtaskRemoveSrc)
 	ON_BN_CLICKED(IDC_NEW_TASK_BROWSE_DEST, &CNewTaskDialog::OnBnClickedNewtaskBrowseDest)
 	ON_BN_CLICKED(IDOK, &CNewTaskDialog::OnBnClickedOk)
 	ON_EN_CHANGE(IDC_NEW_TASK_NAME, &CNewTaskDialog::OnEnChange)
-	ON_NOTIFY(LVN_ITEMCHANGED, IDC_NEW_TASK_SOURCE, &CNewTaskDialog::OnLVItemChanged)
+	ON_EN_CHANGE(IDC_NEW_TASK_SOURCE, &CNewTaskDialog::OnEnChange)
 	ON_EN_CHANGE(IDC_NEW_TASK_DESTINATION, &CNewTaskDialog::OnEnChangeNewTaskDestination)
 	ON_BN_CLICKED(IDC_NEW_TASK_CREATE, &CNewTaskDialog::OnBnClickedNewTaskCreate)
 	ON_BN_CLICKED(IDC_NEW_TASK_ADV_OPTIONS, &CNewTaskDialog::OnBnClickedNewTaskAdvOptions)
 	ON_BN_CLICKED(IDC_NEW_TASK_INCLUDE_SUB, &CNewTaskDialog::OnBnClickedNewTaskIncludeSub)
+	ON_BN_CLICKED(IDC_NEW_TASK_BROWSE_SOURCE, &CNewTaskDialog::OnBnClickedNewTaskBrowseSource)
 END_MESSAGE_MAP()
 
 
@@ -62,10 +66,6 @@ BOOL CNewTaskDialog::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	CRect rc;
-
-	m_listSources.GetClientRect(&rc);
-	m_listSources.InsertColumn(0, _T(""));
-	m_listSources.SetColumnWidth(0, rc.Width() - GetSystemMetrics(SM_CXVSCROLL));
 
 	UpdateControls();
 	m_ready = true;
@@ -89,14 +89,10 @@ void CNewTaskDialog::UpdateControls()
 		if (!taskName.IsNULL()) m_editName.SetWindowText(taskName.m_str.c_str());
 
 		const Database::Property& srcProp = m_props.Find(TASKS_COL_SOURCE);
-		if (!srcProp.IsNULL())
-		{
-			std::vector<StringT> sources;
+		if (!srcProp.IsNULL()) m_editSource.SetWindowText(srcProp.m_str.c_str());
 
-			String::Tokenize(srcProp.m_str, sources, STR_SRC_PATH_SEPARATOR);
-			for (auto&& s : sources)
-				m_listSources.InsertItem(m_listSources.GetItemCount(), s.c_str());
-		}
+		const Database::Property& srcParsingProp = m_props.Find(TASKS_COL_SOURCE_PARSING);
+		if (!srcParsingProp.IsNULL()) m_strSourceParsing = srcParsingProp.m_str.c_str();
 
 		const Database::Property& dest = m_props.Find(TASKS_COL_DESTINATION);
 		if (!dest.IsNULL()) m_editDest.SetWindowText(dest.m_str.c_str());
@@ -114,7 +110,7 @@ void CNewTaskDialog::UpdateControls()
 		else
 		{
 			CButton* pBtn = NULL;
-			if (flags.m_i & TASK_INCLUDE_SUBDIR)
+			if (flags.m_i & TASKS_FLAGS_INCLUDE_SUBDIR)
 			{
 				pBtn = static_cast<CButton*>(GetDlgItem(IDC_NEW_TASK_INCLUDE_SUB));
 				if (pBtn) pBtn->SetCheck(BST_CHECKED);
@@ -124,6 +120,9 @@ void CNewTaskDialog::UpdateControls()
 				m_strFilters = filters.m_str.c_str();
 
 			m_AdvnacedOptionsFlags = flags.m_i & TASKS_FLAGS_ADV_OPT_MASKS;
+
+			if (flags.m_i & TASKS_FLAGS_PORTABLE_DEVICE_SOURCE)
+				m_portableSource = true;
 		}
 	}
 	else
@@ -132,30 +131,6 @@ void CNewTaskDialog::UpdateControls()
 		if (pBtn) pBtn->SetCheck(BST_CHECKED);
 	}
 }
-
-void CNewTaskDialog::OnBnClickedNewtaskAddSrc()
-{
-	CFolderPickerDialog fpg(NULL, 0, this);
-	if (fpg.DoModal() == IDOK)
-	{
-		m_listSources.InsertItem(m_listSources.GetItemCount(), fpg.GetPathName());
-		setChanged();
-		UpdateCreateButtons();
-	}
-}
-
-
-void CNewTaskDialog::OnBnClickedNewtaskRemoveSrc()
-{
-	POSITION pos = m_listSources.GetFirstSelectedItemPosition();
-	while (pos)
-	{
-		int nItem = m_listSources.GetNextSelectedItem(pos);
-		m_listSources.DeleteItem(nItem);
-		UpdateCreateButtons();
-	}
-}
-
 
 void CNewTaskDialog::OnBnClickedNewtaskBrowseDest()
 {
@@ -179,15 +154,6 @@ void CNewTaskDialog::OnEnChange()
 	UpdateCreateButtons();
 }
 
-
-void CNewTaskDialog::OnLVItemChanged(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
-	GetDlgItem(IDC_NEW_TASK_REMOVE_SRC)->EnableWindow((m_listSources.GetSelectedCount() > 0) ? TRUE : FALSE);
-	*pResult = 0;
-}
-
-
 void CNewTaskDialog::OnEnChangeNewTaskDestination()
 {
 	setChanged();
@@ -196,7 +162,7 @@ void CNewTaskDialog::OnEnChangeNewTaskDestination()
 
 void CNewTaskDialog::UpdateCreateButtons()
 {
-	BOOL bEnable = (m_changed && (m_editName.GetWindowTextLength() > 0) && (m_editDest.GetWindowTextLength() > 0) && (m_listSources.GetItemCount() > 0)) ? TRUE : FALSE;
+	BOOL bEnable = (m_changed && (m_editName.GetWindowTextLength() > 0) && (m_editDest.GetWindowTextLength() > 0) && (m_editSource.GetWindowTextLength() > 0)) ? TRUE : FALSE;
 	GetDlgItem(IDC_NEW_TASK_CREATE)->EnableWindow(bEnable);
 }
 
@@ -204,23 +170,20 @@ void CNewTaskDialog::OnBnClickedNewTaskCreate()
 {
 	try
 	{
-		StringT source;
-		for (int index = 0; index < m_listSources.GetItemCount(); ++index)
-		{
-			if (index != 0) source += STR_SRC_PATH_SEPARATOR;
-			source += m_listSources.GetItemText(index, 0);
-		}
-
-		CString strName, strDest;
+		CString strName, strSource, strDest;
 		m_editName.GetWindowText(strName);
+		m_editSource.GetWindowText(strSource);
 		m_editDest.GetWindowText(strDest);
 
 		int flags = 0;
 		CButton* pBtn = static_cast<CButton*>(GetDlgItem(IDC_NEW_TASK_INCLUDE_SUB));
 		if (pBtn && (pBtn->GetCheck() == BST_CHECKED))
-			flags |= TASK_INCLUDE_SUBDIR;
+			flags |= TASKS_FLAGS_INCLUDE_SUBDIR;
 
 		flags |= m_AdvnacedOptionsFlags;
+
+		if (m_portableSource)
+			flags |= TASKS_FLAGS_PORTABLE_DEVICE_SOURCE;
 
 		Database::PropertyList propList;
 		Database::Table table{ theApp.GetDB(), TASKS_TABLE };
@@ -229,8 +192,11 @@ void CNewTaskDialog::OnBnClickedNewTaskCreate()
 			if (m_props.Find(TASKS_COL_NAME).m_str.c_str() != strName)
 				propList.push_back(Database::Property(TASKS_COL_NAME, strName));
 
-			if (m_props.Find(TASKS_COL_SOURCE).m_str.c_str() != source)
-				propList.push_back(Database::Property(TASKS_COL_SOURCE, source));
+			if (m_props.Find(TASKS_COL_SOURCE).m_str.c_str() != strSource)
+				propList.push_back(Database::Property(TASKS_COL_SOURCE, strSource));
+
+			if (m_props.Find(TASKS_COL_SOURCE_PARSING).m_str.c_str() != m_strSourceParsing)
+				propList.push_back(Database::Property(TASKS_COL_SOURCE_PARSING, m_strSourceParsing));
 
 			if (m_props.Find(TASKS_COL_DESTINATION).m_str.c_str() != strDest)
 				propList.push_back(Database::Property(TASKS_COL_DESTINATION, strDest));
@@ -270,7 +236,8 @@ void CNewTaskDialog::OnBnClickedNewTaskCreate()
 				return;
 			}
 			propList.push_back(Database::Property(TASKS_COL_NAME, strName));
-			propList.push_back(Database::Property(TASKS_COL_SOURCE, source));
+			propList.push_back(Database::Property(TASKS_COL_SOURCE, strSource));
+			propList.push_back(Database::Property(TASKS_COL_SOURCE_PARSING, m_strSourceParsing));
 			propList.push_back(Database::Property(TASKS_COL_DESTINATION, strDest));
 			propList.push_back(Database::Property(TASKS_COL_DESTFOLDERFMT, m_strDestinationFolderFormat));
 			propList.push_back(Database::Property(TASKS_COL_FLASGS, flags));
@@ -287,7 +254,6 @@ void CNewTaskDialog::OnBnClickedNewTaskCreate()
 	}
 	OnOK();
 }
-
 
 void CNewTaskDialog::OnBnClickedNewTaskAdvOptions()
 {
@@ -312,4 +278,72 @@ void CNewTaskDialog::OnBnClickedNewTaskIncludeSub()
 {
 	setChanged();
 	UpdateCreateButtons();
+}
+
+
+void CNewTaskDialog::OnBnClickedNewTaskBrowseSource()
+{
+/*
+	CFolderPickerDialog fpg(NULL, 0, this);
+	if (fpg.DoModal() == IDOK)
+	{
+		m_editSource.SetWindowTextW(fpg.GetPathName());
+		setChanged();
+		UpdateCreateButtons();
+	}
+*/
+	StringT source, sourceParsing;
+
+	ComInterface<IFileOpenDialog> fileOpenDlg{ CLSID_FileOpenDialog , IID_IFileOpenDialog };
+	FILEOPENDIALOGOPTIONS fos = 0;
+	fileOpenDlg->GetOptions(&fos);
+	fos |= FOS_PICKFOLDERS;
+	fileOpenDlg->SetOptions(fos);
+
+	HRESULT hr = fileOpenDlg->Show(GetSafeHwnd());
+	if (SUCCEEDED(hr))
+	{
+		IShellItem* pItem = nullptr;
+		hr = fileOpenDlg->GetResult(&pItem);
+		if (SUCCEEDED(hr))
+		{
+			PWSTR pszFilePath = nullptr;
+			hr = pItem->GetDisplayName(SIGDN_DESKTOPABSOLUTEEDITING, &pszFilePath);
+			if (SUCCEEDED(hr) && pszFilePath)
+			{
+				source = pszFilePath;
+				CoTaskMemFree(pszFilePath);
+				pszFilePath = nullptr;
+
+				hr = pItem->GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING, &pszFilePath);
+				if (SUCCEEDED(hr) && pszFilePath)
+				{
+					sourceParsing = pszFilePath;
+					CoTaskMemFree(pszFilePath);
+					pszFilePath = nullptr;
+
+					SFGAOF attr = 0;
+					if (SUCCEEDED((hr = pItem->GetAttributes(SFGAO_CAPABILITYMASK | SFGAO_DISPLAYATTRMASK | SFGAO_CONTENTSMASK | SFGAO_STORAGECAPMASK, &attr))))
+					{
+						m_editSource.SetWindowText(source.c_str());
+						m_strSourceParsing = sourceParsing.c_str();
+
+						if (!(attr & SFGAO_FILESYSTEM))
+							m_portableSource = true;
+					}
+				}
+			}
+			pItem->Release();
+		}
+	}
+
+	if (FAILED(hr))
+	{
+		StringT msg{ _T("Failed to select a folder. Code:") };
+		msg += ToStringT(hr);
+
+		theApp.getLog().error(msg);
+		AfxMessageBox(IDS_ERROR_SELECT_SOURCE, MB_OK | MB_ICONEXCLAMATION);
+
+	}
 }

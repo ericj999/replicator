@@ -5,7 +5,6 @@
 RepSource::RepSource(const PathT& path) :
 	m_parent{ path }
 {
-	m_parent.remove_filename();
 }
 
 

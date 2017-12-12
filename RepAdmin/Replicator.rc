@@ -222,7 +222,7 @@ BEGIN
     CONTROL         "",IDC_HISTORY_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | LVS_OWNERDATA | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,7,395,235
 END
 
-IDD_NEW_TASK DIALOGEX 0, 0, 357, 184
+IDD_NEW_TASK DIALOGEX 0, 0, 357, 159
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "New Task"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
@@ -231,19 +231,18 @@ BEGIN
     EDITTEXT        IDC_NEW_TASK_NAME,48,7,275,14,ES_AUTOHSCROLL
     CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME,7,27,343,1,WS_EX_STATICEDGE
     LTEXT           "&Replicate files from",IDC_STATIC,7,32,62,8
-    CONTROL         "",IDC_NEW_TASK_SOURCE,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_EDITLABELS | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,44,316,38
-    PUSHBUTTON      "+",IDC_NEW_TASK_ADD_SRC,325,44,25,14
-    PUSHBUTTON      "-",IDC_NEW_TASK_REMOVE_SRC,325,60,25,14,WS_DISABLED
-    LTEXT           "&to",IDC_STATIC,7,87,8,8
-    EDITTEXT        IDC_NEW_TASK_DESTINATION,7,100,316,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "...",IDC_NEW_TASK_BROWSE_DEST,325,100,25,14
-    CONTROL         "Include &sub-folders",IDC_NEW_TASK_INCLUDE_SUB,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,136,81,10
-    PUSHBUTTON      "&Create",IDC_NEW_TASK_CREATE,248,163,50,14,WS_DISABLED
-    PUSHBUTTON      "Cancel",IDCANCEL,301,163,50,14
-    LTEXT           "Options",IDC_STATIC,7,121,26,8
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,38,126,312,1
-    PUSHBUTTON      "Advanced options",IDC_NEW_TASK_ADV_OPTIONS,264,133,86,14
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,8,155,342,1
+    LTEXT           "&to",IDC_STATIC,7,62,8,8
+    EDITTEXT        IDC_NEW_TASK_DESTINATION,7,75,316,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_NEW_TASK_BROWSE_DEST,325,75,25,14
+    CONTROL         "Include &sub-folders",IDC_NEW_TASK_INCLUDE_SUB,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,111,81,10
+    PUSHBUTTON      "&Create",IDC_NEW_TASK_CREATE,248,138,50,14,WS_DISABLED
+    PUSHBUTTON      "Cancel",IDCANCEL,301,138,50,14
+    LTEXT           "Options",IDC_STATIC,7,96,26,8
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,38,101,312,1
+    PUSHBUTTON      "Advanced options",IDC_NEW_TASK_ADV_OPTIONS,264,108,86,14
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,8,130,342,1
+    EDITTEXT        IDC_NEW_TASK_SOURCE,7,44,316,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_NEW_TASK_BROWSE_SOURCE,325,44,25,14
 END
 
 IDD_ADVANCED_OPTIONS DIALOGEX 0, 0, 306, 232
@@ -262,12 +261,12 @@ BEGIN
     LTEXT           "( Specify one or more file extensions to be included or excluded; separate with semi-colons if more than one. ex. jpg;bmp )",IDC_NEW_TASK_FILTERS_INFO,18,70,282,17
     LTEXT           "Destination Folders",IDC_STATIC,5,90,38,8
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,45,94,256,1
-    CONTROL         "&Use same folder structure starting from the selected source folder",IDC_DESTINATION_SAME_FROM_SELECT,
-                    "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,11,104,235,8
-    CONTROL         "Use &same folder structure starting from the root of the selected source folder",IDC_DESTINATION_SAME_FROM_ROOT,
-                    "Button",BS_AUTORADIOBUTTON,11,117,269,10
+    CONTROL         "&Use the same folder structures starting after the selected source folder",IDC_DESTINATION_SAME_FROM_SELECT,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,11,104,285,8
+    CONTROL         "Use the &same folder structures starting from the root of the selected source folder",IDC_DESTINATION_SAME_FROM_ROOT,
+                    "Button",BS_AUTORADIOBUTTON,11,117,285,10
     CONTROL         "&Group files by date using the following format",IDC_DESTINATION_GROUP,
-                    "Button",BS_AUTORADIOBUTTON,11,132,163,8
+                    "Button",BS_AUTORADIOBUTTON,11,132,285,8
     EDITTEXT        IDC_AO_DESTINATION_FORMAT,18,146,235,12,ES_AUTOHSCROLL | WS_GROUP
     PUSHBUTTON      "&Edit",IDC_AO_EDIT_FORMAT,258,146,43,12
     LTEXT           "( Example: Specify $(YYYY)\\$(MMMM) to group the files created in Janurary 2017  into <destination folder>\\2017\\Janurary )",IDC_AO_DESTINATION_FORMAT_EXAMPLE,19,160,280,16
@@ -307,12 +306,11 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,146,77,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,199,77,50,14
-    EDITTEXT        IDC_EDIT_HISTORY_DAYS,123,19,26,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "days",IDC_STATIC,154,21,16,8
+    EDITTEXT        IDC_EDIT_HISTORY_DAYS,84,19,26,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "day(s)",IDC_STATIC,118,22,22,8
     LTEXT           "History",IDC_STATIC,7,7,24,8
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,36,11,212,1
-    CONTROL         "&Remove history older than",IDC_REMOVE_OLDER_HISTORY,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,23,21,98,10
+    LTEXT           "Keep history for:",IDC_STATIC,25,22,55,8
 END
 
 
@@ -406,7 +404,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 350
         TOPMARGIN, 7
-        BOTTOMMARGIN, 177
+        BOTTOMMARGIN, 152
     END
 
     IDD_ADVANCED_OPTIONS, DIALOG
@@ -604,6 +602,10 @@ BEGIN
     IDS_FOLDER_FORMAT_IS_EMPTY 
                             "There is no format specified for the destination folders."
     IDS_PROMPT_CANCEL_JOB   "There is task running. Do you want to abort?"
+    IDS_ERROR_SELECT_SOURCE "Failed to select the source folder. The source may not be available or supported. Please try again."
+    IDS_ERROR_DEVICE_NOT_CONNECTED 
+                            "The source device is not connected. Please reconnect the device and try again later."
+    IDS_ERROR_DEVICE_DISCONNECTED "The source device is disconnected."
 END
 
 STRINGTABLE
@@ -621,6 +623,7 @@ BEGIN
     IDS_UPDATE_ACTION_NEWER "Update the destination file if source file is newer"
     IDS_UPDATE_ACTION_KEEP_BOTH "Keep both files in the destination folder"
     IDS_UPDATE_ACTION_DO_NOTHING "Do nothing"
+    IDS_UPDATE_ACTION_OVERWRITE "Always overwrite the destination file"
     IDS_SYNC_ACTION_KEEP    "Keep the file in the destination folder"
     IDS_SYNC_ACTION_REMOVE  "Remove the file from the destination folder"
 END

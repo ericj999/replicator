@@ -456,11 +456,7 @@ void CMainFrame::OnToolsSettings()
 	SettingsDialog dialog(this);
 
 	dialog.m_historyDays = theApp.getHistoryDays();
-	dialog.m_flags = theApp.getSettingFlags();
 
 	if (dialog.DoModal() == IDOK)
-	{
 		theApp.setHistoryDays(dialog.m_historyDays);
-		theApp.setSettingFlags(dialog.m_flags);
-	}
 }

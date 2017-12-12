@@ -36,21 +36,21 @@ protected:
 	int m_AdvnacedOptionsFlags;
 	CString m_strFilters;
 	CString m_strDestinationFolderFormat;
+	CString m_strSourceParsing;
+	bool m_portableSource;
 
 public:
-	CListCtrl m_listSources;
 	virtual BOOL OnInitDialog();
-	afx_msg void OnBnClickedNewtaskAddSrc();
-	afx_msg void OnBnClickedNewtaskRemoveSrc();
 	afx_msg void OnBnClickedNewtaskBrowseDest();
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnEnChange();
-	afx_msg void OnLVItemChanged(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnEnChangeNewTaskDestination();
 	CEdit m_editName;
+	CEdit m_editSource;
 	CEdit m_editDest;
 	CString m_strNewTaskName;
 	afx_msg void OnBnClickedNewTaskCreate();
 	afx_msg void OnBnClickedNewTaskAdvOptions();
 	afx_msg void OnBnClickedNewTaskIncludeSub();
+	afx_msg void OnBnClickedNewTaskBrowseSource();
 };

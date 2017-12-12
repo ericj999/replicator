@@ -62,7 +62,7 @@ END_MESSAGE_MAP()
 // CGeneralPage message handlers
 void CGeneralPage::Refresh(int newTask, bool force)
 {
-	if ((newTask != m_CurrentTask) || (force && (newTask != m_CurrentTask)))
+	if ((newTask != m_CurrentTask) || (force && (newTask == m_CurrentTask)))
 	{
 		CString str;
 		if (newTask > 0)
@@ -80,18 +80,13 @@ void CGeneralPage::Refresh(int newTask, bool force)
 			if (rs->Step())
 			{
 				StringT createdTime = String::UTCTimeToLocalTime(rs->GetColumnStr(COL_CreatedTime));
-				std::vector<StringT> sources;
-				StringT source;
-
-				String::Tokenize(rs->GetColumnStr(COL_Source), sources, STR_SRC_PATH_SEPARATOR);
-				for (auto&& src : sources)
-					source += _T("\t") + src + _T("\n");
+				StringT source = _T("\t") + rs->GetColumnStr(COL_Source) + _T("\n");
 
 				CString s;
 
 				condition.clear();
 				int flags = rs->GetColumnInt(COL_Flags);
-				if (flags & TASK_INCLUDE_SUBDIR)
+				if (flags & TASKS_FLAGS_INCLUDE_SUBDIR)
 					s.LoadString(IDS_CHILD_FOLDER);
 
 				condition = _T("\t") + s + _T("\n");

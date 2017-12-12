@@ -18,10 +18,8 @@
 #define REFRESH_ALL (REFRESH_GENERAL | REFRESH_HISTORY)
 
 #define DEFAULT_HISTORY_DAYS	30
-#define HISTORY_DAYS_MIN		1
+#define HISTORY_DAYS_MIN		0
 #define HISTORY_DAYS_MAX		9999
-
-#define SETTINGFLAGS_DELETE_OLDER_HISTORY	0x01
 
 // CReplicatorApp:
 // See Replicator.cpp for the implementation of this class
@@ -53,9 +51,6 @@ public:
 	int getHistoryDays() { return m_historyDays;  }
 	void setHistoryDays(int days);
 
-	DWORD getSettingFlags() { return m_settingFlags; }
-	void setSettingFlags(DWORD flags);
-
 	Log::Log& getLog() { return m_log; }
 
 	afx_msg void OnAppAbout();
@@ -65,7 +60,6 @@ protected:
 	bool m_verbose;
 	bool m_testRun;
 	int m_historyDays;
-	DWORD m_settingFlags;
 
 	PathT m_configPath;
 	Database::Database m_database;

@@ -22,7 +22,5 @@ protected:
 public:
 	virtual BOOL OnInitDialog();
 	int m_historyDays;
-	DWORD m_flags;
-	afx_msg void OnBnClickedRemoveOlderHistory();
 	afx_msg void OnBnClickedOk();
 };
