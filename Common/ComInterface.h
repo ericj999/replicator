@@ -6,6 +6,7 @@
 
 #include <PortableDeviceApi.h>
 #include <PortableDevice.h>
+#include <Propvarutil.h>
 
 std::string IIDToString(REFIID iid);
 
@@ -36,23 +37,23 @@ public:
 		}
 	}
 
-	ComInterface(ComInterface& cif)
+	ComInterface(ComInterface& cif) :
+		m_interface{ nullptr }
 	{
-		if (m_interface) m_interface->Release();
 		m_interface = cif.m_interface;
 		if(m_interface) m_interface->AddRef();
 	}
 
-	ComInterface(ComInterface&& cif)
+	ComInterface(ComInterface&& cif) :
+		m_interface{ nullptr }
 	{
-		if (m_interface) m_interface->Release();
 		m_interface = cif.m_interface;
 		cif.m_interface = nullptr;
 	}
 
-	ComInterface(T* ptr)
+	ComInterface(T* ptr) :
+		m_interface{ nullptr }
 	{
-		if (m_interface) m_interface->Release();
 		m_interface = ptr;
 	}
 
@@ -62,6 +63,7 @@ public:
 			m_interface->Release();
 	}
 
+	bool operator!() { return m_interface ? false : true; }
 	bool isValid() { return m_interface ? true : false; }
 	T* Get() const { return m_interface;  }
 	T* operator ->() const { return m_interface; }
@@ -70,15 +72,26 @@ public:
 
 	ComInterface& operator=(ComInterface& cif)
 	{
-		if (m_interface) m_interface->Release();
-		m_interface = cif.m_interface;
-		if(m_interface) m_interface->AddRef();
+		if (m_interface != cif.m_interface)
+		{
+			if (m_interface)
+			{
+				m_interface->Release();
+				m_interface = nullptr;
+			}
+			m_interface = cif.m_interface;
+			if (m_interface) m_interface->AddRef();
+		}
 		return *this;
 	}
 
 	ComInterface& operator=(ComInterface&& cif)
 	{
-		if (m_interface) m_interface->Release();
+		if (m_interface)
+		{
+			m_interface->Release();
+			m_interface = nullptr;
+		}
 		m_interface = cif.m_interface;
 		cif.m_interface = nullptr;
 		return *this;
@@ -86,4 +99,39 @@ public:
 
 protected:
 	T* m_interface;
+};
+
+class ComPropVariant
+{
+public:
+	ComPropVariant()
+	{
+		PropVariantInit(&m_prop);
+	}
+	~ComPropVariant()
+	{
+		PropVariantClear(&m_prop);
+	}
+
+	ComPropVariant(const std::wstring& str)
+	{
+		PropVariantInit(&m_prop);
+		InitPropVariantFromString(str.c_str(), &m_prop);
+	}
+
+	ComPropVariant(const FILETIME* ft)
+	{
+		PropVariantInit(&m_prop);
+		InitPropVariantFromFileTime(ft, &m_prop);
+	}
+
+	PROPVARIANT* Get() { return &m_prop; }
+	VARTYPE type() { return m_prop.vt; }
+
+	const std::wstring GetStringValue() const { return m_prop.pwszVal; }
+	const FILETIME& GetFileTimeValue() const { return m_prop.filetime; }
+
+protected:
+	PROPVARIANT m_prop;
+
 };

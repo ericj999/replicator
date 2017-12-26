@@ -12,6 +12,7 @@
 #include "MD5Hash.h"
 #include "RepSource.h"
 #include "ShellFolder.h"
+#include "WPDPortableDeviceContent.h"
 
 enum class RunnerState
 {
@@ -51,7 +52,7 @@ protected:
 	PathT m_srcPath;
 	PathT m_destination;
 	StringT m_parsingSrc;
-
+	StringT m_parsingDestination;
 
 	// async execution
 	std::atomic_bool m_abort;
@@ -60,17 +61,36 @@ protected:
 
 	// member functions
 	RepSource GetSource(const PathT& path);
+	bool MatchedExtension(const std::wstring& ext);
 	void AddPath(const PathT& p, RepSource& repSource);
 	void UpdateTaskInDB(int taskID, Database::PropertyList& propList);
 	void AddHistory(Database::PropertyList& propList);
 	void ReplicateNow(const std::vector<RepSource>& repSources, const PathT& destination);
 	bool GetNewFileName(PathT& destFile, const Util::MD5Hash& md5);
 	void WriteLog(Log::LogLevel level, LPCTSTR format, ...);
-	void ReplicateWithShell(const StringT& parsingSrc, const PathT& srcPath, const PathT& destination);
-	void ReplicateWithShell(ShellWrapper::ShellFolder& folder, const PathT& srcPath, const PathT& destination);
 
-	void ReplicateWithShell2(ShellWrapper::ShellFolder& folder, const PathT& srcPath, const PathT& destination);
-	void ProcessFiles(ShellWrapper::ShellFolder& folder, const PathT& srcPath, const PathT& destination, const ShellItemIDList& shellItemIdList);
-	void ProcessFolders(ShellWrapper::ShellFolder& folder, const PathT& srcPath, const PathT& destination, const ShellItemIDList& shellItemIdList);
+	// from portable devie to filesystem
+	void ReplicateStreamToFile(const StringT& parsingSrc, const PathT& srcPath, const PathT& destination);
+	void ReplicateStreamToFile(ShellWrapper::ShellFolder& folder, const PathT& srcPath, const PathT& destination);
+	void ProcessStreamFiles(ShellWrapper::ShellFolder& folder, const PathT& srcPath, const PathT& destination, const ShellItemIDList& shellItemIdList);
+	void ProcessStreamFolders(ShellWrapper::ShellFolder& folder, const PathT& srcPath, const PathT& destination, const ShellItemIDList& shellItemIdList);
+
+	// from filesystem to portable device using shell api's
+	void ReplicateFileToStream(const PathT& srcPath, const PathT& destination, const PathT& parsingDest);
+	void ReplicateFileToStream(const PathT& srcPath, ShellWrapper::ShellFolder& folder, const PathT& destination);
+	void ProcessFiles(const std::vector<PathT>& fileList, ShellWrapper::ShellFolder& folder, const PathT& destination);
+	void ProcessFolders(const std::vector<PathT>& folderList, ShellWrapper::ShellFolder& folder, const PathT& destination);
+
+	// from filesystem to portable device using WPD
+	void ReplicateFilesToPortableDevice(const PathT& srcPath, const PathT& destination, const PathT& parsingDest);
+	void ReplicateFilesToPortableDevice(WPD::PortableDeviceContent& deviceContent, const PathT& srcPath, const std::wstring& destObjId, const PathT& destination);
+	void ProcessFiles(WPD::PortableDeviceContent& deviceContent, const std::vector<PathT>& srcFileList, const std::wstring& currentFolderObjId,
+		const PathT& currentDestPath, const WPD::PortableDeviceItemMap& destFileMap);
+	void ProcessFolders(WPD::PortableDeviceContent& deviceContent, const std::vector<PathT>& srcFolderList, const std::wstring& currentFolderObjId,
+		const PathT& currentDestPath, const std::map<std::wstring, std::wstring>& destFolderMap);
+
+
+	// replication using shell API's
+	//void Replicate(const PathT& parsingSource, const PathT& parsingDest);
 };
 

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include <Wincrypt.h>
 #include "MD5Hash.h"
+#include "WinFile.h"
 
 #define BUFSIZE (16 * 1024)
 
@@ -12,7 +13,7 @@ namespace Util
 		Calculate(file);
 	}
 
-	MD5Hash::MD5Hash(ShellWrapper::ShellItem& shellItem)
+	MD5Hash::MD5Hash(ShellWrapper::ShellItem2& shellItem)
 	{
 		Calculate(shellItem);
 	}
@@ -27,23 +28,23 @@ namespace Util
 		HCRYPTHASH hHash = NULL;
 		BYTE rgbFile[BUFSIZE];
 		DWORD cbRead = 0;
-		BOOL bResult = FALSE;
+		bool bResult = false;
 
 		if (CryptAcquireContext(&hProv, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT))
 		{
 			if (CryptCreateHash(hProv, CALG_MD5, 0, 0, &hHash))
 			{
-				HANDLE hFile = CreateFile(file.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
-				if (hFile != INVALID_HANDLE_VALUE)
+				WinFile fileObj{ file.c_str(), GENERIC_READ, FILE_SHARE_READ, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN };
+				if (fileObj.isGood())
 				{
-					while (bResult = ReadFile(hFile, rgbFile, BUFSIZE, &cbRead, NULL))
+					while (bResult = fileObj.Read(rgbFile, BUFSIZE, cbRead))
 					{
 						if (0 == cbRead)
 							break;
 
 						if (!CryptHashData(hHash, rgbFile, cbRead, 0))
 						{
-							bResult = FALSE;
+							bResult = false;
 							break;
 						}
 					}
@@ -53,7 +54,6 @@ namespace Util
 						DWORD cbHash = MD5LEN;
 						bResult = CryptGetHashParam(hHash, HP_HASHVAL, m_data, &cbHash, 0);
 					}
-					CloseHandle(hFile);
 				}
 				CryptDestroyHash(hHash);
 			}
@@ -62,7 +62,7 @@ namespace Util
 		return bResult;
 	}
 
-	bool MD5Hash::Calculate(ShellWrapper::ShellItem& shellItem)
+	bool MD5Hash::Calculate(ShellWrapper::ShellItem2& shellItem)
 	{
 		HCRYPTPROV hProv = NULL;
 		HCRYPTHASH hHash = NULL;

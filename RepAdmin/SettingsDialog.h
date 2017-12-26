@@ -23,4 +23,5 @@ public:
 	virtual BOOL OnInitDialog();
 	int m_historyDays;
 	afx_msg void OnBnClickedOk();
+	BOOL m_testRun;
 };

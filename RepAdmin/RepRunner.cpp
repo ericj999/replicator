@@ -3,6 +3,7 @@
 #include <ctime>
 #include <locale>
 #include <codecvt>
+#include <map>
 #include "RepRunner.h"
 #include "GlobDef.h"
 #include "TaskRecord.h"
@@ -11,6 +12,10 @@
 #include "Replicator.h"
 #include "ShellFolder.h"
 #include "FileTime.h"
+#include "WPDPortableDevice.h"
+#include "WPDPortableDeviceContent.h"
+#include "WPDPortableDeviceProperties.h"
+#include "util.h"
 
 #include "resource.h"
 
@@ -19,6 +24,8 @@
 
 #define ENUM_COUNT 1	//50
 #define SHELLITEM_REQUIRED_ATTRIBUTES (SFGAO_CANCOPY | SFGAO_STREAM)
+
+#define NUM_OBJECTS_TO_REQUEST	10
 
 RepRunner::RepRunner(int taskID, RunnerEventCallback callback /* = nullptr*/, bool verbose /*= false*/, bool testRun /*= false*/) :
 	m_taskID{ taskID }, m_callback{ callback }, m_verbose{ verbose }, m_testRun{ testRun }, m_abort{ false }, m_isRunning{ false },
@@ -66,7 +73,9 @@ void RepRunner::Run()
 	{
 		m_log.setLevel(Log::LogLevel::Verbose);
 
-		WriteLog(Log::LogLevel::Info, _T("Begin replication..."));
+		WriteLog(Log::LogLevel::Verbose, _T("==============================="), m_taskID);
+		WriteLog(Log::LogLevel::Verbose, _T("Begin replication task ID %d..."), m_taskID);
+		WriteLog(Log::LogLevel::Verbose, _T("==============================="), m_taskID);
 		std::chrono::system_clock::time_point start{ std::chrono::system_clock::now() };
 		StringT startTimeStr = Util::GetIsoTimeString(std::chrono::system_clock::to_time_t(start));
 		Database::PropertyList propList;
@@ -85,8 +94,8 @@ void RepRunner::Run()
 		m_matchExtension = (m_flags & (TASKS_FLAGS_INCLUDE_FILTERS | TASKS_FLAGS_EXCLUDE_FILTERS)) && !regexFilters.empty();
 		m_filterRegex.assign(regexFilters, std::regex::ECMAScript | std::regex::icase);
 
-		WriteLog(Log::LogLevel::Info, _T("Flags = 0x%X"), m_flags);
-		WriteLog(Log::LogLevel::Info, _T("Filters=\"%s\""), regexFilters.c_str());
+		WriteLog(Log::LogLevel::Verbose, _T("Flags = 0x%X"), m_flags);
+		WriteLog(Log::LogLevel::Verbose, _T("Filters=\"%s\""), regexFilters.c_str());
 
 		StringT destFolderFormat = task.getDestinationFolderFormat();
 
@@ -106,11 +115,17 @@ void RepRunner::Run()
 		m_srcPath = task.getSource();
 		m_destination = task.getDestination();
 		m_parsingSrc = task.getParsingSource();
+		m_parsingDestination = task.getParsingDestination();
 
 		if (!m_parsingSrc.empty() && (m_parsingSrc[0] == _T(':')))
 		{
 			// run Shell APIs....
-			ReplicateWithShell(m_parsingSrc, m_srcPath, m_destination);
+			ReplicateStreamToFile(m_parsingSrc, m_srcPath, m_parsingDestination);	// m_destination);
+		}
+		else if (!m_parsingDestination.empty() && (m_parsingDestination[0] == _T(':')))
+		{
+//			ReplicateFileToStream(m_parsingSrc, m_destination, m_parsingDestination);
+			ReplicateFilesToPortableDevice(m_parsingSrc, m_destination, m_parsingDestination);
 		}
 		else
 		{
@@ -172,6 +187,22 @@ void RepRunner::Run()
 	}
 	if (m_callback) m_callback(RunnerState::STOP, result.c_str());
 	m_isRunning = false;
+}
+
+bool RepRunner::MatchedExtension(const std::wstring& ext)
+{
+	bool matchExt = false;
+
+	if (m_matchExtension)
+	{
+		bool match = std::regex_match(ext, m_filterRegex);
+		if (((m_flags & TASKS_FLAGS_INCLUDE_FILTERS) && match) || ((m_flags & TASKS_FLAGS_EXCLUDE_FILTERS) && !match))
+			matchExt = true;
+	}
+	else
+		matchExt = true;
+
+	return matchExt;
 }
 
 void RepRunner::ReplicateNow(const std::vector<RepSource>& repSources, const PathT& destination)
@@ -244,23 +275,29 @@ void RepRunner::ReplicateNow(const std::vector<RepSource>& repSources, const Pat
 
 			if (toUpdate)
 			{
-				WriteLog(Log::LogLevel::Verbose, _T("Updating \"%s\""), srcFile.wstring().c_str());
+				WriteLog(Log::LogLevel::Info, _T("Updating \"%s\""), srcFile.wstring().c_str());
 				if (!m_testRun)
-					std::experimental::filesystem::copy_file(srcFile, destFile, std::experimental::filesystem::copy_options::overwrite_existing);
-
-				++m_updated;
+				{
+					if (std::experimental::filesystem::copy_file(srcFile, destFile, std::experimental::filesystem::copy_options::overwrite_existing))
+						++m_updated;
+				}
+				else
+					++m_updated;
 			}
 			else if (toAddNew)
 			{
-				WriteLog(Log::LogLevel::Verbose, _T("Adding \"%s\", source:\"%s\""), destFile.wstring().c_str(), srcFile.wstring().c_str());
+				WriteLog(Log::LogLevel::Info, _T("Adding \"%s\", source:\"%s\""), destFile.wstring().c_str(), srcFile.wstring().c_str());
 				if (!m_testRun)
-					std::experimental::filesystem::copy_file(srcFile, destFile);
-
-				++m_added;
+				{
+					if(std::experimental::filesystem::copy_file(srcFile, destFile))
+						++m_added;
+				}
+				else
+					++m_added;
 			}
 			else
 			{
-				WriteLog(Log::LogLevel::Verbose, _T("Skipped \"%s\""), srcFile.wstring().c_str());
+				WriteLog(Log::LogLevel::Info, _T("Skipped \"%s\""), srcFile.wstring().c_str());
 				++m_skipped;
 			}
 		}
@@ -294,28 +331,17 @@ void RepRunner::AddPath(const PathT& p, RepSource& repSource)
 	{
 		if (std::experimental::filesystem::is_regular_file(p))
 		{
-			bool add = false;
-
-			if (m_matchExtension)
-			{
-				bool match = std::regex_match(p.extension().wstring(), m_filterRegex);
-				if (((m_flags & TASKS_FLAGS_INCLUDE_FILTERS) && match) || ((m_flags & TASKS_FLAGS_EXCLUDE_FILTERS) && !match))
-					add = true;
-			}
-			else
-				add = true;
-
-			if (add)
+			if (MatchedExtension(p.extension().wstring()))
 			{
 				++m_fileCount;
 				repSource.add(p);
-				WriteLog(Log::LogLevel::Verbose, _T("[%d] \"%s\"."), m_fileCount, p.wstring().c_str());
+				WriteLog(Log::LogLevel::Info, _T("[%d] Found \"%s\"."), m_fileCount, p.wstring().c_str());
 			}
 		}
 	}
 	catch (std::exception& e)
 	{
-		std::cerr << e.what();
+		WriteLog(Log::LogLevel::Error, _T("Exception caught: %s"), String::StringToStringT(e.what()).c_str());
 	}
 }
 
@@ -328,7 +354,7 @@ void RepRunner::WriteLog(Log::LogLevel level, LPCTSTR format, ...)
 	va_end(args);
 
 	m_log.Write(level, szMessage);
-	if (m_callback) m_callback(RunnerState::RUNNING, szMessage);
+	if (m_callback && (level <= Log::LogLevel::Info)) m_callback(RunnerState::RUNNING, szMessage);
 }
 
 void RepRunner::UpdateTaskInDB(int taskID, Database::PropertyList& propList)
@@ -376,14 +402,14 @@ void RepRunner::AddHistory(Database::PropertyList& propList)
 	}
 }
 
-void RepRunner::ReplicateWithShell(const StringT& parsingSrc, const PathT& srcPath, const PathT& destination)
+void RepRunner::ReplicateStreamToFile(const StringT& parsingSrc, const PathT& srcPath, const PathT& destination)
 {
 	ShellWrapper::ShellFolder folder{ parsingSrc };
 
-	ReplicateWithShell2(folder, srcPath, destination);
+	ReplicateStreamToFile(folder, srcPath, destination);
 }
 
-void RepRunner::ReplicateWithShell2(ShellWrapper::ShellFolder& folder, const PathT& srcPath, const PathT& destination)
+void RepRunner::ReplicateStreamToFile(ShellWrapper::ShellFolder& folder, const PathT& srcPath, const PathT& destination)
 {
 	// get all the ID's first
 	HRESULT hr = E_FAIL;
@@ -400,18 +426,14 @@ void RepRunner::ReplicateWithShell2(ShellWrapper::ShellFolder& folder, const Pat
 		HRESULT getResult = E_FAIL;
 		do
 		{
-			if (m_abort)
-			{
-				WriteLog(Log::LogLevel::Info, _T("Replication was aborted."));
-				return;
-			}
+			if (m_abort) { WriteLog(Log::LogLevel::Info, _T("Replication was aborted.")); return; }
 
 			ULONG got = 0;
 			LPITEMIDLIST itemIdList = nullptr;
 			getResult = enumIDList->Next(1, &itemIdList, &got);
 			if ((getResult == S_OK) && (got == 1))
 			{
-				ShellWrapper::ShellItem shellItem;
+				ShellWrapper::ShellItem2 shellItem;
 				if (SUCCEEDED(hr = SHCreateItemWithParent(nullptr, folder.Get(), itemIdList, IID_IShellItem2, (void**)&shellItem)))
 				{
 					if (shellItem.IsFolder())
@@ -424,42 +446,32 @@ void RepRunner::ReplicateWithShell2(ShellWrapper::ShellFolder& folder, const Pat
 	}
 	// process all file objects
 	if(!fileList.empty())
-		ProcessFiles(folder, srcPath, destination, fileList);
+		ProcessStreamFiles(folder, srcPath, destination, fileList);
 
 	// process all folder objects
 	if(!folderList.empty())
-		ProcessFolders(folder, srcPath, destination, folderList);
+		ProcessStreamFolders(folder, srcPath, destination, folderList);
 }
 
-void RepRunner::ProcessFiles(ShellWrapper::ShellFolder& folder, const PathT& srcPath, const PathT& destination, const ShellItemIDList& shellItemIdList)
+void RepRunner::ProcessStreamFiles(ShellWrapper::ShellFolder& folder, const PathT& srcPath, const PathT& destination, const ShellItemIDList& shellItemIdList)
 {
 	HRESULT hr;
 
 	for (auto it = shellItemIdList.begin(); it != shellItemIdList.end(); ++it)
 	{
-		ShellWrapper::ShellItem shellItem;
+		if (m_abort) { WriteLog(Log::LogLevel::Info, _T("Replication was aborted.")); return; }
+
+		ShellWrapper::ShellItem2 shellItem;
 		if (SUCCEEDED(hr = SHCreateItemWithParent(nullptr, folder.Get(), *it, IID_IShellItem2, (void**)&shellItem)))
 		{
 			PathT filePath{ srcPath };
-
 			filePath /= shellItem.GetName();
 
-			// extension check
-			bool matchExt = false;
-			if (m_matchExtension)
-			{
-				bool match = std::regex_match(filePath.extension().wstring(), m_filterRegex);
-				if (((m_flags & TASKS_FLAGS_INCLUDE_FILTERS) && match) || ((m_flags & TASKS_FLAGS_EXCLUDE_FILTERS) && !match))
-					matchExt = true;
-			}
-			else
-				matchExt = true;
-
 			// condition check
-			if (matchExt)
+			if (MatchedExtension(filePath.extension().wstring()))
 			{
 				++m_fileCount;
-				WriteLog(Log::LogLevel::Verbose, _T("[%d] \"%s\"."), m_fileCount, filePath.wstring().c_str());
+				WriteLog(Log::LogLevel::Info, _T("[%d] Found \"%s\"."), m_fileCount, filePath.wstring().c_str());
 
 				FILETIME srcFileTime = { 0 };
 				UINT64 srcFileSize = 0;
@@ -495,7 +507,6 @@ void RepRunner::ProcessFiles(ShellWrapper::ShellFolder& folder, const PathT& src
 						else
 						{
 							std::wstring src{ filePath.wstring().c_str() };
-							destFile /= src.substr(m_srcPath.wstring().length());
 							destFile /= shellItem.GetName();
 						}
 					}
@@ -511,12 +522,12 @@ void RepRunner::ProcessFiles(ShellWrapper::ShellFolder& folder, const PathT& src
 
 						if (m_flags & TASKS_FLAGS_UPDATE_NEWER)
 						{
-							if (CompareFileTime(&destFileTime.getModifiedTime(), &srcFileTime) != 0)
+							if (CompareFileTime(destFileTime.getModifiedTime(), &srcFileTime) < 0)
 								toUpdate = true;
 						}
 						else if (m_flags & TASKS_FLAGS_UPDATE_KEEP_BOTH)
 						{
-							if ((CompareFileTime(&destFileTime.getModifiedTime(), &srcFileTime) != 0) ||
+							if ((CompareFileTime(destFileTime.getModifiedTime(), &srcFileTime) != 0) ||
 								(std::experimental::filesystem::file_size(destFile) != srcFileSize))
 							{
 								Util::MD5Hash md5{ shellItem };
@@ -535,23 +546,33 @@ void RepRunner::ProcessFiles(ShellWrapper::ShellFolder& folder, const PathT& src
 
 					if (toUpdate)
 					{
-						WriteLog(Log::LogLevel::Verbose, _T("Updating \"%s\""), filePath.wstring().c_str());
+						WriteLog(Log::LogLevel::Info, _T("Updating \"%s\""), filePath.wstring().c_str());
 						if (!m_testRun)
-							Util::CopyStreamToFile(shellItem, destFile.wstring());
-
-						++m_updated;
+						{
+							if(Util::CopyStreamToFile(shellItem, destFile.wstring()))
+								++m_updated;
+							else
+								WriteLog(Log::LogLevel::Error, _T("Failed to update \"%s\""), filePath.wstring().c_str());
+						}
+						else
+							++m_updated;
 					}
 					else if (toAddNew)
 					{
-						WriteLog(Log::LogLevel::Verbose, _T("Adding \"%s\", source:\"%s\""), destFile.wstring().c_str(), filePath.wstring().c_str());
+						WriteLog(Log::LogLevel::Info, _T("Adding \"%s\", source:\"%s\""), destFile.wstring().c_str(), filePath.wstring().c_str());
 						if (!m_testRun)
-							Util::CopyStreamToFile(shellItem, destFile.wstring());
-
-						++m_added;
+						{
+							if(Util::CopyStreamToFile(shellItem, destFile.wstring()))
+								++m_added;
+							else
+								WriteLog(Log::LogLevel::Error, _T("Failed to add \"%s\""), filePath.wstring().c_str());
+						}
+						else
+							++m_added;
 					}
 					else
 					{
-						WriteLog(Log::LogLevel::Verbose, _T("Skipped \"%s\""), filePath.wstring().c_str());
+						WriteLog(Log::LogLevel::Info, _T("Skipped \"%s\""), filePath.wstring().c_str());
 						++m_skipped;
 					}
 				}
@@ -560,13 +581,15 @@ void RepRunner::ProcessFiles(ShellWrapper::ShellFolder& folder, const PathT& src
 	}
 }
 
-void RepRunner::ProcessFolders(ShellWrapper::ShellFolder& folder, const PathT& srcPath, const PathT& destination, const ShellItemIDList& shellItemIdList)
+void RepRunner::ProcessStreamFolders(ShellWrapper::ShellFolder& folder, const PathT& srcPath, const PathT& destination, const ShellItemIDList& shellItemIdList)
 {
 	HRESULT hr;
 
 	for (auto it = shellItemIdList.begin(); it != shellItemIdList.end(); ++it)
 	{
-		ShellWrapper::ShellItem shellItem;
+		if (m_abort) { WriteLog(Log::LogLevel::Info, _T("Replication was aborted.")); return; }
+
+		ShellWrapper::ShellItem2 shellItem;
 		if (SUCCEEDED(hr = SHCreateItemWithParent(nullptr, folder.Get(), *it, IID_IShellItem2, (void**)&shellItem)))
 		{
 			PathT filePath{ srcPath };
@@ -576,171 +599,400 @@ void RepRunner::ProcessFolders(ShellWrapper::ShellFolder& folder, const PathT& s
 
 			if (SUCCEEDED(hr = folder->BindToObject(*it, nullptr, IID_IShellFolder, (void**)&childFolder)))
 			{
-				ReplicateWithShell2(childFolder, filePath.wstring().c_str(), destination);
+				ReplicateStreamToFile(childFolder, filePath.wstring().c_str(), destination);
 			}
 		}
 	}
 }
 
-void RepRunner::ReplicateWithShell(ShellWrapper::ShellFolder& folder, const PathT& srcPath, const PathT& destination)
+void RepRunner::ReplicateFileToStream(const PathT& srcPath, const PathT& destination, const PathT& parsingDest)
 {
+	ShellWrapper::ShellFolder folder{ parsingDest };
 
-	HRESULT hr = E_FAIL;
-	ShellWrapper::EnumIDList enumIDList;
+	ReplicateFileToStream(srcPath, folder, destination);
+}
 
-	SHCONTF scf = SHCONTF_NONFOLDERS;
-	if (m_flags & TASKS_FLAGS_INCLUDE_SUBDIR)
-		scf |= SHCONTF_FOLDERS;
+void RepRunner::ReplicateFileToStream(const PathT& srcPath, ShellWrapper::ShellFolder& folder, const PathT& destination)
+{
+	bool includeSubFolder = (m_flags & TASKS_FLAGS_INCLUDE_SUBDIR) ? true : false;
+	std::vector<PathT> fileList;
+	std::vector<PathT> folderList;
 
-	if (SUCCEEDED(hr = folder->EnumObjects(NULL, scf, &enumIDList)))
+	DirectoryIteratorT dit(srcPath);
+	for (; dit != DirectoryIteratorT(); ++dit)
 	{
-		HRESULT getResult = E_FAIL;
-		do
+		if (m_abort) { WriteLog(Log::LogLevel::Info, _T("Replication was aborted.")); return; }
+
+		try
 		{
-			if (m_abort)
+			if (std::experimental::filesystem::is_regular_file(dit->path()))
 			{
-				WriteLog(Log::LogLevel::Info, _T("Replication was aborted."));
-				return;
-			}
-			ULONG get = ENUM_COUNT, got = 0;
-			ComMemArray<LPITEMIDLIST, ENUM_COUNT> folderItemIdList;
-
-			getResult = enumIDList->Next(get, folderItemIdList.data(), &got);
-			for (ULONG item = 0; item < got; ++item)
-			{
-				ShellWrapper::ShellItem shellItem;
-				if (SUCCEEDED(hr = SHCreateItemWithParent(nullptr, folder.Get(), folderItemIdList[item], IID_IShellItem2, (void**)&shellItem)))
+				if (MatchedExtension(dit->path().extension().wstring()))
 				{
-					PathT filePath{ srcPath };
-					
-					filePath /= shellItem.GetName();
-
-					if (shellItem.IsFolder())
-					{
-						ShellWrapper::ShellFolder childFolder;
-
-						if (SUCCEEDED(hr = folder->BindToObject(folderItemIdList[item], nullptr, IID_IShellFolder, (void**)&childFolder)))
-							ReplicateWithShell(childFolder, filePath.wstring().c_str(), destination);
-					}
-					else
-					{
-						// extension check
-						bool matchExt = false;
-						if (m_matchExtension)
-						{
-							bool match = std::regex_match(filePath.extension().wstring(), m_filterRegex);
-							if (((m_flags & TASKS_FLAGS_INCLUDE_FILTERS) && match) || ((m_flags & TASKS_FLAGS_EXCLUDE_FILTERS) && !match))
-								matchExt = true;
-						}
-						else
-							matchExt = true;
-
-						// condition check
-						if (matchExt)
-						{
-							++m_fileCount;
-							WriteLog(Log::LogLevel::Verbose, _T("[%d] \"%s\"."), m_fileCount, filePath.wstring().c_str());
-
-							FILETIME srcFileTime = { 0 };
-							UINT64 srcFileSize = 0;
-							
-							shellItem->GetUInt64(PKEY_Size, &srcFileSize);
-							if (SUCCEEDED(hr = shellItem->GetFileTime(PKEY_DateModified, &srcFileTime)))
-							{
-								PathT destFile{ destination };
-
-								if (m_flags & TASKS_FLAGS_DEST_GROUP_BY_DATE)
-								{
-									std::tm ft;
-									FILETIME localFT;
-									SYSTEMTIME st;
-
-									FileTimeToLocalFileTime(&srcFileTime, &localFT);
-									FileTimeToSystemTime(&localFT, &st);
-
-									ft.tm_year = st.wYear - 1900;
-									ft.tm_mon = st.wMonth;
-									ft.tm_mday = st.wDay;
-									ft.tm_hour = st.wHour;
-									ft.tm_min = st.wMinute;
-									ft.tm_sec = st.wSecond;
-
-									destFile /= m_pathFormatter.GetPath(&ft);
-									destFile /= shellItem.GetName();
-								}
-								else
-								{
-									if (m_flags & TASKS_FLAGS_DEST_START_FROM_ROOT)
-										destFile /= filePath.relative_path();
-									else
-									{
-										std::wstring src{ filePath.wstring().c_str() };
-										destFile /= src.substr(m_srcPath.wstring().length());
-										destFile /= shellItem.GetName();
-									}
-								}
-
-								if (!std::experimental::filesystem::exists(destFile.parent_path()))
-									std::experimental::filesystem::create_directories(destFile.parent_path());
-
-								bool toUpdate = false, toAddNew = false;
-
-								if (std::experimental::filesystem::exists(destFile))
-								{
-									FileTime destFileTime{ destFile };
-
-									if (m_flags & TASKS_FLAGS_UPDATE_NEWER)
-									{
-										if (CompareFileTime(&destFileTime.getModifiedTime(), &srcFileTime) != 0)
-											toUpdate = true;
-									}
-									else if (m_flags & TASKS_FLAGS_UPDATE_KEEP_BOTH)
-									{
-										if ((CompareFileTime(&destFileTime.getModifiedTime(), &srcFileTime) != 0) ||
-											(std::experimental::filesystem::file_size(destFile) != srcFileSize))
-										{
-											Util::MD5Hash md5{ shellItem };
-											if (GetNewFileName(destFile, md5))
-												toAddNew = true;
-										}
-									}
-									else if (m_flags & TASKS_FLAGS_UPDATE_OVERWRITE)
-									{
-										toUpdate = true;
-									}
-									// else TASKS_FLAGS_UPDATE_DO_NOTHING
-								}
-								else
-									toAddNew = true;
-
-								if (toUpdate)
-								{
-									WriteLog(Log::LogLevel::Verbose, _T("Updating \"%s\""), filePath.wstring().c_str());
-									if (!m_testRun)
-										Util::CopyStreamToFile(shellItem,  destFile.wstring());
-
-									++m_updated;
-								}
-								else if (toAddNew)
-								{
-									WriteLog(Log::LogLevel::Verbose, _T("Adding \"%s\", source:\"%s\""), destFile.wstring().c_str(), filePath.wstring().c_str());
-									if (!m_testRun)
-										Util::CopyStreamToFile(shellItem, destFile.wstring());
-
-									++m_added;
-								}
-								else
-								{
-									WriteLog(Log::LogLevel::Verbose, _T("Skipped \"%s\""), filePath.wstring().c_str());
-									++m_skipped;
-								}
-							}
-						}
-					}
+					++m_fileCount;
+					fileList.push_back(dit->path());
+					WriteLog(Log::LogLevel::Info, _T("[%d] Found \"%s\"."), m_fileCount, dit->path().wstring().c_str());
 				}
 			}
-		} while (getResult == S_OK);
+			else if (includeSubFolder && std::experimental::filesystem::is_directory(dit->path()))
+			{
+				folderList.push_back(dit->path());
+			}
+		}
+		catch (std::exception& e)
+		{
+			WriteLog(Log::LogLevel::Error, _T("Exception caught: %s"), String::StringToStringT(e.what()).c_str());
+		}
+	}
+
+	if (!fileList.empty())
+	{
+		ProcessFiles(fileList, folder, destination);
+	}
+
+	if (!folderList.empty())
+	{
+		ProcessFolders(folderList, folder, destination);
+	}
+}
+
+// fileList: the list of child file items
+// folder: the current destination folder object
+void RepRunner::ProcessFiles(const std::vector<PathT>& fileList, ShellWrapper::ShellFolder& folder, const PathT& destination)
+{
+	ShellWrapper::ShellItem folderItem;
+
+	HRESULT hr = SHGetItemFromObject(folder.Get(), IID_IShellItem, (void**)&folderItem);
+	if (FAILED(hr))
+	{
+		WriteLog(Log::LogLevel::Error, _T("Failed to retrieve the shell item \"%s\". Code: %x"), destination.wstring().c_str(), hr);
+		return;
+	}
+
+	for (auto srcFile : fileList)
+	{
+		bool add = false, update = false;
+		std::wstring filename = srcFile.filename().wstring();
+
+		ShellWrapper::ShellItem2 item = folder.OpenFileItem(filename);
+
+		if (item.isValid())
+		{
+			HRESULT hr = E_FAIL;
+			UINT64 srcFileSize = 0;
+
+			item->GetUInt64(PKEY_Size, &srcFileSize);
+
+			FileTime destFileTime{ item };
+			FileTime srcFileTime{ srcFile.wstring() };
+
+			if (srcFileTime.isValid() && destFileTime.isValid())
+			{
+				if (CompareFileTime(srcFileTime.getModifiedTime(), destFileTime.getModifiedTime()) > 0)
+					update = true;
+			}
+			else
+				update = true;
+		}
+		else
+			add = true;
+
+		PathT destFilePath{ destination };
+		destFilePath /= filename;
+
+		if (add)
+		{
+			WriteLog(Log::LogLevel::Info, _T("Adding \"%s\", source:\"%s\""), destFilePath.wstring().c_str(), srcFile.wstring().c_str());
+
+			if (!m_testRun)
+			{
+				if (Util::CopyFileToFolder(srcFile, folderItem))
+					++m_added;
+				else
+					WriteLog(Log::LogLevel::Error, _T("Failed to add \"%s\""), destFilePath.wstring().c_str());
+			}
+			else
+				++m_added;
+		}
+		else if (update)
+		{
+			WriteLog(Log::LogLevel::Info, _T("Updating \"%s\""), destFilePath.wstring().c_str());
+			if (!m_testRun)
+			{
+				if (Util::CopyFileToFolder(srcFile, folderItem))
+					++m_updated;
+				else
+					WriteLog(Log::LogLevel::Error, _T("Failed to update \"%s\""), destFilePath.wstring().c_str());
+			}
+			else
+				++m_updated;
+		}
+		else
+		{
+			WriteLog(Log::LogLevel::Info, _T("Skipped \"%s\""), destFilePath.wstring().c_str());
+			++m_skipped;
+		}
+	}
+}
+
+// folderList: the list of subfolders 
+// folder: the current destination folder object
+void RepRunner::ProcessFolders(const std::vector<PathT>& folderList, ShellWrapper::ShellFolder& folder, const PathT& destination)
+{
+	for (auto folderPath : folderList)
+	{
+		if (m_abort) { WriteLog(Log::LogLevel::Info, _T("Replication was aborted.")); return; }
+
+		ShellWrapper::ShellFolder subFolder = folder.CreateSubFolder(folderPath.filename().wstring());
+
+		PathT subPath{ destination };
+		subPath /= folderPath.filename().wstring();
+
+		ReplicateFileToStream(folderPath, subFolder, subPath);
+	}
+}
+
+const std::wstring g_portableDevicePrefix{ L"\\\\?\\" };
+
+void RepRunner::ReplicateFilesToPortableDevice(const PathT& srcPath, const PathT& destination, const PathT& parsingDest)
+{
+	std::vector<std::wstring> paths = Util::ParseParsingPath(parsingDest);
+	if ((paths.size() < 3) || paths[0].empty() || (paths[0][0] != L':') || (paths[1].compare(0, g_portableDevicePrefix.length(), g_portableDevicePrefix) != 0))
+	{
+		throw new std::runtime_error("Invalid destination path.");
+	}
+
+	WPD::PortableDevice device{ paths[1] };
+
+	WPD::PortableDeviceContent deviceContent;
+
+	HRESULT hr = device->Content(&deviceContent);
+	if (SUCCEEDED(hr))
+	{
+		ComInterface<IPortableDevicePropVariantCollection> objectIDs;
+		ComInterface<IPortableDevicePropVariantCollection> persistentUniqueIDs{ CLSID_PortableDevicePropVariantCollection };
+		ComPropVariant persistentId{ paths[paths.size() - 1] };
+
+		hr = persistentUniqueIDs->Add(persistentId.Get());
+		if (SUCCEEDED(hr))
+		{
+			hr = deviceContent->GetObjectIDsFromPersistentUniqueIDs(persistentUniqueIDs.Get(), &objectIDs);
+			if (SUCCEEDED(hr))
+			{
+				DWORD count = 0;
+				hr = objectIDs->GetCount(&count);
+				if (SUCCEEDED(hr) && (count == 1))
+				{
+					ComPropVariant objectId;
+					hr = objectIDs->GetAt(0, objectId.Get());
+					if (SUCCEEDED(hr))
+					{
+						ReplicateFilesToPortableDevice(deviceContent, srcPath, objectId.GetStringValue(), destination);
+					}
+					else
+						WriteLog(Log::LogLevel::Error, _T("Failed to get the object ID value. Code: %x"), hr);
+				}
+				else
+					WriteLog(Log::LogLevel::Error, _T("Failed to retrieve the object ID. Count: %d, Code: %x"), count, hr);
+			}
+			else
+				WriteLog(Log::LogLevel::Error, _T("Failed to retrieve the object ID. Code: %x"), hr);
+		}
+		else
+			WriteLog(Log::LogLevel::Error, _T("Failed to create property collection. Code: %x"), hr);
+	}
+	else
+		WriteLog(Log::LogLevel::Error, _T("Failed to open portable device. Code: %x"), hr);
+}
+
+void RepRunner::ReplicateFilesToPortableDevice(WPD::PortableDeviceContent& deviceContent, const PathT& srcPath, const std::wstring& destObjId, const PathT& destination)
+{
+	bool includeSubFolder = (m_flags & TASKS_FLAGS_INCLUDE_SUBDIR) ? true : false;
+	std::vector<PathT> fileList;
+	std::vector<PathT> folderList;
+
+	// discover all files and folder from the source
+	DirectoryIteratorT dit(srcPath);
+	for (; dit != DirectoryIteratorT(); ++dit)
+	{
+		if (m_abort) { WriteLog(Log::LogLevel::Info, _T("Replication was aborted.")); return; }
+
+		try
+		{
+			if (std::experimental::filesystem::is_regular_file(dit->path()))
+			{
+				if (MatchedExtension(dit->path().extension().wstring()))
+				{
+					++m_fileCount;
+					fileList.push_back(dit->path());
+					WriteLog(Log::LogLevel::Info, _T("[%d] Found \"%s\"."), m_fileCount, dit->path().wstring().c_str());
+				}
+			}
+			else if (includeSubFolder && std::experimental::filesystem::is_directory(dit->path()))
+			{
+				folderList.push_back(dit->path());
+			}
+		}
+		catch (std::exception& e)
+		{
+			WriteLog(Log::LogLevel::Error, _T("Exception caught: %s"), String::StringToStringT(e.what()).c_str());
+		}
+	}
+
+	// discover all files in destination
+	ComInterface<IEnumPortableDeviceObjectIDs>  enumObjectIDs;
+	WPD::PortableDeviceProperties properties;
+
+	WPD::PortableDeviceItemMap destFileMap;
+	std::map<std::wstring, std::wstring> destFolderMap;
+
+	HRESULT hr = E_FAIL;
+
+	hr = deviceContent->Properties(&properties);
+	if (SUCCEEDED(hr))
+	{
+		hr = deviceContent->EnumObjects(0, destObjId.c_str(), nullptr, &enumObjectIDs);
+		while (hr == S_OK)
+		{
+			DWORD  numFetched = 0;
+			PWSTR  objectIDArray[NUM_OBJECTS_TO_REQUEST] = { 0 };
+			hr = enumObjectIDs->Next(NUM_OBJECTS_TO_REQUEST, objectIDArray, &numFetched);
+			if (SUCCEEDED(hr))
+			{
+				for (DWORD index = 0; (index < numFetched) && (objectIDArray[index] != nullptr); index++)
+				{
+					WPD::PortableDeviceItem item;
+
+					hr = properties.GetItemWithProperties(objectIDArray[index], item);
+					if (SUCCEEDED(hr))
+					{
+						if (IsEqualGUID(item.GetContentType(), WPD_CONTENT_TYPE_FOLDER))
+						{
+							if(includeSubFolder)
+								destFolderMap.insert(std::pair<std::wstring, std::wstring>(item.GetName(), item.GetObjId()));
+						}
+						else
+						{
+							destFileMap.insert(std::pair<std::wstring, WPD::PortableDeviceItem>(item.GetName(), item));
+						}
+					}
+					CoTaskMemFree(objectIDArray[index]);
+					objectIDArray[index] = nullptr;
+				}
+			}
+		}
+	}
+
+	// process
+	if (!fileList.empty())
+	{
+		ProcessFiles(deviceContent, fileList, destObjId, destination, destFileMap);
+	}
+
+	if (!folderList.empty())
+	{
+		ProcessFolders(deviceContent, folderList, destObjId, destination, destFolderMap);
+	}
+}
+
+void RepRunner::ProcessFiles(WPD::PortableDeviceContent& deviceContent, const std::vector<PathT>& srcFileList, const std::wstring& currentFolderObjId,
+	const PathT& currentDestPath, const WPD::PortableDeviceItemMap& destFileMap)
+{
+	for (auto srcFile : srcFileList)
+	{
+		if (m_abort) { WriteLog(Log::LogLevel::Info, _T("Replication was aborted.")); return; }
+
+		bool add = false, update = false;
+		auto destFile = destFileMap.find(srcFile.filename());
+		if (destFile != destFileMap.end())
+		{
+			FileTime srcFileTime{ srcFile };
+
+			// do we need to update if different?
+			if (CompareFileTime(srcFileTime.getModifiedTime(), destFile->second.GetModifiedTime()) > 0)
+				update = true;
+		}
+		else
+			add = true;
+
+		PathT destFilePath{ currentDestPath };
+		destFilePath /= srcFile.filename();
+
+		if (update)
+		{
+			WriteLog(Log::LogLevel::Info, _T("Updating \"%s\""), destFilePath.wstring().c_str());
+			if (m_testRun)
+			{
+				HRESULT hr = deviceContent.UpdateFile(srcFile, currentFolderObjId, destFile->second.GetObjId());
+				if (SUCCEEDED(hr))
+				{
+					++m_updated;
+				}
+				else
+				{
+					WriteLog(Log::LogLevel::Error, _T("Failed to update \"%s\" with \"%s\". Code: %x"),
+						currentDestPath.wstring().c_str(), srcFile.wstring().c_str(), hr);
+				}
+			}
+			else
+				++m_updated;
+		}
+		else if(add)
+		{
+			WriteLog(Log::LogLevel::Info, _T("Adding \"%s\" to \"%s\""), srcFile.wstring().c_str(), currentDestPath.wstring().c_str());
+			if (!m_testRun)
+			{
+				HRESULT hr = deviceContent.TransferFile(srcFile, currentFolderObjId);
+				if (SUCCEEDED(hr))
+				{
+					++m_added;
+				}
+				else
+				{
+					WriteLog(Log::LogLevel::Error, _T("Failed to transfer \"%s\" to \"%s\". Code: %x"),
+						srcFile.wstring().c_str(), currentDestPath.wstring().c_str(), hr);
+				}
+			}
+			else
+				++m_added;
+		}
+		else
+		{
+			WriteLog(Log::LogLevel::Info, _T("Skipped \"%s\""), destFilePath.wstring().c_str());
+			++m_skipped;
+		}
 	}
 
 }
+void RepRunner::ProcessFolders(WPD::PortableDeviceContent& deviceContent, const std::vector<PathT>& srcFolderList, const std::wstring& currentFolderObjId,
+	const PathT& currentDestPath, const std::map<std::wstring, std::wstring>& destFolderMap)
+{
+	for (auto srcfolder : srcFolderList)
+	{
+		if (m_abort) { WriteLog(Log::LogLevel::Info, _T("Replication was aborted.")); return; }
 
+		std::wstring childFolderObjId;
+		PathT childDest{ currentDestPath };
+
+		childDest /= srcfolder.filename();
+
+		auto destFolder = destFolderMap.find(srcfolder.filename());
+		if (destFolder == destFolderMap.end())
+		{
+			HRESULT hr = deviceContent.CreateFolder(currentFolderObjId, srcfolder.filename(), childFolderObjId);
+			if (FAILED(hr))
+			{
+				WriteLog(Log::LogLevel::Error, _T("Failed to create folder \"%s\". Code:%x"), childDest.wstring().c_str(), hr);
+				continue;
+			}
+		}
+		else
+		{
+			childFolderObjId = destFolder->second;
+		}
+		if (!childFolderObjId.empty())
+		{
+			ReplicateFilesToPortableDevice(deviceContent, srcfolder, childFolderObjId, childDest);
+		}
+	}
+}

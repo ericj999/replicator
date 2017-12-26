@@ -11,6 +11,7 @@ TaskRecord::ColumnDef columns[] =
 	{ TASKS_COL_SOURCE, Database::PT_TEXT },
 	{ TASKS_COL_SOURCE_PARSING, Database::PT_TEXT },
 	{ TASKS_COL_DESTINATION, Database::PT_TEXT },
+	{ TASKS_COL_DEST_PARSING, Database::PT_TEXT },
 	{ TASKS_COL_FLASGS, Database::PT_INT },
 	{ TASKS_COL_FILTERS, Database::PT_TEXT },
 	{ TASKS_COL_DESTFOLDERFMT, Database::PT_TEXT }
@@ -42,6 +43,9 @@ TaskRecord::TaskRecord(Database::Database& db, int taskID) :
 
 		const Database::Property& dest = props.Find(TASKS_COL_DESTINATION);
 		if (!dest.IsNULL()) m_destination = dest.m_str;
+
+		const Database::Property& parsingDest = props.Find(TASKS_COL_DEST_PARSING);
+		if (!parsingDest.IsNULL()) m_parsingDestination = parsingDest.m_str;
 
 		const Database::Property& destFolderFormat = props.Find(TASKS_COL_DESTFOLDERFMT);
 		if (!destFolderFormat.IsNULL()) m_destinationFolderFormat = destFolderFormat.m_str;

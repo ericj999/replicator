@@ -20,6 +20,7 @@ public:
 	const StringT& getSource() { return m_source; }
 	const StringT& getParsingSource() { return m_parsingSource; }
 	const StringT& getDestination() { return m_destination;  }
+	const StringT& getParsingDestination() { return m_parsingDestination; }
 	const StringT& getDestinationFolderFormat() { return m_destinationFolderFormat; }
 	int getFlags() { return m_flags; }
 	const StringT& getFilters() { return m_filters; }
@@ -30,6 +31,7 @@ protected:
 	StringT m_source;
 	StringT m_parsingSource;
 	StringT m_destination;
+	StringT m_parsingDestination;
 	int m_flags;
 	StringT m_filters;
 	StringT m_destinationFolderFormat;

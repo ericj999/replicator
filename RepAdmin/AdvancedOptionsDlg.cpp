@@ -47,7 +47,7 @@ int SyncOptionID[SyncOptionMax] =
 IMPLEMENT_DYNAMIC(CAdvancedOptionsDlg, CDialogEx)
 
 CAdvancedOptionsDlg::CAdvancedOptionsDlg(CWnd* pParent /*=NULL*/)
-: CDialogEx(CAdvancedOptionsDlg::IDD, pParent), m_flags{ 0 }, m_options{ 0 }
+	: CDialogEx(CAdvancedOptionsDlg::IDD, pParent), m_flags{ 0 }, m_options{ 0 }, m_noDestinationOptions{ false }
 {
 
 }
@@ -139,6 +139,16 @@ BOOL CAdvancedOptionsDlg::OnInitDialog()
 		m_cbUpdateOptions.SetCurSel(UpdateOptionOverwrite);
 	else
 		m_cbUpdateOptions.SetCurSel(UpdateOptionUpdateNewer);
+
+	if (m_noDestinationOptions)
+	{
+		CButton* pBtn = static_cast<CButton*>(GetDlgItem(IDC_DESTINATION_SAME_FROM_SELECT));
+		if (pBtn) pBtn->SetCheck(BST_CHECKED);
+
+		GetDlgItem(IDC_DESTINATION_GROUP)->EnableWindow(FALSE);
+		GetDlgItem(IDC_DESTINATION_SAME_FROM_ROOT)->EnableWindow(FALSE);
+		UpdateFolderOption(0);
+	}
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE

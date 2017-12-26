@@ -160,6 +160,13 @@
     <ClInclude Include="Table.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TaskRecord.h" />
+    <ClInclude Include="WinFile.h" />
+    <ClInclude Include="WPDDefinitions.h" />
+    <ClInclude Include="WPDPortableDevice.h" />
+    <ClInclude Include="WPDPortableDeviceContent.h" />
+    <ClInclude Include="WPDPortableDeviceManager.h" />
+    <ClInclude Include="WPDPortableDeviceProperties.h" />
+    <ClInclude Include="WPDUtils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\SQLite\sqlite3.c">
@@ -190,6 +197,13 @@
     <ClCompile Include="Table.cpp" />
     <ClCompile Include="TaskRecord.cpp" />
     <ClCompile Include="util.cpp" />
+    <ClCompile Include="WinFile.cpp" />
+    <ClCompile Include="WPDPortableDevice.cpp" />
+    <ClCompile Include="WPDPortableDeviceContent.cpp" />
+    <ClCompile Include="WPDPortableDeviceManager.cpp" />
+    <ClCompile Include="WPDPortableDeviceProperties.cpp" />
+    <ClCompile Include="WPDDefinitions.cpp" />
+    <ClCompile Include="WPDUtils.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

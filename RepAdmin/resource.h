@@ -16,6 +16,7 @@
 #define IDS_TOOLBAR_CUSTOMIZE           125
 #define IDR_MAINFRAME                   128
 #define IDR_MAINFRAME_256               129
+#define IDS_TITLE_TESTRUN               129
 #define IDR_ReplicatorTYPE              130
 #define IDS_LIST_NAME                   200
 #define IDS_LIST_STATUS                 201
@@ -56,6 +57,7 @@
 #define IDC_NEW_TASK_INCLUSION          1007
 #define IDS_ERROR_DEVICE_DISCONNECTED   1007
 #define IDC_NEW_TASK_EXCLUSION          1008
+#define IDS_ERROR_PORTABLE_TO_PORTABLE  1008
 #define IDC_NEW_TASK_FILTERS            1009
 #define IDC_NEW_TASK_BROWSE_DEST        1010
 #define IDC_NEW_TASK_ADD_SRC            1011
@@ -88,6 +90,13 @@
 #define IDC_EDIT_HISTORY_DAYS           1042
 #define IDC_REMOVE_OLDER_HISTORY        1043
 #define IDC_NEW_TASK_BROWSE_SOURCE      1045
+#define IDC_TEST_RUN                    1046
+#define IDC_TASK_NAME                   1047
+#define IDC_TASK_ID                     1048
+#define IDC_SOURCE_PATH                 1049
+#define IDC_DEST_PATH                   1050
+#define IDC_CREATED_TIME                1051
+#define IDC_CONDITIONS                  1052
 #define IDS_TASK_INFO_TEMPLATE          2000
 #define IDS_CHILD_FOLDER                2001
 #define IDS_ALL_FILES                   2002
@@ -136,9 +145,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        327
+#define _APS_NEXT_RESOURCE_VALUE        328
 #define _APS_NEXT_COMMAND_VALUE         32782
-#define _APS_NEXT_CONTROL_VALUE         1046
+#define _APS_NEXT_CONTROL_VALUE         1053
 #define _APS_NEXT_SYMED_VALUE           313
 #endif
 #endif

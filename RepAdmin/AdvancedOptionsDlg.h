@@ -16,6 +16,7 @@ public:
 	void set_Filters(LPCTSTR filters) { m_filters = filters; }
 	void set_Options(int options) { m_options = options; }
 	void set_DestinationFolderFormat(LPCTSTR folderFormat) { m_destinationFolderFormat = folderFormat;  }
+	void setNoDestinationOptions() { m_noDestinationOptions = true; }
 
 	int get_Flags() { return m_flags;  }
 	CString get_Filters() { return m_filters; }
@@ -34,6 +35,7 @@ protected:
 	int m_options;
 	CString m_filters;
 	CString m_destinationFolderFormat;
+	bool m_noDestinationOptions;
 
 	void UpdateFolderOption(int flags);
 

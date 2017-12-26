@@ -20,8 +20,6 @@ namespace WPD
 		clientInfo->SetUnsignedIntegerValue(WPD_CLIENT_MINOR_VERSION, CLIENT_MINOR_VER);
 		clientInfo->SetUnsignedIntegerValue(WPD_CLIENT_REVISION, CLIENT_REVISION);
 		clientInfo->SetUnsignedIntegerValue(WPD_CLIENT_SECURITY_QUALITY_OF_SERVICE, SECURITY_IMPERSONATION);
-		// we always open the device in read only mode
-		clientInfo->SetUnsignedIntegerValue(WPD_CLIENT_DESIRED_ACCESS, GENERIC_READ);
 		
 		if (FAILED(m_interface->Open(deviceId.c_str(), clientInfo.Get())))
 		{

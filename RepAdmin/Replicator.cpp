@@ -250,6 +250,7 @@ void CReplicatorApp::CreateDB(const StringT& db)
 		"Source TEXT NOT NULL," \
 		"SourceParsing TEXT," \
 		"Destination TEXT NOT NULL," \
+		"DestParsing TEXT," \
 		"Flags INT DEFAULT 0," \
 		"Filters TEXT," \
 		"LastRun DATETIME," \

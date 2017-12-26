@@ -205,7 +205,18 @@ IDD_GENERALPAGE DIALOGEX 0, 0, 409, 249
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD | WS_DISABLED | WS_SYSMENU
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "",IDC_GENERAL_INFO,7,7,395,235
+    LTEXT           "Task:",IDC_STATIC,7,7,18,8
+    LTEXT           "",IDC_TASK_NAME,54,7,348,8
+    LTEXT           "ID:",IDC_STATIC,7,28,11,8
+    LTEXT           "",IDC_TASK_ID,54,28,348,8
+    LTEXT           "Create:",IDC_STATIC,7,49,26,8
+    LTEXT           "",IDC_CREATED_TIME,54,49,348,8
+    LTEXT           "Source:",IDC_STATIC,7,70,26,8
+    LTEXT           "",IDC_SOURCE_PATH,54,70,348,19
+    LTEXT           "Destination:",IDC_STATIC,7,91,40,8
+    LTEXT           "",IDC_DEST_PATH,54,91,348,19
+    LTEXT           "Condition(s):",IDC_STATIC,7,112,42,8
+    LTEXT           "",IDC_CONDITIONS,54,112,348,69
 END
 
 IDD_SETTINGSPAGE DIALOGEX 0, 0, 409, 249
@@ -232,7 +243,7 @@ BEGIN
     CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME,7,27,343,1,WS_EX_STATICEDGE
     LTEXT           "&Replicate files from",IDC_STATIC,7,32,62,8
     LTEXT           "&to",IDC_STATIC,7,62,8,8
-    EDITTEXT        IDC_NEW_TASK_DESTINATION,7,75,316,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_NEW_TASK_DESTINATION,7,75,316,14,ES_AUTOHSCROLL | ES_READONLY
     PUSHBUTTON      "...",IDC_NEW_TASK_BROWSE_DEST,325,75,25,14
     CONTROL         "Include &sub-folders",IDC_NEW_TASK_INCLUDE_SUB,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,111,81,10
     PUSHBUTTON      "&Create",IDC_NEW_TASK_CREATE,248,138,50,14,WS_DISABLED
@@ -241,7 +252,7 @@ BEGIN
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,38,101,312,1
     PUSHBUTTON      "Advanced options",IDC_NEW_TASK_ADV_OPTIONS,264,108,86,14
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,8,130,342,1
-    EDITTEXT        IDC_NEW_TASK_SOURCE,7,44,316,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_NEW_TASK_SOURCE,7,44,316,14,ES_AUTOHSCROLL | ES_READONLY
     PUSHBUTTON      "...",IDC_NEW_TASK_BROWSE_SOURCE,325,44,25,14
 END
 
@@ -299,18 +310,22 @@ BEGIN
     CTEXT           "Waiting...",IDC_STATIC,7,12,139,8
 END
 
-IDD_SETTINGS DIALOGEX 0, 0, 255, 98
+IDD_SETTINGS DIALOGEX 0, 0, 255, 118
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Settings"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,146,77,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,199,77,50,14
+    DEFPUSHBUTTON   "OK",IDOK,146,97,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,199,97,50,14
     EDITTEXT        IDC_EDIT_HISTORY_DAYS,84,19,26,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "day(s)",IDC_STATIC,118,22,22,8
     LTEXT           "History",IDC_STATIC,7,7,24,8
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,36,11,212,1
     LTEXT           "Keep history for:",IDC_STATIC,25,22,55,8
+    LTEXT           "Tools",IDC_STATIC,7,44,18,8
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,30,49,218,1
+    CONTROL         "&Test run without replicating the files",IDC_TEST_RUN,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,60,131,10
 END
 
 
@@ -435,7 +450,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 248
         TOPMARGIN, 7
-        BOTTOMMARGIN, 91
+        BOTTOMMARGIN, 111
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -481,6 +496,11 @@ BEGIN
     0
 END
 
+IDD_GENERALPAGE AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -498,6 +518,7 @@ END
 STRINGTABLE
 BEGIN
     IDR_MAINFRAME           "Replicator\n\nReplicator\n\n\nReplicator.Document\nReplicator.Document"
+    IDS_TITLE_TESTRUN       "Replicator (Test Run)"
 END
 
 STRINGTABLE
@@ -610,7 +631,6 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_TASK_INFO_TEMPLATE  "Task:\n\t%s\n\nCreated:\n\t%s\n\nSource:\n%s\nDestination:\n\t%s\n\nConditions:\n%s"
     IDS_CHILD_FOLDER        "Include children folders"
     IDS_ALL_FILES           "Include all files"
     IDS_FILES_MATCHING      "Include file types matching "
@@ -666,6 +686,12 @@ BEGIN
     IDS_HP_COL_START_TIME   "Start"
     IDS_HP_COL_END_TIME     "End"
     IDS_HP_COL_RESULT       "Result"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_ERROR_PORTABLE_TO_PORTABLE 
+                            "Replicating between folders both on protable devices is not supported."
 END
 
 #endif    // English (United States) resources

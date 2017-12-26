@@ -4,7 +4,7 @@
 #include "StringT.h"
 
 #define MUTEX_WAIT_TIME_SEC	1
-#define MAX_LOG_FILE_SIZE	(4 * 1024 * 1024)
+#define MAX_LOG_FILE_SIZE	(10 * 1024 * 1024)
 #define MAX_LOG_FILES		10
 
 namespace Log
@@ -36,11 +36,7 @@ namespace Log
 		void warn(const StringT& msg) { Write(LogLevel::Warning, msg); }
 		void verbose(const StringT& msg) { Write(LogLevel::Verbose, msg); }
 
-		void Write(LogLevel level, const StringT& msg);
-//		void Roll(bool force = false);
-		void Roll();
-
-	private:
+	protected:
 		LogLevel m_logLevel;
 		PathT m_path;
 		int m_maxSize;
@@ -48,6 +44,8 @@ namespace Log
 		std::timed_mutex m_mutex;
 
 		void CheckPath();
+		void Write(LogLevel level, const StringT& msg);
+		void Roll();
 	};
 }
 

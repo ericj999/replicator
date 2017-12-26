@@ -64,7 +64,8 @@ void CGeneralPage::Refresh(int newTask, bool force)
 {
 	if ((newTask != m_CurrentTask) || (force && (newTask == m_CurrentTask)))
 	{
-		CString str;
+		StringT name, taskId, createdTime, sourcePath, destPath, repCondition;
+
 		if (newTask > 0)
 		{
 			Database::Table tb{ theApp.GetDB(), TASKS_TABLE };
@@ -79,9 +80,6 @@ void CGeneralPage::Refresh(int newTask, bool force)
 			Database::RecordsetPtr rs = tb.Select(props, condition);
 			if (rs->Step())
 			{
-				StringT createdTime = String::UTCTimeToLocalTime(rs->GetColumnStr(COL_CreatedTime));
-				StringT source = _T("\t") + rs->GetColumnStr(COL_Source) + _T("\n");
-
 				CString s;
 
 				condition.clear();
@@ -89,7 +87,7 @@ void CGeneralPage::Refresh(int newTask, bool force)
 				if (flags & TASKS_FLAGS_INCLUDE_SUBDIR)
 					s.LoadString(IDS_CHILD_FOLDER);
 
-				condition = _T("\t") + s + _T("\n");
+				condition = s + _T("\r\n");
 
 				if (flags & TASKS_FLAGS_INCLUDE_FILTERS)
 				{
@@ -104,13 +102,24 @@ void CGeneralPage::Refresh(int newTask, bool force)
 				else
 					s.LoadStringW(IDS_ALL_FILES);
 
-				condition += _T("\t") + s + _T("\n");
+				condition += s + _T("\r\n");
 
-				str.Format(IDS_TASK_INFO_TEMPLATE, rs->GetColumnStr(COL_Name).c_str(), createdTime.c_str(), source.c_str(), rs->GetColumnStr(COL_Destination).c_str(), condition.c_str());
+				name = rs->GetColumnStr(COL_Name);
+				createdTime = String::UTCTimeToLocalTime(rs->GetColumnStr(COL_CreatedTime));
+				sourcePath = rs->GetColumnStr(COL_Source);
+				destPath = rs->GetColumnStr(COL_Destination);
+				repCondition = condition;
 			}
 		}
-		SetDlgItemText(IDC_GENERAL_INFO, str);
+
+		taskId = ToStringT(newTask);
 		m_CurrentTask = newTask;
 
+		SetDlgItemText(IDC_TASK_NAME, name.c_str());
+		SetDlgItemText(IDC_TASK_ID, taskId.c_str());
+		SetDlgItemText(IDC_CREATED_TIME, createdTime.c_str());
+		SetDlgItemText(IDC_SOURCE_PATH, sourcePath.c_str());
+		SetDlgItemText(IDC_DEST_PATH, destPath.c_str());
+		SetDlgItemText(IDC_CONDITIONS, repCondition.c_str());
 	}
 }

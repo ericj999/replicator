@@ -47,6 +47,7 @@ public:
 
 	bool getVerboseMode() { return m_verbose; }
 	bool getTestRunMode() { return m_testRun;  }
+	void setTestRunMode(bool enable) { m_testRun = enable; }
 
 	int getHistoryDays() { return m_historyDays;  }
 	void setHistoryDays(int days);

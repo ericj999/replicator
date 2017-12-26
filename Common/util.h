@@ -16,6 +16,11 @@ namespace Util
 	StringT GetDurationString(const std::chrono::seconds& seconds);
 	StringT GetIsoTimeString(time_t tt);
 	StringT FormatTimeString(int year, int month, int day, int hour, int min, int sec);
+
+	std::vector<std::wstring> ParseParsingPath(const std::wstring& path);
+
 	int CreateProcess(const PathT& program, const StringT& parameters, HANDLE* pHandle = NULL);
-	bool CopyStreamToFile(ShellWrapper::ShellItem& shellItem, const std::wstring& dest);
+	bool CopyStreamToFile(ShellWrapper::ShellItem2& shellItem, const std::wstring& dest);
+	bool CopyFileToFolder(const PathT& src, ShellWrapper::ShellItem& shellFolder);
+	bool CopyFileToStream(const std::wstring& src, ShellWrapper::ShellItem& shellItem);
 }

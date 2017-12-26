@@ -37,7 +37,9 @@ protected:
 	CString m_strFilters;
 	CString m_strDestinationFolderFormat;
 	CString m_strSourceParsing;
-	bool m_portableSource;
+	CString m_strDestParsing;
+
+	bool BrowseFolder(StringT& pathName, StringT& parsingPathName);
 
 public:
 	virtual BOOL OnInitDialog();

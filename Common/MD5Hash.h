@@ -11,7 +11,7 @@ namespace Util
 	{
 	public:
 		MD5Hash(const PathT& file);
-		MD5Hash(ShellWrapper::ShellItem& shellItem);
+		MD5Hash(ShellWrapper::ShellItem2& shellItem);
 		~MD5Hash();
 
 		bool operator==(const MD5Hash& other)
@@ -23,6 +23,6 @@ namespace Util
 		BYTE m_data[MD5LEN];
 
 		bool Calculate(const PathT& file);
-		bool Calculate(ShellWrapper::ShellItem& shellItem);
+		bool Calculate(ShellWrapper::ShellItem2& shellItem);
 	};
 }

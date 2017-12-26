@@ -9,8 +9,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SQLite", "SQLite\SQLite.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utReplicator", "utReplicator\utReplicator.vcxproj", "{6C7E985C-3F04-4E93-8494-98FC00D979A5}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RepRunner", "RepProc\RepProc.vcxproj", "{83188ACC-A8C0-4E6E-A0C9-6739D5FC5531}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Common", "Common\Common.vcxproj", "{E3ECEE3D-FCE7-4960-B1E1-1B5D77DEB2B9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{1F89B892-966F-403F-A2DB-6CA357C5CE23}"
@@ -18,8 +16,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestPipeServer", "TestPipeServer\TestPipeServer.vcxproj", "{52BC9AFD-4072-4701-8835-B3F331C71C30}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestPipeClient", "TestPipeClient\TestPipeClient.vcxproj", "{E3C53ECE-B670-488C-8150-6E790823CAA5}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Transport", "Transport\Transport.vcxproj", "{FEC35747-35FA-4CCE-94C5-CF7456B7B593}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RepUITest", "RepUITest\RepUITest.vcxproj", "{E05C86BB-EFBE-4BB9-A277-9DAE142B7841}"
 EndProject
@@ -69,18 +65,6 @@ Global
 		{6C7E985C-3F04-4E93-8494-98FC00D979A5}.Release|Win32.Build.0 = Release|Win32
 		{6C7E985C-3F04-4E93-8494-98FC00D979A5}.Release|x64.ActiveCfg = Release|x64
 		{6C7E985C-3F04-4E93-8494-98FC00D979A5}.Release|x64.Build.0 = Release|x64
-		{83188ACC-A8C0-4E6E-A0C9-6739D5FC5531}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{83188ACC-A8C0-4E6E-A0C9-6739D5FC5531}.Debug|Mixed Platforms.Build.0 = Debug|Win32
-		{83188ACC-A8C0-4E6E-A0C9-6739D5FC5531}.Debug|Win32.ActiveCfg = Debug|Win32
-		{83188ACC-A8C0-4E6E-A0C9-6739D5FC5531}.Debug|Win32.Build.0 = Debug|Win32
-		{83188ACC-A8C0-4E6E-A0C9-6739D5FC5531}.Debug|x64.ActiveCfg = Debug|x64
-		{83188ACC-A8C0-4E6E-A0C9-6739D5FC5531}.Debug|x64.Build.0 = Debug|x64
-		{83188ACC-A8C0-4E6E-A0C9-6739D5FC5531}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{83188ACC-A8C0-4E6E-A0C9-6739D5FC5531}.Release|Mixed Platforms.Build.0 = Release|Win32
-		{83188ACC-A8C0-4E6E-A0C9-6739D5FC5531}.Release|Win32.ActiveCfg = Release|Win32
-		{83188ACC-A8C0-4E6E-A0C9-6739D5FC5531}.Release|Win32.Build.0 = Release|Win32
-		{83188ACC-A8C0-4E6E-A0C9-6739D5FC5531}.Release|x64.ActiveCfg = Release|x64
-		{83188ACC-A8C0-4E6E-A0C9-6739D5FC5531}.Release|x64.Build.0 = Release|x64
 		{E3ECEE3D-FCE7-4960-B1E1-1B5D77DEB2B9}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
 		{E3ECEE3D-FCE7-4960-B1E1-1B5D77DEB2B9}.Debug|Mixed Platforms.Build.0 = Debug|Win32
 		{E3ECEE3D-FCE7-4960-B1E1-1B5D77DEB2B9}.Debug|Win32.ActiveCfg = Debug|Win32
@@ -117,18 +101,6 @@ Global
 		{E3C53ECE-B670-488C-8150-6E790823CAA5}.Release|Win32.Build.0 = Release|Win32
 		{E3C53ECE-B670-488C-8150-6E790823CAA5}.Release|x64.ActiveCfg = Release|x64
 		{E3C53ECE-B670-488C-8150-6E790823CAA5}.Release|x64.Build.0 = Release|x64
-		{FEC35747-35FA-4CCE-94C5-CF7456B7B593}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{FEC35747-35FA-4CCE-94C5-CF7456B7B593}.Debug|Mixed Platforms.Build.0 = Debug|Win32
-		{FEC35747-35FA-4CCE-94C5-CF7456B7B593}.Debug|Win32.ActiveCfg = Debug|Win32
-		{FEC35747-35FA-4CCE-94C5-CF7456B7B593}.Debug|Win32.Build.0 = Debug|Win32
-		{FEC35747-35FA-4CCE-94C5-CF7456B7B593}.Debug|x64.ActiveCfg = Debug|x64
-		{FEC35747-35FA-4CCE-94C5-CF7456B7B593}.Debug|x64.Build.0 = Debug|x64
-		{FEC35747-35FA-4CCE-94C5-CF7456B7B593}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{FEC35747-35FA-4CCE-94C5-CF7456B7B593}.Release|Mixed Platforms.Build.0 = Release|Win32
-		{FEC35747-35FA-4CCE-94C5-CF7456B7B593}.Release|Win32.ActiveCfg = Release|Win32
-		{FEC35747-35FA-4CCE-94C5-CF7456B7B593}.Release|Win32.Build.0 = Release|Win32
-		{FEC35747-35FA-4CCE-94C5-CF7456B7B593}.Release|x64.ActiveCfg = Release|x64
-		{FEC35747-35FA-4CCE-94C5-CF7456B7B593}.Release|x64.Build.0 = Release|x64
 		{E05C86BB-EFBE-4BB9-A277-9DAE142B7841}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
 		{E05C86BB-EFBE-4BB9-A277-9DAE142B7841}.Debug|Mixed Platforms.Build.0 = Debug|Win32
 		{E05C86BB-EFBE-4BB9-A277-9DAE142B7841}.Debug|Win32.ActiveCfg = Debug|Win32

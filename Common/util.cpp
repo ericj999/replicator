@@ -1,7 +1,14 @@
 #include "stdafx.h"
 #include "util.h"
 #include <Shlobj.h>
+#include <Shlwapi.h>
+#include <shellapi.h>
+#include <Propsys.h>
+#include <Propvarutil.h>
 #include "GlobDef.h"
+#include "FileTime.h"
+#include "WinFile.h"
+#include "ShellFolder.h"
 
 namespace Util
 {
@@ -145,16 +152,16 @@ namespace Util
 		return iRet;
 	}
 
-	bool CopyStreamToFile(ShellWrapper::ShellItem& shellItem, const std::wstring& dest)
+	bool CopyStreamToFile(ShellWrapper::ShellItem2& shellItem, const std::wstring& dest)
 	{
 		bool ret = false;
 		HRESULT hr = E_FAIL;
 		BYTE rgbFile[BUFSIZE];
 		DWORD cbRead = 0;
 
-		HANDLE hFile = CreateFile(dest.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		WinFile file{ dest.c_str(), GENERIC_WRITE, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL };
 
-		if (hFile != INVALID_HANDLE_VALUE)
+		if (file.isGood())
 		{
 			try
 			{
@@ -170,7 +177,7 @@ namespace Util
 						if (cbRead == 0)
 							break;
 
-						if (!WriteFile(hFile, rgbFile, cbRead, &written, NULL) || (cbRead != written))
+						if (!file.Write(rgbFile, cbRead, written) || (cbRead != written))
 						{
 							ret = false;
 							break;
@@ -187,23 +194,313 @@ namespace Util
 			}
 			if (ret)
 			{
-				FILETIME createTime, accessTime, writeTime;
-
-				FILETIME* pWriteTime = SUCCEEDED(shellItem->GetFileTime(PKEY_DateModified, &writeTime)) ? &writeTime : nullptr;
-				FILETIME* pCreateTime = SUCCEEDED(shellItem->GetFileTime(PKEY_DateCreated, &createTime)) ? &createTime : pWriteTime;
-				FILETIME* pAccessTime = SUCCEEDED(shellItem->GetFileTime(PKEY_DateAccessed, &accessTime)) ? &accessTime : pWriteTime;
-
-				if (pWriteTime)
+				FileTime itemTime{ shellItem };
+				if (itemTime.isValid())
 				{
-					if (!SetFileTime(hFile, pCreateTime, pAccessTime, pWriteTime))
+					if (!file.SetFileTime(itemTime.getCreatedTime(), itemTime.getAccessedTime(), itemTime.getModifiedTime()))
 					{
 						DWORD err = GetLastError();
 
 					}
 				}
 			}
-			CloseHandle(hFile);
 		}
 		return ret;
+	}
+
+	bool CopyFileToFolder(const PathT& src, ShellWrapper::ShellItem& shellFolder)
+	{
+		bool ret = false;
+		HRESULT hr = E_FAIL;
+
+		ShellWrapper::ShellItem srcItem;
+
+		hr = SHCreateItemFromParsingName(src.wstring().c_str(), nullptr, IID_IShellItem, (void**)&srcItem);
+		if (SUCCEEDED(hr))
+		{
+			ComInterface<IFileOperation> fileOperation{ CLSID_FileOperation };
+			hr = fileOperation->SetOperationFlags(FOF_NO_UI | FOF_FILESONLY);
+			if (FAILED(hr))
+			{
+				// failed to set NO_UI option
+			}
+
+			hr = fileOperation->CopyItem(srcItem.Get(), shellFolder.Get(), src.filename().c_str(), nullptr);
+			if (SUCCEEDED(hr))
+			{
+				if (SUCCEEDED(hr = fileOperation->PerformOperations()))
+				{
+					ret = true;
+				}
+			}
+		}
+		if (ret)
+		{
+			ShellWrapper::ShellItem newItem = shellFolder.OpenChildItem(src.filename().wstring().c_str());
+			if (newItem.isValid())
+			{
+				ComInterface<IFileOperation> fileOperation{ CLSID_FileOperation };
+				hr = fileOperation->SetOperationFlags(FOF_NO_UI);
+				if (FAILED(hr))
+				{
+					// failed to set NO_UI option
+				}
+
+				FileTime ft{ src.wstring() };
+				if (ft.isValid())
+				{
+					PROPERTYKEY propKey[3] = { PKEY_DateCreated, PKEY_DateAccessed, PKEY_DateModified };
+					PKA_FLAGS flag[3] = { PKA_SET, PKA_SET, PKA_SET };
+					PROPVARIANT propValue[3];
+
+					InitPropVariantFromFileTime(ft.getCreatedTime(), &propValue[0]);
+					InitPropVariantFromFileTime(ft.getAccessedTime(), &propValue[1]);
+					InitPropVariantFromFileTime(ft.getModifiedTime(), &propValue[2]);
+					propValue[2].vt = VT_DATE;
+
+					ComInterface<IPropertyChangeArray> changeArray;
+					hr = PSCreatePropertyChangeArray(propKey, flag, propValue, 3, IID_IPropertyChangeArray, (void**)&changeArray);
+					if (SUCCEEDED(hr))
+					{
+						hr = fileOperation->SetProperties(changeArray.Get());
+						if (SUCCEEDED(hr))
+						{
+							hr = fileOperation->ApplyPropertiesToItem(newItem.Get());
+							if(SUCCEEDED(hr))
+								hr = fileOperation->PerformOperations();
+						}
+					}
+				}
+			}
+			/*
+
+			FileTime ft{ src.wstring() };
+			if (ft.isValid())
+			{
+				// IStorage doesn't implement SetElementTimes
+				ShellWrapper::ShellItem newItem = shellFolder.OpenChildItem(src.filename().wstring().c_str());
+				if (newItem.isValid())
+				{
+					LPITEMIDLIST pidl = nullptr;
+					hr = SHGetIDListFromObject(shellFolder.Get(), &pidl);
+					if (SUCCEEDED(hr))
+					{
+						ComInterface<IPropertyStore> propStore;
+						hr = SHGetPropertyStoreFromIDList(pidl, GPS_READWRITE, IID_IPropertyStore, (void**)&propStore);
+						if (SUCCEEDED(hr))
+						{
+							PROPVARIANT propValue;
+							InitPropVariantFromFileTime(ft.getModifiedTime(), &propValue);
+
+							hr = propStore->SetValue(PKEY_DateCreated, propValue);
+							if(SUCCEEDED(hr))
+								hr = propStore->Commit();
+						}
+					}
+				}
+			}
+
+			LPITEMIDLIST pidl = nullptr;
+			hr = SHGetIDListFromObject(shellFolder.Get(), &pidl);
+			if (SUCCEEDED(hr))
+			{
+				ShellWrapper::ShellFolder parent;
+				ComInterface<IStorage> storage;
+				PCUITEMID_CHILD pidlRelative = nullptr;
+
+				hr = SHBindToParent(pidl, IID_IShellFolder, (void**)&parent, &pidlRelative);
+				if (SUCCEEDED(hr))
+				{
+					hr = parent->BindToStorage(pidlRelative, nullptr, IID_IStorage, (void**)&storage);
+					if (SUCCEEDED(hr))
+					{
+						FileTime ft{ src.wstring() };
+						if (ft.isValid())
+						{
+							hr = storage->SetElementTimes(src.filename().c_str(), ft.getCreatedTime(), ft.getAccessedTime(), ft.getModifiedTime());
+						}
+					}
+				}
+			}
+
+
+			ShellWrapper::ShellItem newItem = shellFolder.OpenChildItem(src.filename().wstring().c_str());
+			if (newItem.isValid())
+			{
+				ComInterface<IFileOperation> fileOperation{ CLSID_FileOperation };
+				hr = fileOperation->SetOperationFlags(FOF_NO_UI | FOF_FILESONLY);
+				if (FAILED(hr))
+				{
+					// failed to set NO_UI option
+				}
+
+				FileTime ft{ src.wstring() };
+				if (ft.isValid())
+				{
+					PROPVARIANT propValue;
+
+					PropVariantInit(&propValue);
+					propValue.vt = VT_FILETIME;
+					propValue.filetime = *ft.getCreatedTime();
+
+					ComInterface<IPropertyChange> propChange;
+
+					hr = PSCreateSimplePropertyChange(PKA_SET, PKEY_DateCreated, propValue, IID_IPropertyChange, (void**)&propChange);
+					if (SUCCEEDED(hr))
+					{
+						PKA_FLAGS flag = PKA_SET;
+						ComInterface<IPropertyChangeArray> changeArray;
+						hr = PSCreatePropertyChangeArray(&PKEY_DateCreated, &flag, &propValue, 1, IID_IPropertyChangeArray, (void**)&changeArray);
+						if (SUCCEEDED(hr))
+						{
+							hr = fileOperation->SetProperties(changeArray.Get());
+							if (SUCCEEDED(hr))
+								hr = fileOperation->PerformOperations();
+						}
+					}
+				}
+			}
+
+			LPITEMIDLIST pidl = nullptr;
+
+//			hr = SHGetIDListFromObject(shellFolder.Get(), &pidl);
+//			if (SUCCEEDED(hr))
+			{
+				ComInterface<IStorage> storage;
+
+//				hr = SHBindToParent(pidl, IID_IStorage, (void**)&storage, nullptr);
+				hr = shellFolder->QueryInterface(IID_IStorage, (void**)&storage);
+				if (SUCCEEDED(hr))
+				{
+					FileTime ft{ src.wstring() };
+					if (ft.isValid())
+					{
+						hr = storage->SetElementTimes(src.filename().c_str(), ft.getCreatedTime(), ft.getAccessedTime(), ft.getModifiedTime());
+					}
+				}
+			}
+
+			ShellWrapper::ShellItem newItem = shellFolder.OpenChildItem(src.filename().wstring().c_str());
+			if (newItem.isValid())
+			{
+				ShellWrapper::ShellItem2 newItem2;
+				if (SUCCEEDED(hr = newItem->QueryInterface(IID_IShellItem2, (void**)&newItem2)))
+				{
+					PROPERTYKEY key = PKEY_DateModified;
+					ComInterface<IPropertyStore> propStore;
+
+					if (SUCCEEDED(hr = newItem2->GetPropertyStoreForKeys(&key, 1, GPS_READWRITE, IID_IPropertyStore, (void**)&propStore)))
+					{
+						FileTime ft{ src.wstring() };
+						if (ft.isValid())
+						{
+							PROPVARIANT propValue;
+							PropVariantInit(&propValue);
+							propValue.vt = VT_FILETIME;
+							propValue.filetime = *ft.getModifiedTime();
+
+							hr = propStore->SetValue(PKEY_DateModified, propValue);
+						}
+					}
+				}
+				else
+				{
+					// cannot open the new item to set the times
+				}
+			}
+			*/
+		}
+		return ret;
+	}
+
+	// doesn't work
+	bool CopyFileToStream(const std::wstring& src, ShellWrapper::ShellItem& shellItem)
+	{
+		bool ret = false;
+		HRESULT hr = E_FAIL;
+		BYTE rgbFile[BUFSIZE];
+		DWORD cbRead = 0;
+
+		WinFile file{ src, GENERIC_READ, 0, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL };
+		if (file.isGood())
+		{
+			try
+			{
+				ShellWrapper::BindCtx bindCtx{ STGM_WRITE | STGM_CREATE };
+				ShellWrapper::Stream stream;
+
+				if (SUCCEEDED(hr = shellItem->BindToHandler(bindCtx.Get(), BHID_Stream, IID_IStream, (void**)&stream)))
+				{
+					ret = true;
+
+					while (file.Read(rgbFile, BUFSIZE, cbRead))
+					{
+						DWORD written = 0;
+						if (cbRead == 0)
+							break;
+						
+						if (FAILED(stream->Write(rgbFile, cbRead, &written)) || (cbRead != written))
+						{
+							ret = false;
+							break;
+						}
+
+						if (hr == S_FALSE)
+							break;
+					}
+				}
+			}
+			catch (...)
+			{
+				ret = false;
+			}
+			if (ret)
+			{
+				ShellWrapper::ShellItem2 item2;
+
+				shellItem->QueryInterface(IID_IShellItem2, (void**)&item2);
+
+				FileTime itemTime{ item2 };
+
+				if (itemTime.isValid())
+				{
+					if (!file.SetFileTime(itemTime.getCreatedTime(), itemTime.getAccessedTime(), itemTime.getModifiedTime()))
+					{
+						DWORD err = GetLastError();
+					}
+				}
+			}
+		}
+		return ret;
+	}
+
+	// Utility functions
+	std::vector<std::wstring> ParseParsingPath(const std::wstring& path)
+	{
+		std::vector<std::wstring> list;
+
+		std::wstring::size_type lastPos = 0;
+		std::wstring::size_type next = path.find_first_not_of(L"\\?", lastPos);
+		std::wstring::size_type pos = path.find_first_of(L'\\', (next == std::wstring::npos) ? lastPos : next);
+
+		for (;;)
+		{
+			if (pos == std::wstring::npos)
+			{
+				list.push_back(path.substr(lastPos));
+				break;
+			}
+			else
+				list.push_back(path.substr(lastPos, pos - lastPos));
+
+			lastPos = pos + 1;
+			next = path.find_first_not_of(L"\\?", lastPos);
+
+			if (next == std::wstring::npos)
+				break;	// end with \
+													
+			pos = path.find_first_of(L'\\', next);
+		}
+		return list;
 	}
 }

@@ -20,14 +20,14 @@ IMPLEMENT_DYNAMIC(CNewTaskDialog, CDialogEx)
 
 CNewTaskDialog::CNewTaskDialog(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CNewTaskDialog::IDD, pParent), m_update{ false }, m_AdvnacedOptionsFlags{ TASKS_FLAGS_UPDATE_NEWER },
-	m_changed{ false }, m_ready{ false }, m_portableSource{ false }
+	m_changed{ false }, m_ready{ false }
 {
 
 }
 
 CNewTaskDialog::CNewTaskDialog(const Database::PropertyList& props, CWnd* pParent /*=NULL*/)
 	: CDialogEx(CNewTaskDialog::IDD, pParent), m_update{ true }, m_props(props), m_AdvnacedOptionsFlags{ TASKS_FLAGS_UPDATE_NEWER }, 
-	m_changed{ false }, m_ready{ false }, m_portableSource{ false }
+	m_changed{ false }, m_ready{ false }
 {
 
 }
@@ -97,6 +97,9 @@ void CNewTaskDialog::UpdateControls()
 		const Database::Property& dest = m_props.Find(TASKS_COL_DESTINATION);
 		if (!dest.IsNULL()) m_editDest.SetWindowText(dest.m_str.c_str());
 
+		const Database::Property& destParsingProp = m_props.Find(TASKS_COL_DEST_PARSING);
+		if (!destParsingProp.IsNULL()) m_strDestParsing = destParsingProp.m_str.c_str();
+
 		const Database::Property& destFolderFormat = m_props.Find(TASKS_COL_DESTFOLDERFMT);
 		if (!destFolderFormat.IsNULL()) 
 			m_strDestinationFolderFormat = destFolderFormat.m_str.c_str();
@@ -120,9 +123,6 @@ void CNewTaskDialog::UpdateControls()
 				m_strFilters = filters.m_str.c_str();
 
 			m_AdvnacedOptionsFlags = flags.m_i & TASKS_FLAGS_ADV_OPT_MASKS;
-
-			if (flags.m_i & TASKS_FLAGS_PORTABLE_DEVICE_SOURCE)
-				m_portableSource = true;
 		}
 	}
 	else
@@ -134,12 +134,17 @@ void CNewTaskDialog::UpdateControls()
 
 void CNewTaskDialog::OnBnClickedNewtaskBrowseDest()
 {
-	CFolderPickerDialog fpg(NULL, 0, this);
-	if (fpg.DoModal() == IDOK)
+	StringT path, parsingPath;
+
+	if (BrowseFolder(path, parsingPath))
 	{
-		SetDlgItemText(IDC_NEW_TASK_DESTINATION, fpg.GetPathName());
+		SetDlgItemText(IDC_NEW_TASK_DESTINATION, path.c_str());
+		m_strDestParsing = parsingPath.c_str();
+
 		setChanged();
+		UpdateCreateButtons();
 	}
+
 }
 
 
@@ -170,6 +175,12 @@ void CNewTaskDialog::OnBnClickedNewTaskCreate()
 {
 	try
 	{
+		if ((m_strSourceParsing.GetLength() > 0) && (m_strSourceParsing.GetAt(0) == L':')
+			&& (m_strDestParsing.GetLength() > 0) && (m_strDestParsing.GetAt(0) == L':'))
+		{
+			AfxMessageBox(IDS_ERROR_PORTABLE_TO_PORTABLE, MB_ICONSTOP | MB_OK);
+			return;
+		}
 		CString strName, strSource, strDest;
 		m_editName.GetWindowText(strName);
 		m_editSource.GetWindowText(strSource);
@@ -181,9 +192,6 @@ void CNewTaskDialog::OnBnClickedNewTaskCreate()
 			flags |= TASKS_FLAGS_INCLUDE_SUBDIR;
 
 		flags |= m_AdvnacedOptionsFlags;
-
-		if (m_portableSource)
-			flags |= TASKS_FLAGS_PORTABLE_DEVICE_SOURCE;
 
 		Database::PropertyList propList;
 		Database::Table table{ theApp.GetDB(), TASKS_TABLE };
@@ -200,6 +208,9 @@ void CNewTaskDialog::OnBnClickedNewTaskCreate()
 
 			if (m_props.Find(TASKS_COL_DESTINATION).m_str.c_str() != strDest)
 				propList.push_back(Database::Property(TASKS_COL_DESTINATION, strDest));
+
+			if (m_props.Find(TASKS_COL_DEST_PARSING).m_str.c_str() != m_strDestParsing)
+				propList.push_back(Database::Property(TASKS_COL_DEST_PARSING, m_strDestParsing));
 
 			if (m_props.Find(TASKS_COL_DESTFOLDERFMT).m_str.c_str() != m_strDestinationFolderFormat)
 				propList.push_back(Database::Property(TASKS_COL_DESTFOLDERFMT, m_strDestinationFolderFormat));
@@ -239,6 +250,7 @@ void CNewTaskDialog::OnBnClickedNewTaskCreate()
 			propList.push_back(Database::Property(TASKS_COL_SOURCE, strSource));
 			propList.push_back(Database::Property(TASKS_COL_SOURCE_PARSING, m_strSourceParsing));
 			propList.push_back(Database::Property(TASKS_COL_DESTINATION, strDest));
+			propList.push_back(Database::Property(TASKS_COL_DEST_PARSING, m_strDestParsing));
 			propList.push_back(Database::Property(TASKS_COL_DESTFOLDERFMT, m_strDestinationFolderFormat));
 			propList.push_back(Database::Property(TASKS_COL_FLASGS, flags));
 			propList.push_back(Database::Property(TASKS_COL_FILTERS, m_strFilters));
@@ -262,6 +274,8 @@ void CNewTaskDialog::OnBnClickedNewTaskAdvOptions()
 	advDlg.set_Flags(m_AdvnacedOptionsFlags);
 	advDlg.set_Filters(m_strFilters);
 	advDlg.set_DestinationFolderFormat(m_strDestinationFolderFormat);
+	if ((m_strDestParsing.GetLength() > 0) && (m_strDestParsing.GetAt(0) == L':'))
+		advDlg.setNoDestinationOptions();
 
 	if (advDlg.DoModal() == IDOK)
 	{
@@ -280,24 +294,27 @@ void CNewTaskDialog::OnBnClickedNewTaskIncludeSub()
 	UpdateCreateButtons();
 }
 
-
 void CNewTaskDialog::OnBnClickedNewTaskBrowseSource()
 {
-/*
-	CFolderPickerDialog fpg(NULL, 0, this);
-	if (fpg.DoModal() == IDOK)
+	StringT path, parsingPath;
+
+	if (BrowseFolder(path, parsingPath))
 	{
-		m_editSource.SetWindowTextW(fpg.GetPathName());
+		m_editSource.SetWindowText(path.c_str());
+		m_strSourceParsing = parsingPath.c_str();
+
 		setChanged();
 		UpdateCreateButtons();
 	}
-*/
-	StringT source, sourceParsing;
+}
 
+bool CNewTaskDialog::BrowseFolder(StringT& pathName, StringT& parsingPathName)
+{
+	bool ret = false;
 	ComInterface<IFileOpenDialog> fileOpenDlg{ CLSID_FileOpenDialog , IID_IFileOpenDialog };
 	FILEOPENDIALOGOPTIONS fos = 0;
 	fileOpenDlg->GetOptions(&fos);
-	fos |= FOS_PICKFOLDERS;
+	fos |= FOS_PICKFOLDERS | FOS_PATHMUSTEXIST;
 	fileOpenDlg->SetOptions(fos);
 
 	HRESULT hr = fileOpenDlg->Show(GetSafeHwnd());
@@ -311,32 +328,30 @@ void CNewTaskDialog::OnBnClickedNewTaskBrowseSource()
 			hr = pItem->GetDisplayName(SIGDN_DESKTOPABSOLUTEEDITING, &pszFilePath);
 			if (SUCCEEDED(hr) && pszFilePath)
 			{
-				source = pszFilePath;
+				StringT source = pszFilePath;
 				CoTaskMemFree(pszFilePath);
 				pszFilePath = nullptr;
 
 				hr = pItem->GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING, &pszFilePath);
 				if (SUCCEEDED(hr) && pszFilePath)
 				{
-					sourceParsing = pszFilePath;
+					StringT sourceParsing = pszFilePath;
 					CoTaskMemFree(pszFilePath);
 					pszFilePath = nullptr;
 
 					SFGAOF attr = 0;
 					if (SUCCEEDED((hr = pItem->GetAttributes(SFGAO_CAPABILITYMASK | SFGAO_DISPLAYATTRMASK | SFGAO_CONTENTSMASK | SFGAO_STORAGECAPMASK, &attr))))
 					{
-						m_editSource.SetWindowText(source.c_str());
-						m_strSourceParsing = sourceParsing.c_str();
-
-						if (!(attr & SFGAO_FILESYSTEM))
-							m_portableSource = true;
+						pathName = source;
+						parsingPathName = sourceParsing;
+						ret = true;
 					}
 				}
 			}
 			pItem->Release();
 		}
 	}
-
+/*
 	if (FAILED(hr))
 	{
 		StringT msg{ _T("Failed to select a folder. Code:") };
@@ -344,6 +359,7 @@ void CNewTaskDialog::OnBnClickedNewTaskBrowseSource()
 
 		theApp.getLog().error(msg);
 		AfxMessageBox(IDS_ERROR_SELECT_SOURCE, MB_OK | MB_ICONEXCLAMATION);
-
 	}
+*/
+	return ret;
 }

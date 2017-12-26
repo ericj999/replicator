@@ -7,6 +7,28 @@
 
 namespace ShellWrapper
 {
+	class ShellItem : public ComInterface<IShellItem>
+	{
+	public:
+		ShellItem() {}
+		~ShellItem() {}
+
+		ShellItem CreateChildItem(const std::wstring& name, DWORD attributes);
+		ShellItem OpenChildItem(const std::wstring& name);
+		bool IsFolder();
+
+	};
+
+	class ShellItem2 : public ComInterface<IShellItem2>
+	{
+	public:
+		ShellItem2() {}
+		~ShellItem2() {}
+
+		std::wstring GetName(SIGDN signdn = SIGDN_NORMALDISPLAY);
+		bool IsFolder();
+	};
+
 	class ShellFolder : public ComInterface<IShellFolder>
 	{
 	public:
@@ -17,16 +39,13 @@ namespace ShellWrapper
 		void Open(std::wstring const& path);
 
 		std::wstring GetDisplayNameOf(PCUITEMID_CHILD pidl, SHGDNF flags);
-	};
+		ShellFolder CreateSubFolder(const std::wstring& subFolderName);
+		ShellItem CreateFileItem(const std::wstring& filename);
+		ShellItem2 OpenFileItem(const std::wstring& filename);
 
-	class ShellItem : public ComInterface<IShellItem2>
-	{
-	public:
-		ShellItem() {}
-		~ShellItem() {}
-
-		std::wstring GetName(SIGDN signdn = SIGDN_NORMALDISPLAY);
-		bool IsFolder();
+	protected:
+		void OpenDirect(std::wstring const& path);
+		void OpenByEnumeration(const std::vector<std::wstring>& parsingPath);
 	};
 
 	class Stream : public ComInterface<IStream>
@@ -56,7 +75,4 @@ namespace ShellWrapper
 		EnumIDList() {}
 		~EnumIDList() {}
 	};
-
-	std::vector<std::wstring> ParseParsingPath(const std::wstring& path);
-
 }

@@ -326,6 +326,7 @@ struct tagEditColumnDef
 	{ TASKS_COL_SOURCE, Database::PT_TEXT },
 	{ TASKS_COL_SOURCE_PARSING, Database::PT_TEXT },
 	{ TASKS_COL_DESTINATION, Database::PT_TEXT },
+	{ TASKS_COL_DEST_PARSING, Database::PT_TEXT },
 	{ TASKS_COL_FLASGS, Database::PT_INT },
 	{ TASKS_COL_FILTERS, Database::PT_TEXT },
 	{ TASKS_COL_DESTFOLDERFMT, Database::PT_TEXT }

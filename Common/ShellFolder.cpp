@@ -1,10 +1,12 @@
 #include "stdafx.h"
 #include <string>
+#include <shellapi.h>
 #include <vector>
 
 #include "StringT.h"
 #include "ShellFolder.h"
 #include "ComMemObj.h"
+#include "util.h"
 
 namespace ShellWrapper
 {
@@ -16,19 +18,54 @@ namespace ShellWrapper
 
 	void ShellFolder::Open(std::wstring const& path)
 	{
-		HRESULT hr;
-
 		if (m_interface)
 		{
 			m_interface->Release();
 			m_interface = nullptr;
 		}
-
-		std::vector<std::wstring> parsingPath = ShellWrapper::ParseParsingPath(path);
+		std::vector<std::wstring> parsingPath = Util::ParseParsingPath(path);
 		if (parsingPath.size() < 2)
+		{
 			throw std::runtime_error("Cannot replicate entire device!");
+		}
 
+		if (path[0] == L':')
+			OpenByEnumeration(parsingPath);
+		else
+			OpenDirect(path);
+
+		if (!m_interface)
+		{
+			throw std::runtime_error("Failed to open folder!");
+		}
+	}
+
+	void ShellFolder::OpenDirect(std::wstring const& path)
+	{
+		HRESULT hr = E_FAIL;
 		ShellFolder desktopFolder;
+		if (SUCCEEDED(SHGetDesktopFolder(&desktopFolder)))
+		{
+			ComMemObj<ITEMIDLIST> itemId;
+
+			if (SUCCEEDED(hr = desktopFolder->ParseDisplayName(NULL, nullptr, const_cast<LPWSTR>(path.c_str()), nullptr, &itemId, nullptr)))
+			{
+				ShellWrapper::ShellFolder folder;
+				hr = desktopFolder->BindToObject(itemId.Get(), nullptr, IID_IShellFolder, reinterpret_cast<void**>(&folder));
+				if (SUCCEEDED(hr))
+				{
+					m_interface = folder.m_interface;
+					m_interface->AddRef();
+				}
+			}
+		}
+	}
+
+	void ShellFolder::OpenByEnumeration(const std::vector<std::wstring>& parsingPath)
+	{
+		HRESULT hr = E_FAIL;
+		ShellFolder desktopFolder;
+
 		if (SUCCEEDED(SHGetDesktopFolder(&desktopFolder)))
 		{
 			bool found = false;
@@ -77,10 +114,6 @@ namespace ShellWrapper
 				m_interface->AddRef();
 			}
 		}
-		if (!m_interface)
-		{
-			throw std::runtime_error("Failed to open folder!");
-		}
 	}
 
 	std::wstring ShellFolder::GetDisplayNameOf(PCUITEMID_CHILD pidl, SHGDNF flags)
@@ -96,8 +129,113 @@ namespace ShellWrapper
 		return name;
 	}
 
+	ShellFolder ShellFolder::CreateSubFolder(const std::wstring& subFolderName)
+	{
+		ShellFolder subFolder;
+		ShellItem itemObj;
+
+		SHGetItemFromObject(m_interface, IID_IShellItem, (void**)&itemObj);
+		if (itemObj.isValid())
+		{
+			ShellItem subItem = itemObj.CreateChildItem(subFolderName, FILE_ATTRIBUTE_DIRECTORY);
+			if(subItem.isValid())
+			{
+				subItem->BindToHandler(nullptr, BHID_SFObject, IID_IShellFolder, (void**)&subFolder);
+			}
+		}
+		return subFolder;
+	}
+
+	ShellItem2 ShellFolder::OpenFileItem(const std::wstring& filename)
+	{
+		ShellItem2 shellItem2;
+		ShellItem itemObj;
+
+		SHGetItemFromObject(m_interface, IID_IShellItem, (void**)&itemObj);
+		if (itemObj.isValid())
+		{
+			ShellItem subItem = itemObj.OpenChildItem(filename);
+			if (subItem.isValid())
+			{
+				subItem->QueryInterface(IID_IShellItem2, (void**)&shellItem2);
+			}
+		}
+		return shellItem2;
+	}
+
+	// doesn't work when using the IStream object.....
+	ShellItem ShellFolder::CreateFileItem(const std::wstring& filename)
+	{
+		ShellItem itemObj;
+		ShellItem nullItem;
+
+		SHGetItemFromObject(m_interface, IID_IShellItem, (void**)&itemObj);
+		if (itemObj.isValid())
+		{
+			ShellItem subItem = itemObj.CreateChildItem(filename, FILE_ATTRIBUTE_NORMAL);
+			return subItem;
+		}
+		return nullItem;
+	}
+
+// ShellItem
+	// open the child item if exists, else create a new child item
+	ShellItem ShellItem::CreateChildItem(const std::wstring& name, DWORD attributes)
+	{
+		HRESULT hr = E_FAIL;
+		ShellItem subItem, newItem;
+
+		newItem = OpenChildItem(name);
+
+		if (!newItem)
+		{
+			ComInterface<IFileOperation> fileOperation{ CLSID_FileOperation };
+
+			hr = fileOperation->SetOperationFlags(FOF_NO_UI);
+
+			if (SUCCEEDED(hr = fileOperation->NewItem(m_interface, attributes, name.c_str(), NULL, NULL)))
+			{
+				if (SUCCEEDED(hr = fileOperation->PerformOperations()))
+				{
+					hr = SHCreateItemFromRelativeName(m_interface, name.c_str(), NULL, IID_IShellItem, (void**)&newItem);
+					if (SUCCEEDED(hr))
+					{
+						return newItem;
+					}
+				}
+			}
+		}
+		else
+			return newItem;
+			
+		return subItem;
+	}
+
+	ShellItem ShellItem::OpenChildItem(const std::wstring& name)
+	{
+		ShellItem subItem, newItem;
+
+		HRESULT hr = SHCreateItemFromRelativeName(m_interface, name.c_str(), NULL, IID_IShellItem, (void**)&newItem);
+		if (SUCCEEDED(hr))
+		{
+			return newItem;
+		}
+		return subItem;
+	}
+		
+	bool ShellItem::IsFolder()
+	{
+		SFGAOF attrs = 0;
+		HRESULT hr = E_FAIL;
+
+		if (SUCCEEDED(hr = m_interface->GetAttributes(SFGAO_CAPABILITYMASK | SFGAO_DISPLAYATTRMASK | SFGAO_CONTENTSMASK | SFGAO_STORAGECAPMASK, &attrs)))
+			return (attrs & SFGAO_FOLDER);
+
+		return false;
+	}
+
 // IShellItem2
-	std::wstring ShellItem::GetName(SIGDN sigdn)
+	std::wstring ShellItem2::GetName(SIGDN sigdn)
 	{
 		LPWSTR pwstr = nullptr;
 		std::wstring wstr;
@@ -111,7 +249,7 @@ namespace ShellWrapper
 		return wstr;
 	}
 
-	bool ShellItem::IsFolder()
+	bool ShellItem2::IsFolder()
 	{
 		SFGAOF attrs = 0;
 		HRESULT hr = E_FAIL;
@@ -120,35 +258,5 @@ namespace ShellWrapper
 			return (attrs & SFGAO_FOLDER);
 
 		return false;
-	}
-
-// Utility functions
-	std::vector<std::wstring> ParseParsingPath(const std::wstring& path)
-	{
-		std::vector<std::wstring> list;
-
-		std::wstring::size_type lastPos = 0;
-		std::wstring::size_type next = path.find_first_not_of(L"\\?", lastPos);
-		std::wstring::size_type pos = path.find_first_of(L'\\', (next == std::wstring::npos) ? lastPos : next);
-
-		for (;;)
-		{
-			if (pos == std::wstring::npos)
-			{
-				list.push_back(path.substr(lastPos));
-				break;
-			}
-			else
-				list.push_back(path.substr(lastPos, pos - lastPos));
-
-			lastPos = pos + 1;
-			next = path.find_first_not_of(L"\\?", lastPos);
-
-			if (next == std::wstring::npos)
-				break;	// end with \
-							
-			pos = path.find_first_of(L'\\', next);
-		}
-		return list;
 	}
 }

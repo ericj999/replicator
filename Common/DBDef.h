@@ -8,6 +8,7 @@
 #define TASKS_COL_SOURCE			_T("Source")
 #define TASKS_COL_SOURCE_PARSING	_T("SourceParsing")
 #define TASKS_COL_DESTINATION		_T("Destination")
+#define TASKS_COL_DEST_PARSING		_T("DestParsing")
 #define TASKS_COL_FLASGS			_T("Flags")
 #define TASKS_COL_FILTERS			_T("Filters")
 #define TASKS_COL_LASTRUN			_T("LastRun")

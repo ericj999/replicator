@@ -456,7 +456,28 @@ void CMainFrame::OnToolsSettings()
 	SettingsDialog dialog(this);
 
 	dialog.m_historyDays = theApp.getHistoryDays();
+	dialog.m_testRun = theApp.getTestRunMode();
 
 	if (dialog.DoModal() == IDOK)
+	{
 		theApp.setHistoryDays(dialog.m_historyDays);
+		theApp.setTestRunMode(dialog.m_testRun);
+
+		CString title;
+		if (dialog.m_testRun)
+		{
+			title.LoadString(IDS_TITLE_TESTRUN);
+		}
+		else
+		{
+			CString str;
+			str.LoadString(IDR_MAINFRAME);
+			int pos = str.Find(L'\n');
+			if (pos > 0)
+				title = str.Left(pos);
+			else
+				title = str;
+		}
+		SetWindowText(title);
+	}
 }
