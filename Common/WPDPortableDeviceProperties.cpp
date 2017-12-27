@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "WPDPortableDeviceProperties.h"
+#include "Log.h"
 
 namespace WPD
 {
@@ -9,6 +10,16 @@ namespace WPD
 		for (size_t index = 0; index < count; ++index)
 		{
 			HRESULT hr = m_interface->Add(keys[index]);
+			if (FAILED(hr))
+			{
+				std::wstring message{ L"Failed to add property key to collection. GUID=" };
+
+				message += GuidToString(keys[index].fmtid);
+				message += std::wstring(L", id=");
+				message += ToStringT(keys[index].pid);
+
+				Log::logger.error(message);
+			}
 		}
 	}
 
@@ -37,6 +48,10 @@ namespace WPD
 			item.m_name = objValues.GetStringValue(WPD_OBJECT_ORIGINAL_FILE_NAME);
 			item.m_modifiedTime = objValues.GetFileTimeValue(WPD_OBJECT_DATE_MODIFIED);
 		}
+		else
+		{
+			Log::logger.error(StringT(L"Failed to get item properties for object ") + StringT(objId) + StringT(L". Code:") + ToStringT(hr));
+		}
 		return hr;
 	}
 
@@ -50,7 +65,10 @@ namespace WPD
 			HRESULT hr = m_interface->GetStringValue(key, &value);
 			if (SUCCEEDED(hr))
 				str = value;
-
+			else
+			{
+				Log::logger.error(L"Failed to get string value.");
+			}
 			if(value) CoTaskMemFree(value);
 		}
 		return str;
@@ -61,6 +79,8 @@ namespace WPD
 		GUID guid = GUID_NULL;
 		if (m_interface && SUCCEEDED(m_interface->GetGuidValue(key, &guid)))
 			return guid;
+		else
+			Log::logger.error(L"Failed to get GUID value.");
 
 		return GUID_NULL;
 	}
@@ -78,6 +98,10 @@ namespace WPD
 				{
 					ft = value.GetFileTimeValue();
 				}
+			}
+			else
+			{
+				Log::logger.error(L"Failed to get filetime value.");
 			}
 		}
 		return ft;

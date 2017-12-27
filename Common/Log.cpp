@@ -7,10 +7,15 @@
 #include <thread>
 #include <iomanip>
 #include "StringT.h"
+#define __LOG_CPP__
 #include "Log.h"
 
 namespace Log
 {
+	Log logger;
+
+	TCHAR LevelSymbol[static_cast<size_t>(LogLevel::max)] = { _T('E'), _T('W'), _T('I'), _T('V') };
+
 	Log::Log() :
 		m_logLevel{ Info }, m_maxSize{ MAX_LOG_FILE_SIZE }, m_maxFiles{ MAX_LOG_FILES }
 	{
@@ -46,7 +51,7 @@ namespace Log
 
 					fs.rdbuf()->pubsetbuf(buf, _countof(buf));	// setting the wchar_t buffer so wchar_t can be written to file
 					//	MS doesn't support %F, %T in put_time
-					fs << std::put_time<TCHAR>(&tmLocal, _T("%Y-%m-%d %H:%M:%S")) << _T(" [") << std::this_thread::get_id() << _T("] ") << msg << _T("\r\n");
+					fs << std::put_time<TCHAR>(&tmLocal, _T("%Y-%m-%d %H:%M:%S <")) << getLevelSymbol(level) << _T(">[") << std::this_thread::get_id() << _T("] ") << msg << _T("\r\n");
 					// roll the log if too big
 					std::streampos pos = fs.tellp();
 					if (pos > m_maxSize)
@@ -80,6 +85,7 @@ namespace Log
 
 	void Log::Roll()
 	{
+#if 0
 		PathT oldLog{ m_path };
 		oldLog.concat(_T(".old"));
 		
@@ -88,32 +94,46 @@ namespace Log
 
 		std::experimental::filesystem::rename(m_path, oldLog);
 	}
-#if 0
-	void Log::Roll(bool force /*= false*/)
-	{
-		if (!m_path.empty() && (m_maxFiles > 1) && std::experimental::filesystem::exists(m_path) && (force || (std::experimental::filesystem::file_size(m_path) >= m_maxSize)))
+#else
+		try
 		{
-			PathT log{ m_path.parent_path() };
-			log /= m_path.filename().wstring() + ToStringT(m_maxFiles - 1);
-
-			if (std::experimental::filesystem::exists(log))
-				std::experimental::filesystem::remove(log);
-
-			int i;
-			for (i = m_maxFiles - 2; i > 0; --i)
+			if (!m_path.empty() && (m_maxFiles > 1) && std::experimental::filesystem::exists(m_path) && (std::experimental::filesystem::file_size(m_path) >= m_maxSize))
 			{
-				PathT src{ m_path.parent_path() };
-				PathT dest{ m_path.parent_path() };
+				PathT log{ m_path.parent_path() };
+				log /= m_path.stem().wstring() + ToStringT(m_maxFiles - 1) + m_path.extension().wstring();
 
-				src /= m_path.filename().wstring() + ToStringT(i);
-				dest /= m_path.filename().wstring() + ToStringT(i + 1);
+				if (std::experimental::filesystem::exists(log))
+					std::experimental::filesystem::remove(log);
 
-				std::experimental::filesystem::rename(src, dest);
+				int i;
+				for (i = m_maxFiles - 1; i > 0; --i)
+				{
+					PathT src{ m_path.parent_path() };
+					PathT dest{ m_path.parent_path() };
+
+					src /= m_path.stem().wstring() + ToStringT(i - 1) + m_path.extension().wstring();
+					dest /= m_path.stem().wstring() + ToStringT(i) + m_path.extension().wstring();
+
+					if (std::experimental::filesystem::exists(src))
+						std::experimental::filesystem::rename(src, dest);
+				}
+				log = m_path.parent_path();
+				log /= m_path.stem().wstring() + ToStringT(i) + m_path.extension().wstring();
+				std::experimental::filesystem::rename(m_path, log);
 			}
-			log = m_path.parent_path();
-			log /= m_path.filename().wstring() + ToStringT(i);
-			std::experimental::filesystem::rename(m_path, log);
+		}
+		catch (std::exception e)
+		{
+
 		}
 	}
 #endif
+
+	TCHAR Log::getLevelSymbol(LogLevel level)
+	{
+		if ((level >= LogLevel::Error) && (level < LogLevel::max))
+			return LevelSymbol[static_cast<int>(level)];
+		else
+			return _T('\0');
+	}
 }

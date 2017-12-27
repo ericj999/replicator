@@ -523,7 +523,7 @@ END
 
 STRINGTABLE
 BEGIN
-    AFX_IDS_APP_TITLE       "Easy Duplicate"
+    AFX_IDS_APP_TITLE       "File Replicator"
     AFX_IDS_IDLEMESSAGE     "Ready"
     IDS_DELETE_CONFIRMATION "Are you sure that you want to delete the task?"
     IDS_INVALID_TASKID      "Invalid task ID!"
@@ -543,7 +543,7 @@ END
 STRINGTABLE
 BEGIN
     ID_APP_ABOUT            "Display program information, version number and copyright\nAbout"
-    ID_APP_EXIT             "Quit the application; prompts to save documents\nExit"
+    ID_APP_EXIT             "Quit the application\nExit"
 END
 
 STRINGTABLE
@@ -657,6 +657,15 @@ BEGIN
     IDS_RESULT_FORMAT       "%s Duration: %s. %d discovered, %d added, %d updated, %d up-to-date. "
     IDS_ABORTED             "Aborted."
     IDS_COMPLETED           "Completed."
+    IDS_NOT_VERIFIED        " %d could not be verified."
+    IDS_MSG_ABORTED         "Replication was aborted."
+    IDS_MSG_FOUND           "[%d] Found ""%s""."
+    IDS_MSG_ADDING          "Adding ""%s"". Source:""%s"""
+    IDS_MSG_UPDATING        "Updating ""%s""."
+    IDS_MSG_SKIPPED         "Skipped ""%s""."
+    IDS_MSG_FAILED_TO_ADD   "Failed to add ""%s"""
+    IDS_MSG_FAILED_TO_UPDATE "Failed to update ""%s"""
+    IDS_MSG_FAILED_TO_CREATE_FOLDER "Failed to create folder ""%s""."
 END
 
 STRINGTABLE

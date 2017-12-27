@@ -9,6 +9,7 @@
 #include "FileTime.h"
 #include "WinFile.h"
 #include "ShellFolder.h"
+#include "Log.h"
 
 namespace Util
 {
@@ -200,10 +201,14 @@ namespace Util
 					if (!file.SetFileTime(itemTime.getCreatedTime(), itemTime.getAccessedTime(), itemTime.getModifiedTime()))
 					{
 						DWORD err = GetLastError();
-
+						Log::logger.error(StringT(L"Faile to set filetime. Code:") + ToStringT(err));
 					}
 				}
 			}
+		}
+		else
+		{
+			Log::logger.error(StringT(L"Faile to open \"") + dest + StringT(L"\" for writing."));
 		}
 		return ret;
 	}
@@ -222,7 +227,7 @@ namespace Util
 			hr = fileOperation->SetOperationFlags(FOF_NO_UI | FOF_FILESONLY);
 			if (FAILED(hr))
 			{
-				// failed to set NO_UI option
+				Log::logger.error(StringT(L"SetOperationFlags(FOF_NO_UI | FOF_FILESONLY) failed. Code:") + ToStringT(hr));
 			}
 
 			hr = fileOperation->CopyItem(srcItem.Get(), shellFolder.Get(), src.filename().c_str(), nullptr);
@@ -232,7 +237,19 @@ namespace Util
 				{
 					ret = true;
 				}
+				else
+				{
+					Log::logger.error(StringT(L"Failed to perform copy operation for \"") + src.wstring() + StringT(L"\". Code:") + ToStringT(hr));
+				}
 			}
+			else
+			{
+				Log::logger.error(StringT(L"Failed to set copy operation for \"") + src.wstring() + StringT(L"\". Code:") + ToStringT(hr));
+			}
+		}
+		else
+		{
+			Log::logger.error(StringT(L"SHCreateItemFromParsingName() failed. Code:") + ToStringT(hr));
 		}
 		if (ret)
 		{
@@ -243,7 +260,7 @@ namespace Util
 				hr = fileOperation->SetOperationFlags(FOF_NO_UI);
 				if (FAILED(hr))
 				{
-					// failed to set NO_UI option
+					Log::logger.error(StringT(L"SetOperationFlags(FOF_NO_UI) failed. Code:") + ToStringT(hr));
 				}
 
 				FileTime ft{ src.wstring() };
@@ -268,8 +285,14 @@ namespace Util
 							hr = fileOperation->ApplyPropertiesToItem(newItem.Get());
 							if(SUCCEEDED(hr))
 								hr = fileOperation->PerformOperations();
+							else
+								Log::logger.error(StringT(L"IFileOperation::ApplyPropertiesToItem() failed. Code:") + ToStringT(hr));
 						}
+						else
+							Log::logger.error(StringT(L"IFileOperation::SetProperties() failed. Code:") + ToStringT(hr));
 					}
+					else
+						Log::logger.error(StringT(L"PSCreatePropertyChangeArray() failed. Code:") + ToStringT(hr));
 				}
 			}
 			/*

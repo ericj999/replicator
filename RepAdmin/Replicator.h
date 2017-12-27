@@ -52,8 +52,6 @@ public:
 	int getHistoryDays() { return m_historyDays;  }
 	void setHistoryDays(int days);
 
-	Log::Log& getLog() { return m_log; }
-
 	afx_msg void OnAppAbout();
 	DECLARE_MESSAGE_MAP()
 
@@ -69,8 +67,6 @@ protected:
 	void CreateDB(const StringT& db);
 	void MaintainDB();
 	void ReadConfig();
-
-	Log::Log m_log;
 };
 
 extern CReplicatorApp theApp;

@@ -11,10 +11,11 @@ namespace Log
 {
 	enum LogLevel
 	{
-		Error,
+		Error = 0,
 		Warning,
 		Info,
-		Verbose
+		Verbose,
+		max
 	};
 
 	class Log
@@ -31,6 +32,8 @@ namespace Log
 		void setLevel(LogLevel level) { m_logLevel = level; }
 
 		// methods
+		void Write(LogLevel level, const StringT& msg);
+
 		void info(const StringT& msg) { Write(LogLevel::Info, msg); }
 		void error(const StringT& msg) { Write(LogLevel::Error, msg); }
 		void warn(const StringT& msg) { Write(LogLevel::Warning, msg); }
@@ -44,8 +47,11 @@ namespace Log
 		std::timed_mutex m_mutex;
 
 		void CheckPath();
-		void Write(LogLevel level, const StringT& msg);
 		void Roll();
+		TCHAR getLevelSymbol(LogLevel level);
 	};
-}
 
+#ifndef __LOG_CPP__
+	extern Log logger;
+#endif
+}

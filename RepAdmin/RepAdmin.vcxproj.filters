@@ -99,6 +99,9 @@
     <ClInclude Include="SettingsDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LocaleResources.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -150,6 +153,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SettingsDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LocaleResources.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

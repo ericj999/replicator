@@ -16,6 +16,7 @@
 #include "GlobDef.h"
 
 #include "RepRunner.h"
+#include "Log.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -166,7 +167,7 @@ int CTaskListView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void CTaskListView::OnContextMenu(CWnd* pWnd, CPoint point)
 {
-	theApp.GetContextMenuManager()->ShowPopupMenu(IDR_TASK_PUPUP_MENU, point.x, point.y, this, TRUE);
+	theApp.GetContextMenuManager()->ShowPopupMenu(IDR_TASK_POPUP_MENU, point.x, point.y, this, TRUE);
 }
 
 void CTaskListView::AddNewTask(LPCTSTR taskName)
@@ -268,7 +269,7 @@ void CTaskListView::OnTaskRun()
 		int item = GetListCtrl().GetNextSelectedItem(pos);
 		int taskId = static_cast<int>(GetListCtrl().GetItemData(item));
 
-		theApp.getLog().info(StringT(_T("Run task ")) + ToStringT(taskId));
+		Log::logger.info(StringT(_T("Run task ")) + ToStringT(taskId));
 
 		CString state;
 		state.LoadString(IDS_TASK_RUNNING);
@@ -301,7 +302,7 @@ void CTaskListView::OnTaskDelete()
 			StringT condition = _T("TaskID=") + ToStringT(taskId);
 			try
 			{
-				theApp.getLog().info(StringT(_T("Delete task ")) + ToStringT(taskId));
+				Log::logger.info(StringT(_T("Delete task ")) + ToStringT(taskId));
 
 				tb.Delete(condition);
 				GetListCtrl().DeleteItem(item);
@@ -340,7 +341,7 @@ void CTaskListView::OnTaskEdit()
 		int item = GetListCtrl().GetNextSelectedItem(pos);
 		int taskId = static_cast<int>(GetListCtrl().GetItemData(item));
 
-		theApp.getLog().info(StringT(_T("Edit task ")) + ToStringT(taskId));
+		Log::logger.info(StringT(_T("Edit task ")) + ToStringT(taskId));
 
 		Database::Table tb{ theApp.GetDB(), TASKS_TABLE };
 		StringT condition = _T("TaskID=") + ToStringT(taskId);
@@ -497,7 +498,7 @@ void CTaskListView::OnTaskStop()
 			if (it != m_tasks.end())
 			{
 				it->second->Abort();
-				theApp.getLog().info(StringT(_T("Abort task ")) + ToStringT(taskId));
+				Log::logger.info(StringT(_T("Abort task ")) + ToStringT(taskId));
 			}
 		}
 	}
@@ -523,7 +524,7 @@ void CTaskListView::OnUpdateTaskStop(CCmdUI *pCmdUI)
 
 void CTaskListView::StopAllTasks()
 {
-	theApp.getLog().info(_T("Stop all tasks."));
+	Log::logger.info(_T("Stop all tasks."));
 	std::lock_guard<std::mutex> lock{ m_tasksLock };
 	for (auto&& it : m_tasks)
 	{

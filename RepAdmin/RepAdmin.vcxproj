@@ -209,6 +209,7 @@
     <ClInclude Include="AdvancedOptionsDlg.h" />
     <ClInclude Include="CRepCommandLineInfo.h" />
     <ClInclude Include="FolderFormatDialog.h" />
+    <ClInclude Include="LocaleResources.h" />
     <ClInclude Include="Replicator.h" />
     <ClInclude Include="ReplicatorDoc.h" />
     <ClInclude Include="ReplicatorView.h" />
@@ -231,6 +232,7 @@
     <ClCompile Include="AdvancedOptionsDlg.cpp" />
     <ClCompile Include="CRepCommandLineInfo.cpp" />
     <ClCompile Include="FolderFormatDialog.cpp" />
+    <ClCompile Include="LocaleResources.cpp" />
     <ClCompile Include="Replicator.cpp" />
     <ClCompile Include="ReplicatorDoc.cpp" />
     <ClCompile Include="ReplicatorView.cpp" />

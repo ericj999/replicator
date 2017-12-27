@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <regex>
 #include <sstream>
+#include <combaseapi.h>
 
 using StringT  = std::basic_string<TCHAR>;
 
@@ -46,3 +47,22 @@ namespace String
 	inline std::string StringTToString(const StringT& str) { return str; }
 #endif
 }
+
+class GuidToString
+{
+public:
+	GuidToString(const GUID& guid)
+	{
+		if (!::StringFromGUID2(guid, m_guidStr, sizeof(m_guidStr)))
+		{
+			m_guidStr[0] = L'\0';
+		}
+	}
+
+	operator PCWSTR()
+	{
+		return m_guidStr;
+	}
+protected:
+	WCHAR m_guidStr[64];
+};

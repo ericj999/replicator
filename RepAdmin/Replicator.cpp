@@ -15,6 +15,7 @@
 #include "util.h"
 #include "CRepCommandLineInfo.h"
 #include "Table.h"
+#include "LocaleResources.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -70,12 +71,13 @@ BOOL CReplicatorApp::InitInstance()
 
 	CWinAppEx::InitInstance();
 
+	// Initialize global logger
 	PathT logPath = Util::GetConfigPath();
 	logPath /= STR_LOG_FILENAME;
 
-	m_log.setPath(logPath);
-	m_log.info(_T("Program started."));
-
+	Log::logger.setPath(logPath);
+	Log::logger.setLevel(Log::LogLevel::Verbose);
+	Log::logger.info(_T("Program started."));
 
 	// Initialize OLE libraries
 	CoInitialize(NULL);
@@ -86,6 +88,7 @@ BOOL CReplicatorApp::InitInstance()
 
 	// AfxInitRichEdit2() is required to use RichEdit control	
 	// AfxInitRichEdit2();
+	InitLocaleResource();
 
 	// Standard initialization
 	// If you are not using these features and wish to reduce the size
@@ -122,7 +125,7 @@ BOOL CReplicatorApp::InitInstance()
 	}
 	catch (std::exception e)
 	{
-		m_log.error(_T("Failed to connect to the database!"));
+		Log::logger.error(_T("Failed to connect to the database!"));
 		return FALSE;
 	}
 
@@ -159,7 +162,7 @@ BOOL CReplicatorApp::InitInstance()
 	m_pMainWnd->ShowWindow(SW_SHOW);
 	m_pMainWnd->UpdateWindow();
 
-	m_log.info(_T("Initializing instance completed"));
+	Log::logger.info(_T("Initializing instance completed"));
 	return TRUE;
 }
 
@@ -167,7 +170,7 @@ int CReplicatorApp::ExitInstance()
 {
 	//TODO: handle additional resources you may have added
 	CoUninitialize();
-	m_log.info(_T("Exit instance."));
+	Log::logger.info(_T("Exit instance."));
 	return CWinAppEx::ExitInstance();
 }
 
@@ -312,9 +315,9 @@ void CReplicatorApp::MaintainDB()
 		
 		condition << HISTORY_COL_START_TIME << " < date('now', '-" << m_historyDays << " day')";
 
-		m_log.info(StringT(_T("Deleting history older than ")) + ToStringT(m_historyDays) + StringT(_T(" day(s)")));
+		Log::logger.info(StringT(_T("Deleting history older than ")) + ToStringT(m_historyDays) + StringT(_T(" day(s)")));
 		history.Delete(condition.str());
-		m_log.info(_T("Done deleting old history"));
+		Log::logger.info(_T("Done deleting old history"));
 	}
 }
 
@@ -345,7 +348,7 @@ void CReplicatorApp::setHistoryDays(int days)
 			m_historyDays = days;
 			if (regKey.SetDWORDValue(REGSTR_VALUE_HISTORY_DAYS, m_historyDays) != ERROR_SUCCESS)
 			{
-				m_log.error(StringT(_T("Failed to update history registry setting. Code:")) + ToStringT(GetLastError()));
+				Log::logger.error(StringT(_T("Failed to update history registry setting. Code:")) + ToStringT(GetLastError()));
 			}
 		}
 	}

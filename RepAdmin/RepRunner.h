@@ -39,7 +39,6 @@ protected:
 	bool m_testRun;
 	bool m_isRunning;
 	Database::Database m_db;
-	Log::Log m_log;
 	RunnerEventCallback m_callback;
 	DatePathFormatter m_pathFormatter;
 

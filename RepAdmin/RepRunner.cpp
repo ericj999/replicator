@@ -16,6 +16,7 @@
 #include "WPDPortableDeviceContent.h"
 #include "WPDPortableDeviceProperties.h"
 #include "util.h"
+#include "LocaleResources.h"
 
 #include "resource.h"
 
@@ -31,14 +32,6 @@ RepRunner::RepRunner(int taskID, RunnerEventCallback callback /* = nullptr*/, bo
 	m_taskID{ taskID }, m_callback{ callback }, m_verbose{ verbose }, m_testRun{ testRun }, m_abort{ false }, m_isRunning{ false },
 	m_fileCount{ 0 }, m_updated{ 0 }, m_skipped{ 0 }, m_added{ 0 }, m_flags{ 0 }, m_matchExtension{ 0 }
 {
-	PathT logPath = Util::GetConfigPath();
-	StringStreamT fn;
-
-	fn << STR_LOG_FILENAME << taskID << STR_LOG_EXTENSION;
-	logPath /= fn.str();
-
-	m_log.setPath(logPath);
-
 	PathT dbPath{ Util::GetDatabasePath() };
 	m_db.Connect(dbPath);
 }
@@ -71,11 +64,8 @@ void RepRunner::Run()
 
 	try
 	{
-		m_log.setLevel(Log::LogLevel::Verbose);
-
-		WriteLog(Log::LogLevel::Verbose, _T("==============================="), m_taskID);
+		WriteLog(Log::LogLevel::Verbose, _T("==============================="));
 		WriteLog(Log::LogLevel::Verbose, _T("Begin replication task ID %d..."), m_taskID);
-		WriteLog(Log::LogLevel::Verbose, _T("==============================="), m_taskID);
 		std::chrono::system_clock::time_point start{ std::chrono::system_clock::now() };
 		StringT startTimeStr = Util::GetIsoTimeString(std::chrono::system_clock::to_time_t(start));
 		Database::PropertyList propList;
@@ -136,10 +126,10 @@ void RepRunner::Run()
 
 			if (!m_abort)
 			{
-				WriteLog(Log::LogLevel::Info, _T("Discoverd total %d file(s)."), m_fileCount);
+				WriteLog(Log::LogLevel::Verbose, _T("Discoverd total %d file(s)."), m_fileCount);
 
 				// replicating....
-				WriteLog(Log::LogLevel::Info, _T("Destination = \"%s\""), m_destination.wstring().c_str());
+				WriteLog(Log::LogLevel::Verbose, _T("Destination = \"%s\""), m_destination.wstring().c_str());
 
 				ReplicateNow(repSources, m_destination);
 			}
@@ -167,8 +157,15 @@ void RepRunner::Run()
 		}
 
 		cstr.Format(IDS_RESULT_FORMAT, (LPCTSTR) rstr, runTimeStr.c_str(), m_fileCount, m_added, m_updated, m_skipped);
-
 		result = (LPCTSTR)cstr;
+
+		int failed = m_fileCount - m_added - m_updated - m_skipped;
+		if (failed > 0)
+		{
+			cstr.Format(IDS_NOT_VERIFIED, failed);
+			result += (LPCTSTR)cstr;
+		}
+
 		propList.push_back(Database::Property(TASKS_COL_LASTRUNSTATUS, result));
 		UpdateTaskInDB(m_taskID, propList);
 
@@ -183,10 +180,12 @@ void RepRunner::Run()
 	catch (std::exception& e)
 	{
 		result = _T("Exception occurred. ") + String::StringToStringT(e.what());
-		WriteLog(Log::LogLevel::Error, result.c_str() );
+		WriteLog(Log::LogLevel::Error, result.c_str());
 	}
 	if (m_callback) m_callback(RunnerState::STOP, result.c_str());
 	m_isRunning = false;
+	WriteLog(Log::LogLevel::Verbose, _T("End replication task ID %d."), m_taskID);
+	WriteLog(Log::LogLevel::Verbose, _T("==============================="));
 }
 
 bool RepRunner::MatchedExtension(const std::wstring& ext)
@@ -213,7 +212,7 @@ void RepRunner::ReplicateNow(const std::vector<RepSource>& repSources, const Pat
 		{
 			if (m_abort)
 			{
-				WriteLog(Log::LogLevel::Info, _T("Replication was aborted."));
+				WriteLog(Log::LogLevel::Info, GetLocalizedString(StringResource::aborted).c_str());
 				return;
 			}
 
@@ -275,7 +274,7 @@ void RepRunner::ReplicateNow(const std::vector<RepSource>& repSources, const Pat
 
 			if (toUpdate)
 			{
-				WriteLog(Log::LogLevel::Info, _T("Updating \"%s\""), srcFile.wstring().c_str());
+				WriteLog(Log::LogLevel::Info, GetLocalizedString(StringResource::updating).c_str(), destFile.wstring().c_str());
 				if (!m_testRun)
 				{
 					if (std::experimental::filesystem::copy_file(srcFile, destFile, std::experimental::filesystem::copy_options::overwrite_existing))
@@ -286,7 +285,7 @@ void RepRunner::ReplicateNow(const std::vector<RepSource>& repSources, const Pat
 			}
 			else if (toAddNew)
 			{
-				WriteLog(Log::LogLevel::Info, _T("Adding \"%s\", source:\"%s\""), destFile.wstring().c_str(), srcFile.wstring().c_str());
+				WriteLog(Log::LogLevel::Info, GetLocalizedString(StringResource::adding).c_str(), destFile.wstring().c_str(), srcFile.wstring().c_str());
 				if (!m_testRun)
 				{
 					if(std::experimental::filesystem::copy_file(srcFile, destFile))
@@ -297,12 +296,12 @@ void RepRunner::ReplicateNow(const std::vector<RepSource>& repSources, const Pat
 			}
 			else
 			{
-				WriteLog(Log::LogLevel::Info, _T("Skipped \"%s\""), srcFile.wstring().c_str());
+				WriteLog(Log::LogLevel::Info, GetLocalizedString(StringResource::skipped).c_str(), srcFile.wstring().c_str());
 				++m_skipped;
 			}
 		}
 	}
-	WriteLog(Log::LogLevel::Info, _T("End replication. %d added, %d updated, %d skipped."), m_added, m_updated, m_skipped);
+	WriteLog(Log::LogLevel::Verbose, _T("End replication. %d added, %d updated, %d skipped."), m_added, m_updated, m_skipped);
 }
 
 bool RepRunner::GetNewFileName(PathT& destFile, const Util::MD5Hash& md5)
@@ -335,13 +334,13 @@ void RepRunner::AddPath(const PathT& p, RepSource& repSource)
 			{
 				++m_fileCount;
 				repSource.add(p);
-				WriteLog(Log::LogLevel::Info, _T("[%d] Found \"%s\"."), m_fileCount, p.wstring().c_str());
+				WriteLog(Log::LogLevel::Info, GetLocalizedString(StringResource::found).c_str(), m_fileCount, p.wstring().c_str());
 			}
 		}
 	}
 	catch (std::exception& e)
 	{
-		WriteLog(Log::LogLevel::Error, _T("Exception caught: %s"), String::StringToStringT(e.what()).c_str());
+		Log::logger.error(StringT(_T("Exception caught: ")) + String::StringToStringT(e.what()));
 	}
 }
 
@@ -353,7 +352,7 @@ void RepRunner::WriteLog(Log::LogLevel level, LPCTSTR format, ...)
 	_vstprintf_s(szMessage, _countof(szMessage), format, args);
 	va_end(args);
 
-	m_log.Write(level, szMessage);
+	Log::logger.Write(level, szMessage);
 	if (m_callback && (level <= Log::LogLevel::Info)) m_callback(RunnerState::RUNNING, szMessage);
 }
 
@@ -371,7 +370,8 @@ RepSource RepRunner::GetSource(const PathT& path)
 	PathT srcPath{ path };
 	RepSource source{ srcPath };
 
-	WriteLog(Log::LogLevel::Info, _T("Discovering source directory [%s]..."), srcPath.wstring().c_str());
+	WriteLog(Log::LogLevel::Verbose, _T("Discovering source directory [%s]..."), srcPath.wstring().c_str());
+
 	if (m_flags & TASKS_FLAGS_INCLUDE_SUBDIR)
 	{
 		RecursiveDirectoryIteratorT dit(srcPath);
@@ -426,7 +426,7 @@ void RepRunner::ReplicateStreamToFile(ShellWrapper::ShellFolder& folder, const P
 		HRESULT getResult = E_FAIL;
 		do
 		{
-			if (m_abort) { WriteLog(Log::LogLevel::Info, _T("Replication was aborted.")); return; }
+			if (m_abort) { WriteLog(Log::LogLevel::Info, GetLocalizedString(StringResource::aborted).c_str()); return; }
 
 			ULONG got = 0;
 			LPITEMIDLIST itemIdList = nullptr;
@@ -459,7 +459,7 @@ void RepRunner::ProcessStreamFiles(ShellWrapper::ShellFolder& folder, const Path
 
 	for (auto it = shellItemIdList.begin(); it != shellItemIdList.end(); ++it)
 	{
-		if (m_abort) { WriteLog(Log::LogLevel::Info, _T("Replication was aborted.")); return; }
+		if (m_abort) { WriteLog(Log::LogLevel::Info, GetLocalizedString(StringResource::aborted).c_str()); return; }
 
 		ShellWrapper::ShellItem2 shellItem;
 		if (SUCCEEDED(hr = SHCreateItemWithParent(nullptr, folder.Get(), *it, IID_IShellItem2, (void**)&shellItem)))
@@ -471,7 +471,7 @@ void RepRunner::ProcessStreamFiles(ShellWrapper::ShellFolder& folder, const Path
 			if (MatchedExtension(filePath.extension().wstring()))
 			{
 				++m_fileCount;
-				WriteLog(Log::LogLevel::Info, _T("[%d] Found \"%s\"."), m_fileCount, filePath.wstring().c_str());
+				WriteLog(Log::LogLevel::Info, GetLocalizedString(StringResource::found).c_str(), m_fileCount, filePath.wstring().c_str());
 
 				FILETIME srcFileTime = { 0 };
 				UINT64 srcFileSize = 0;
@@ -546,35 +546,39 @@ void RepRunner::ProcessStreamFiles(ShellWrapper::ShellFolder& folder, const Path
 
 					if (toUpdate)
 					{
-						WriteLog(Log::LogLevel::Info, _T("Updating \"%s\""), filePath.wstring().c_str());
+						WriteLog(Log::LogLevel::Info, GetLocalizedString(StringResource::updating).c_str(), filePath.wstring().c_str());
 						if (!m_testRun)
 						{
 							if(Util::CopyStreamToFile(shellItem, destFile.wstring()))
 								++m_updated;
 							else
-								WriteLog(Log::LogLevel::Error, _T("Failed to update \"%s\""), filePath.wstring().c_str());
+								WriteLog(Log::LogLevel::Error, GetLocalizedString(StringResource::failedToUpdate).c_str(), filePath.wstring().c_str());
 						}
 						else
 							++m_updated;
 					}
 					else if (toAddNew)
 					{
-						WriteLog(Log::LogLevel::Info, _T("Adding \"%s\", source:\"%s\""), destFile.wstring().c_str(), filePath.wstring().c_str());
+						WriteLog(Log::LogLevel::Info, GetLocalizedString(StringResource::adding).c_str(), destFile.wstring().c_str(), filePath.wstring().c_str());
 						if (!m_testRun)
 						{
 							if(Util::CopyStreamToFile(shellItem, destFile.wstring()))
 								++m_added;
 							else
-								WriteLog(Log::LogLevel::Error, _T("Failed to add \"%s\""), filePath.wstring().c_str());
+								WriteLog(Log::LogLevel::Error, GetLocalizedString(StringResource::failedToAdd).c_str(), destFile.wstring().c_str());
 						}
 						else
 							++m_added;
 					}
 					else
 					{
-						WriteLog(Log::LogLevel::Info, _T("Skipped \"%s\""), filePath.wstring().c_str());
+						WriteLog(Log::LogLevel::Info, GetLocalizedString(StringResource::skipped).c_str(), filePath.wstring().c_str());
 						++m_skipped;
 					}
+				}
+				else
+				{
+					Log::logger.error(StringT(_T("Failed to get filetime. Code:")) + ToStringT(hr));
 				}
 			}
 		}
@@ -587,7 +591,7 @@ void RepRunner::ProcessStreamFolders(ShellWrapper::ShellFolder& folder, const Pa
 
 	for (auto it = shellItemIdList.begin(); it != shellItemIdList.end(); ++it)
 	{
-		if (m_abort) { WriteLog(Log::LogLevel::Info, _T("Replication was aborted.")); return; }
+		if (m_abort) { WriteLog(Log::LogLevel::Info, GetLocalizedString(StringResource::aborted).c_str()); return; }
 
 		ShellWrapper::ShellItem2 shellItem;
 		if (SUCCEEDED(hr = SHCreateItemWithParent(nullptr, folder.Get(), *it, IID_IShellItem2, (void**)&shellItem)))
@@ -621,7 +625,7 @@ void RepRunner::ReplicateFileToStream(const PathT& srcPath, ShellWrapper::ShellF
 	DirectoryIteratorT dit(srcPath);
 	for (; dit != DirectoryIteratorT(); ++dit)
 	{
-		if (m_abort) { WriteLog(Log::LogLevel::Info, _T("Replication was aborted.")); return; }
+		if (m_abort) { WriteLog(Log::LogLevel::Info, GetLocalizedString(StringResource::aborted).c_str()); return; }
 
 		try
 		{
@@ -631,7 +635,7 @@ void RepRunner::ReplicateFileToStream(const PathT& srcPath, ShellWrapper::ShellF
 				{
 					++m_fileCount;
 					fileList.push_back(dit->path());
-					WriteLog(Log::LogLevel::Info, _T("[%d] Found \"%s\"."), m_fileCount, dit->path().wstring().c_str());
+					WriteLog(Log::LogLevel::Info, GetLocalizedString(StringResource::found).c_str(), m_fileCount, dit->path().wstring().c_str());
 				}
 			}
 			else if (includeSubFolder && std::experimental::filesystem::is_directory(dit->path()))
@@ -641,7 +645,7 @@ void RepRunner::ReplicateFileToStream(const PathT& srcPath, ShellWrapper::ShellF
 		}
 		catch (std::exception& e)
 		{
-			WriteLog(Log::LogLevel::Error, _T("Exception caught: %s"), String::StringToStringT(e.what()).c_str());
+			Log::logger.error(StringT(_T("Exception caught: ")) + String::StringToStringT(e.what()));
 		}
 	}
 
@@ -665,7 +669,7 @@ void RepRunner::ProcessFiles(const std::vector<PathT>& fileList, ShellWrapper::S
 	HRESULT hr = SHGetItemFromObject(folder.Get(), IID_IShellItem, (void**)&folderItem);
 	if (FAILED(hr))
 	{
-		WriteLog(Log::LogLevel::Error, _T("Failed to retrieve the shell item \"%s\". Code: %x"), destination.wstring().c_str(), hr);
+		Log::logger.error(StringT(_T("Failed to retrieve the shell item \"")) + destination.wstring() + StringT(_T("\". Code:")) + ToStringT(hr));
 		return;
 	}
 
@@ -702,34 +706,34 @@ void RepRunner::ProcessFiles(const std::vector<PathT>& fileList, ShellWrapper::S
 
 		if (add)
 		{
-			WriteLog(Log::LogLevel::Info, _T("Adding \"%s\", source:\"%s\""), destFilePath.wstring().c_str(), srcFile.wstring().c_str());
+			WriteLog(Log::LogLevel::Info, GetLocalizedString(StringResource::adding).c_str(), destFilePath.wstring().c_str(), srcFile.wstring().c_str());
 
 			if (!m_testRun)
 			{
 				if (Util::CopyFileToFolder(srcFile, folderItem))
 					++m_added;
 				else
-					WriteLog(Log::LogLevel::Error, _T("Failed to add \"%s\""), destFilePath.wstring().c_str());
+					WriteLog(Log::LogLevel::Error, GetLocalizedString(StringResource::failedToAdd).c_str(), destFilePath.wstring().c_str());
 			}
 			else
 				++m_added;
 		}
 		else if (update)
 		{
-			WriteLog(Log::LogLevel::Info, _T("Updating \"%s\""), destFilePath.wstring().c_str());
+			WriteLog(Log::LogLevel::Info, GetLocalizedString(StringResource::updating).c_str(), destFilePath.wstring().c_str());
 			if (!m_testRun)
 			{
 				if (Util::CopyFileToFolder(srcFile, folderItem))
 					++m_updated;
 				else
-					WriteLog(Log::LogLevel::Error, _T("Failed to update \"%s\""), destFilePath.wstring().c_str());
+					WriteLog(Log::LogLevel::Error, GetLocalizedString(StringResource::failedToUpdate).c_str(), destFilePath.wstring().c_str());
 			}
 			else
 				++m_updated;
 		}
 		else
 		{
-			WriteLog(Log::LogLevel::Info, _T("Skipped \"%s\""), destFilePath.wstring().c_str());
+			WriteLog(Log::LogLevel::Info, GetLocalizedString(StringResource::skipped).c_str(), srcFile.wstring().c_str());
 			++m_skipped;
 		}
 	}
@@ -741,7 +745,7 @@ void RepRunner::ProcessFolders(const std::vector<PathT>& folderList, ShellWrappe
 {
 	for (auto folderPath : folderList)
 	{
-		if (m_abort) { WriteLog(Log::LogLevel::Info, _T("Replication was aborted.")); return; }
+		if (m_abort) { WriteLog(Log::LogLevel::Info, GetLocalizedString(StringResource::aborted).c_str()); return; }
 
 		ShellWrapper::ShellFolder subFolder = folder.CreateSubFolder(folderPath.filename().wstring());
 
@@ -790,19 +794,29 @@ void RepRunner::ReplicateFilesToPortableDevice(const PathT& srcPath, const PathT
 						ReplicateFilesToPortableDevice(deviceContent, srcPath, objectId.GetStringValue(), destination);
 					}
 					else
-						WriteLog(Log::LogLevel::Error, _T("Failed to get the object ID value. Code: %x"), hr);
+					{
+						Log::logger.error(StringT(_T("Failed to get the object ID value. Code:")) + ToStringT(hr));
+					}
 				}
 				else
-					WriteLog(Log::LogLevel::Error, _T("Failed to retrieve the object ID. Count: %d, Code: %x"), count, hr);
+				{
+					Log::logger.error(StringT(_T("Failed to retrieve the object ID. Count:")) + ToStringT(count) + StringT(_T(" Code:")) + ToStringT(hr));
+				}
 			}
 			else
-				WriteLog(Log::LogLevel::Error, _T("Failed to retrieve the object ID. Code: %x"), hr);
+			{
+				Log::logger.error(StringT(_T("Failed to retrieve the object ID. Code:")) + ToStringT(hr));
+			}
 		}
 		else
-			WriteLog(Log::LogLevel::Error, _T("Failed to create property collection. Code: %x"), hr);
+		{
+			Log::logger.error(StringT(_T("Failed to create property collection. Code")) + ToStringT(hr));
+		}
 	}
 	else
-		WriteLog(Log::LogLevel::Error, _T("Failed to open portable device. Code: %x"), hr);
+	{
+		Log::logger.error(StringT(_T("Failed to open portable device. Code:")) + ToStringT(hr));
+	}
 }
 
 void RepRunner::ReplicateFilesToPortableDevice(WPD::PortableDeviceContent& deviceContent, const PathT& srcPath, const std::wstring& destObjId, const PathT& destination)
@@ -815,7 +829,7 @@ void RepRunner::ReplicateFilesToPortableDevice(WPD::PortableDeviceContent& devic
 	DirectoryIteratorT dit(srcPath);
 	for (; dit != DirectoryIteratorT(); ++dit)
 	{
-		if (m_abort) { WriteLog(Log::LogLevel::Info, _T("Replication was aborted.")); return; }
+		if (m_abort) { WriteLog(Log::LogLevel::Info, GetLocalizedString(StringResource::aborted).c_str()); return; }
 
 		try
 		{
@@ -825,7 +839,7 @@ void RepRunner::ReplicateFilesToPortableDevice(WPD::PortableDeviceContent& devic
 				{
 					++m_fileCount;
 					fileList.push_back(dit->path());
-					WriteLog(Log::LogLevel::Info, _T("[%d] Found \"%s\"."), m_fileCount, dit->path().wstring().c_str());
+					WriteLog(Log::LogLevel::Info, GetLocalizedString(StringResource::found).c_str(), m_fileCount, dit->path().wstring().c_str());
 				}
 			}
 			else if (includeSubFolder && std::experimental::filesystem::is_directory(dit->path()))
@@ -835,7 +849,7 @@ void RepRunner::ReplicateFilesToPortableDevice(WPD::PortableDeviceContent& devic
 		}
 		catch (std::exception& e)
 		{
-			WriteLog(Log::LogLevel::Error, _T("Exception caught: %s"), String::StringToStringT(e.what()).c_str());
+			Log::logger.error(StringT(_T("Exception caught:")) + String::StringToStringT(e.what()).c_str());
 		}
 	}
 
@@ -900,7 +914,7 @@ void RepRunner::ProcessFiles(WPD::PortableDeviceContent& deviceContent, const st
 {
 	for (auto srcFile : srcFileList)
 	{
-		if (m_abort) { WriteLog(Log::LogLevel::Info, _T("Replication was aborted.")); return; }
+		if (m_abort) { WriteLog(Log::LogLevel::Info, GetLocalizedString(StringResource::aborted).c_str()); return; }
 
 		bool add = false, update = false;
 		auto destFile = destFileMap.find(srcFile.filename());
@@ -920,7 +934,7 @@ void RepRunner::ProcessFiles(WPD::PortableDeviceContent& deviceContent, const st
 
 		if (update)
 		{
-			WriteLog(Log::LogLevel::Info, _T("Updating \"%s\""), destFilePath.wstring().c_str());
+			WriteLog(Log::LogLevel::Info, GetLocalizedString(StringResource::updating).c_str(), destFilePath.wstring().c_str());
 			if (m_testRun)
 			{
 				HRESULT hr = deviceContent.UpdateFile(srcFile, currentFolderObjId, destFile->second.GetObjId());
@@ -930,8 +944,8 @@ void RepRunner::ProcessFiles(WPD::PortableDeviceContent& deviceContent, const st
 				}
 				else
 				{
-					WriteLog(Log::LogLevel::Error, _T("Failed to update \"%s\" with \"%s\". Code: %x"),
-						currentDestPath.wstring().c_str(), srcFile.wstring().c_str(), hr);
+					WriteLog(Log::LogLevel::Error, GetLocalizedString(StringResource::failedToUpdate).c_str(), destFilePath.wstring().c_str());
+					WriteLog(Log::LogLevel::Verbose, L"Error code: %x", hr);
 				}
 			}
 			else
@@ -939,7 +953,7 @@ void RepRunner::ProcessFiles(WPD::PortableDeviceContent& deviceContent, const st
 		}
 		else if(add)
 		{
-			WriteLog(Log::LogLevel::Info, _T("Adding \"%s\" to \"%s\""), srcFile.wstring().c_str(), currentDestPath.wstring().c_str());
+			WriteLog(Log::LogLevel::Info, GetLocalizedString(StringResource::adding).c_str(), destFilePath.wstring().c_str(), srcFile.wstring().c_str());
 			if (!m_testRun)
 			{
 				HRESULT hr = deviceContent.TransferFile(srcFile, currentFolderObjId);
@@ -949,8 +963,9 @@ void RepRunner::ProcessFiles(WPD::PortableDeviceContent& deviceContent, const st
 				}
 				else
 				{
-					WriteLog(Log::LogLevel::Error, _T("Failed to transfer \"%s\" to \"%s\". Code: %x"),
-						srcFile.wstring().c_str(), currentDestPath.wstring().c_str(), hr);
+					WriteLog(Log::LogLevel::Error, GetLocalizedString(StringResource::failedToAdd).c_str(),
+						currentDestPath.wstring().c_str(), srcFile.wstring().c_str());
+					WriteLog(Log::LogLevel::Verbose, L"Error code: %x", hr);
 				}
 			}
 			else
@@ -958,7 +973,7 @@ void RepRunner::ProcessFiles(WPD::PortableDeviceContent& deviceContent, const st
 		}
 		else
 		{
-			WriteLog(Log::LogLevel::Info, _T("Skipped \"%s\""), destFilePath.wstring().c_str());
+			WriteLog(Log::LogLevel::Info, GetLocalizedString(StringResource::skipped).c_str(), srcFile.wstring().c_str());
 			++m_skipped;
 		}
 	}
@@ -969,7 +984,7 @@ void RepRunner::ProcessFolders(WPD::PortableDeviceContent& deviceContent, const 
 {
 	for (auto srcfolder : srcFolderList)
 	{
-		if (m_abort) { WriteLog(Log::LogLevel::Info, _T("Replication was aborted.")); return; }
+		if (m_abort) { WriteLog(Log::LogLevel::Info, GetLocalizedString(StringResource::aborted).c_str()); return; }
 
 		std::wstring childFolderObjId;
 		PathT childDest{ currentDestPath };
@@ -982,7 +997,8 @@ void RepRunner::ProcessFolders(WPD::PortableDeviceContent& deviceContent, const 
 			HRESULT hr = deviceContent.CreateFolder(currentFolderObjId, srcfolder.filename(), childFolderObjId);
 			if (FAILED(hr))
 			{
-				WriteLog(Log::LogLevel::Error, _T("Failed to create folder \"%s\". Code:%x"), childDest.wstring().c_str(), hr);
+				WriteLog(Log::LogLevel::Error, GetLocalizedString(StringResource::failedToCreateFolder).c_str(), childDest.wstring().c_str());
+				WriteLog(Log::LogLevel::Verbose, L"Error code: %x", hr);
 				continue;
 			}
 		}

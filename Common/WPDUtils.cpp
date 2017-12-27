@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "WPDPortableDeviceProperties.h"
 #include "WPDUtils.h"
-
+#include "Log.h"
 
 namespace WPD
 {
@@ -31,10 +31,18 @@ namespace WPD
 				{
 					totalBytesRead += bytesRead; // Calculating total bytes read from device for debugging purposes only
 
-					if(SUCCEEDED(hr = destStream->Write(objectData, bytesRead, &bytesWritten)))
+					if (SUCCEEDED(hr = destStream->Write(objectData, bytesRead, &bytesWritten)))
 					{
 						totalBytesWritten += bytesWritten;
 					}
+					else
+					{
+						Log::logger.error(StringT(_T("Failed to write to stream.")) + ToStringT(hr));
+					}
+				}
+				else
+				{
+					Log::logger.error(StringT(_T("Failed to read from stream.")) + ToStringT(hr));
 				}
 			} while (SUCCEEDED(hr) && (bytesRead > 0));
 			// Remember to delete the temporary transfer buffer

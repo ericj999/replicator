@@ -4,6 +4,7 @@
 #include "WPDPortableDeviceProperties.h"
 #include "WPDDefinitions.h"
 #include "WPDUtils.h"
+#include "Log.h"
 
 namespace WPD
 {
@@ -131,17 +132,28 @@ namespace WPD
 		PortableDeviceValues properties;
 
 		if (FAILED(hr = properties->SetStringValue(WPD_OBJECT_PARENT_ID, parentObjId.c_str())))
+		{
+			Log::logger.error(StringT(L"Failed to set object parent ID ") + parentObjId
+				+ StringT(L" for new folder ") + folderName + StringT(L"(") + newFolderId + StringT(L"). Code:") + ToStringT(hr));
 			return hr;
-
+		}
 		if (FAILED(hr = properties->SetStringValue(WPD_OBJECT_NAME, folderName.c_str())))
+		{
+			Log::logger.error(StringT(L"Failed to set object name for new folder ") + folderName + StringT(L"(") + newFolderId + StringT(L"). Code:") + ToStringT(hr));
 			return hr;
-
+		}
 		if (FAILED(hr = properties->SetGuidValue(WPD_OBJECT_CONTENT_TYPE, WPD_CONTENT_TYPE_FOLDER)))
+		{
+			Log::logger.error(StringT(L"Failed to set content type for new folder ") + folderName + StringT(L"(") + newFolderId + StringT(L"). Code:") + ToStringT(hr));
 			return hr;
-
+		}
 		PWSTR newObject = nullptr;
 		if (SUCCEEDED(hr = m_interface->CreateObjectWithPropertiesOnly(properties.Get(), &newObject)))
 			newFolderId = newObject;
+		else
+		{
+			Log::logger.error(StringT(L"CreateObjectWithPropertiesOnly() failed. Code:") + ToStringT(hr));
+		}
 
 		if(newObject) CoTaskMemFree(newObject);
 		return hr;
