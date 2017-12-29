@@ -54,30 +54,12 @@ namespace String
 		return Util::FormatTimeString(lt.wYear, lt.wMonth, lt.wDay, lt.wHour, lt.wMinute, lt.wSecond);
 	}
 
-	void Tokenize(const StringT& str, std::vector<StringT>& tokens, const StringT& delimiters /*= _T(" ")*/)
-	{
-		// Skip delimiters at beginning.
-		StringT::size_type lastPos = str.find_first_not_of(delimiters, 0);
-		// Find first "non-delimiter".
-		StringT::size_type pos = str.find_first_of(delimiters, lastPos);
-
-		while ((pos != StringT::npos) || (lastPos != StringT::npos))
-		{
-			// Found a token, add it to the vector.
-			tokens.push_back(str.substr(lastPos, pos - lastPos));
-			// Skip delimiters.  Note the "not_of"
-			lastPos = str.find_first_not_of(delimiters, pos);
-			// Find next "non-delimiter"
-			pos = str.find_first_of(delimiters, lastPos);
-		}
-	}
-
 	StringT GetFiltersExp(const StringT& filters)
 	{
 		StringT str;
 		std::vector<StringT> exts;
 		
-		Tokenize(filters, exts, STR_SRC_PATH_SEPARATOR);
+		Tokenize<TCHAR>(filters, exts, STR_SRC_PATH_SEPARATOR);
 		if (!exts.empty())
 		{
 			bool addBar = false;

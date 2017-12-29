@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "RepSource.h"
-
+#include "LocaleResources.h"
 
 RepSource::RepSource(const PathT& path) :
 	m_parent{ path }
@@ -20,7 +20,7 @@ void RepSource::add(const PathT& path)
 	}
 	else
 	{
-		throw std::runtime_error("mismatch folder paths!");
+		throw std::runtime_error( EXCEPSTR_MISMATCHED_FOLDER_PATHS );
 	}
 
 }

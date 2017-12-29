@@ -261,23 +261,7 @@ void CReplicatorApp::CreateDB(const StringT& db)
 		"DestFolderFormat TEXT," \
 		"LastSuccessfulRun DATETIME" \
 		");");
-/*
-	m_database.Exec("CREATE TABLE Logs(" \
-		"ID INTEGER PRIMARY KEY," \
-		"TaskID INTEGER NOT NULL," \
-		"Level INT NOT NULL," \
-		"EventTime DATETIME DEFAULT CURRENT_TIMESTAMP," \
-		"Message TEXT" \
-		");");
 
-	m_database.Exec("CREATE TABLE Schedules(" \
-		"ScheduleID INTEGER PRIMARY KEY," \
-		"TaskID INT NOT NULL," \
-		"ScheduleTime DATETIME," \
-		"NextRunTime DATETIME," \
-		"RecurringInteval INT" \
-		");");
-*/
 	m_database.Exec("CREATE TABLE History(" \
 		"rid INTEGER PRIMARY KEY AUTOINCREMENT," \
 		"TaskID INT NOT NULL," \
@@ -286,25 +270,6 @@ void CReplicatorApp::CreateDB(const StringT& db)
 		"Result TEXT" \
 		");");
 }
-/*
-void CReplicatorApp::WriteLog(int taskID, LogLevel level, const StringT& msg)
-{
-	StringT sql = _T("INSERT INTO LOGS (TaskID, Level, Message) VALUES (?1, ?2, ?3);");
-	try
-	{
-		Database::Statement stm{ m_database };
-		stm.Prepare(sql);
-		stm.Bind(1, taskID);
-		stm.Bind(2, static_cast<int>(level));
-		stm.Bind(3, msg);
-		stm.Step();
-	}
-	catch (Database::Exception& e)
-	{
-		std::cerr << e.what();
-	}
-}
-*/
 
 void CReplicatorApp::MaintainDB()
 {

@@ -3,6 +3,7 @@
 
 #include "WPDPortableDevice.h"
 #include "WPDPortableDeviceProperties.h"
+#include "ExceptionString.h"
 
 namespace WPD
 {
@@ -23,7 +24,7 @@ namespace WPD
 		
 		if (FAILED(m_interface->Open(deviceId.c_str(), clientInfo.Get())))
 		{
-			throw std::runtime_error("Failed to open the portable device.");
+			throw std::runtime_error{ EXCEPSTR_ACCESS_PORTABLE_DEVICE_FAILURE };
 		}
 	}
 }

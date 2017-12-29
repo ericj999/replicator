@@ -4,6 +4,7 @@
 #include <propkey.h>
 #include "ComInterface.h"
 #include "ComMemObj.h"
+#include "ExceptionString.h"
 
 namespace ShellWrapper
 {
@@ -61,7 +62,7 @@ namespace ShellWrapper
 		BindCtx(DWORD modes)
 		{
 			if (FAILED(CreateBindCtx(0, &m_interface)))
-				throw std::runtime_error("Failed to create bind object.");
+				throw std::runtime_error{ EXCEPSTR_CREATE_BIND_OBJ_FAILURE };
 
 			BIND_OPTS boptions = { sizeof(BIND_OPTS), 0, modes, 0 };
 			m_interface->SetBindOptions(&boptions);

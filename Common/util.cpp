@@ -159,56 +159,63 @@ namespace Util
 		HRESULT hr = E_FAIL;
 		BYTE rgbFile[BUFSIZE];
 		DWORD cbRead = 0;
-
-		WinFile file{ dest.c_str(), GENERIC_WRITE, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL };
-
-		if (file.isGood())
+		std::wstring tempDestFile{ dest + L".temp" };
 		{
-			try
+			WinFile file{ tempDestFile.c_str(), GENERIC_WRITE, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL };
+
+			if (file.isGood())
 			{
-				ShellWrapper::BindCtx bindCtx{ STGM_READ | STGM_SHARE_DENY_NONE };
-				ShellWrapper::Stream stream;
-
-				if (SUCCEEDED(hr = shellItem->BindToHandler(bindCtx.Get(), BHID_Stream, IID_IStream, (void**)&stream)))
+				try
 				{
-					ret = true;
-					while (SUCCEEDED(hr = stream->Read(rgbFile, BUFSIZE, &cbRead)))
-					{
-						DWORD written = 0;
-						if (cbRead == 0)
-							break;
+					ShellWrapper::BindCtx bindCtx{ STGM_READ | STGM_SHARE_DENY_NONE };
+					ShellWrapper::Stream stream;
 
-						if (!file.Write(rgbFile, cbRead, written) || (cbRead != written))
+					if (SUCCEEDED(hr = shellItem->BindToHandler(bindCtx.Get(), BHID_Stream, IID_IStream, (void**)&stream)))
+					{
+						ret = true;
+						while (SUCCEEDED(hr = stream->Read(rgbFile, BUFSIZE, &cbRead)))
 						{
-							ret = false;
-							break;
-						}
+							DWORD written = 0;
+							if (cbRead == 0)
+								break;
 
-						if (hr == S_FALSE)
-							break;
+							if (!file.Write(rgbFile, cbRead, written) || (cbRead != written))
+							{
+								ret = false;
+								break;
+							}
+
+							if (hr == S_FALSE)
+								break;
+						}
 					}
 				}
-			}
-			catch (...)
-			{
-				ret = false;
-			}
-			if (ret)
-			{
-				FileTime itemTime{ shellItem };
-				if (itemTime.isValid())
+				catch (...)
 				{
-					if (!file.SetFileTime(itemTime.getCreatedTime(), itemTime.getAccessedTime(), itemTime.getModifiedTime()))
+					ret = false;
+				}
+				if (ret)
+				{
+					FileTime itemTime{ shellItem };
+					if (itemTime.isValid())
 					{
-						DWORD err = GetLastError();
-						Log::logger.error(StringT(L"Faile to set filetime. Code:") + ToStringT(err));
+						if (!file.SetFileTime(itemTime.getCreatedTime(), itemTime.getAccessedTime(), itemTime.getModifiedTime()))
+						{
+							DWORD err = GetLastError();
+							Log::logger.error(StringT(L"Faile to set filetime. Code:") + ToStringT(err));
+						}
 					}
 				}
+			}
+			else
+			{
+				Log::logger.error(StringT(L"Faile to open \"") + tempDestFile + StringT(L"\" for writing."));
 			}
 		}
-		else
+		if (ret)
 		{
-			Log::logger.error(StringT(L"Faile to open \"") + dest + StringT(L"\" for writing."));
+			::DeleteFile(dest.c_str());
+			ret = ::MoveFile(tempDestFile.c_str(), dest.c_str());
 		}
 		return ret;
 	}

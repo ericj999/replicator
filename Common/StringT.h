@@ -37,7 +37,26 @@ namespace String
 {
 	StringT replace(const StringT& str, const StringT& toFind, const StringT& toReplace);
 	StringT UTCTimeToLocalTime(const StringT& utcTime);
-	void Tokenize(const StringT& str, std::vector<StringT>& tokens, const StringT& delimiters = _T(" "));
+
+	template<typename T>
+	void Tokenize(const std::basic_string<T>& str, std::vector<std::basic_string<T>>& tokens, const std::basic_string<T>& delimiters)
+	{
+		// Skip delimiters at beginning.
+		std::basic_string<T>::size_type lastPos = str.find_first_not_of(delimiters, 0);
+		// Find first "non-delimiter".
+		std::basic_string<T>::size_type pos = str.find_first_of(delimiters, lastPos);
+
+		while ((pos != std::basic_string<T>::npos) || (lastPos != std::basic_string<T>::npos))
+		{
+			// Found a token, add it to the vector.
+			tokens.push_back(str.substr(lastPos, pos - lastPos));
+			// Skip delimiters.  Note the "not_of"
+			lastPos = str.find_first_not_of(delimiters, pos);
+			// Find next "non-delimiter"
+			pos = str.find_first_of(delimiters, lastPos);
+		}
+	};
+
 	StringT GetFiltersExp(const StringT& filters);
 #ifdef _UNICODE
 	StringT StringToStringT(const std::string& str);
@@ -64,5 +83,5 @@ public:
 		return m_guidStr;
 	}
 protected:
-	WCHAR m_guidStr[64];
+	WCHAR m_guidStr[128];
 };

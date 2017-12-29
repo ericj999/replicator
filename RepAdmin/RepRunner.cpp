@@ -61,13 +61,13 @@ void RepRunner::Run()
 
 	m_isRunning = true;
 	StringT result;
+	std::chrono::system_clock::time_point start{ std::chrono::system_clock::now() };
+	StringT startTimeStr = Util::GetIsoTimeString(std::chrono::system_clock::to_time_t(start));
 
 	try
 	{
 		WriteLog(Log::LogLevel::Verbose, _T("==============================="));
 		WriteLog(Log::LogLevel::Verbose, _T("Begin replication task ID %d..."), m_taskID);
-		std::chrono::system_clock::time_point start{ std::chrono::system_clock::now() };
-		StringT startTimeStr = Util::GetIsoTimeString(std::chrono::system_clock::to_time_t(start));
 		Database::PropertyList propList;
 
 		propList.push_back(Database::Property(TASKS_COL_LASTRUN, startTimeStr));
@@ -93,11 +93,7 @@ void RepRunner::Run()
 		{
 			if (destFolderFormat.empty())
 			{
-				propList.clear();
-				propList.push_back(Database::Property(TASKS_COL_LASTRUNSTATUS, _T("Destination folder format is empty.")));
-
-				UpdateTaskInDB(m_taskID, propList);
-				throw std::runtime_error("Destination folder format is empty.");
+				throw std::runtime_error( EXCEPSTR_DEST_FOLDER_FORMAT_EMPTY );
 			}
 			m_pathFormatter.SetFormat(destFolderFormat);
 		}
@@ -181,6 +177,23 @@ void RepRunner::Run()
 	{
 		result = _T("Exception occurred. ") + String::StringToStringT(e.what());
 		WriteLog(Log::LogLevel::Error, result.c_str());
+
+		std::wstring locResult = GetLocalizedString(e.what());
+
+		Database::PropertyList propList;
+		propList.push_back(Database::Property(TASKS_COL_LASTRUNSTATUS, locResult.empty() ? result : locResult));
+		UpdateTaskInDB(m_taskID, propList);
+
+		std::chrono::system_clock::time_point endTime{ std::chrono::system_clock::now() };
+		StringT endTimeStr = Util::GetIsoTimeString(std::chrono::system_clock::to_time_t(endTime));
+
+		propList.clear();
+		propList.push_back(Database::Property(HISTORY_COL_TASKID, m_taskID));
+		propList.push_back(Database::Property(HISTORY_COL_START_TIME, startTimeStr));
+		propList.push_back(Database::Property(HISTORY_COL_END_TIME, endTimeStr));
+		propList.push_back(Database::Property(HISTORY_COL_RESULT, result));
+		AddHistory(propList);
+
 	}
 	if (m_callback) m_callback(RunnerState::STOP, result.c_str());
 	m_isRunning = false;

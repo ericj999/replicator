@@ -8,6 +8,8 @@
 #include <PortableDevice.h>
 #include <Propvarutil.h>
 
+#include "ExceptionString.h"
+
 std::string IIDToString(REFIID iid);
 
 template<typename T>
@@ -24,7 +26,7 @@ public:
 	{
 		if (FAILED(CoCreateInstance(clsid, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&m_interface))))
 		{
-			throw std::runtime_error{ std::string{ "Failed to create instacne of " } +IIDToString(clsid) };
+			throw std::runtime_error{ std::string{ EXCEPSTR_CREATE_INSTANCE_FAILURE } + "|" + IIDToString(clsid) };
 		}
 	}
 
@@ -33,7 +35,7 @@ public:
 	{
 		if (FAILED(CoCreateInstance(clsid, NULL, CLSCTX_INPROC_SERVER, iid, reinterpret_cast<void**>(&m_interface))))
 		{
-			throw std::runtime_error{ std::string{ "Failed to create instacne of " } +IIDToString(clsid) };
+			throw std::runtime_error{ std::string{ EXCEPSTR_CREATE_INSTANCE_FAILURE } + "|" +IIDToString(clsid) };
 		}
 	}
 

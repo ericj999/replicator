@@ -7,6 +7,7 @@
 #include "ShellFolder.h"
 #include "ComMemObj.h"
 #include "util.h"
+#include "ExceptionString.h"
 
 namespace ShellWrapper
 {
@@ -26,7 +27,7 @@ namespace ShellWrapper
 		std::vector<std::wstring> parsingPath = Util::ParseParsingPath(path);
 		if (parsingPath.size() < 2)
 		{
-			throw std::runtime_error("Cannot replicate entire device!");
+			throw std::runtime_error{ EXCEPSTR_CREATE_BIND_OBJ_FAILURE };
 		}
 
 		if (path[0] == L':')
@@ -36,7 +37,7 @@ namespace ShellWrapper
 
 		if (!m_interface)
 		{
-			throw std::runtime_error("Failed to open folder!");
+			throw std::runtime_error{ EXCEPSTR_OPEN_FOLDER_FAILURE };
 		}
 	}
 

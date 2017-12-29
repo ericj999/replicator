@@ -700,7 +700,24 @@ END
 STRINGTABLE
 BEGIN
     IDS_ERROR_PORTABLE_TO_PORTABLE 
-                            "Replicating between folders both on protable devices is not supported."
+                            "Replicating between folders both on protable device is not supported."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_EXCEP_CREATE_INSTANCE_FAILURE "Failed to create instance of {1}."
+    IDS_EXCEP_DEST_FOLDER_FORMAT_EMPTY 
+                            "The destination folder format is empty."
+    IDS_EXCEP_MISMATCHED_FOLDER_PATHS "Mismatched folder paths."
+    IDS_EXCEP_CREATE_BIND_OBJ_FAILURE 
+                            "Failed to create bind object from shell item."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_EXCEP_OPEN_FOLDER_FAILURE "Could not open the folder on device."
+    IDS_EXCEP_ACCESS_PORTABLE_DEVICE_FAILURE 
+                            "Could not access the portable device. Please make sure the device being connected to PC in MTP mode."
 END
 
 #endif    // English (United States) resources

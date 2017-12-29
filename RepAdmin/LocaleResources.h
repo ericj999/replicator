@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "ExceptionString.h"
 
 enum StringResource
 {
@@ -18,3 +19,4 @@ enum StringResource
 void InitLocaleResource();
 
 const std::wstring& GetLocalizedString(StringResource id);
+std::wstring GetLocalizedString(const std::string& str);
