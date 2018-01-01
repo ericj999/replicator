@@ -20,12 +20,6 @@
 
 #include "resource.h"
 
-#define STR_LOG_FILENAME	_T("Replicate-")
-#define STR_LOG_EXTENSION	_T(".log")
-
-#define ENUM_COUNT 1	//50
-#define SHELLITEM_REQUIRED_ATTRIBUTES (SFGAO_CANCOPY | SFGAO_STREAM)
-
 #define NUM_OBJECTS_TO_REQUEST	10
 
 RepRunner::RepRunner(int taskID, RunnerEventCallback callback /* = nullptr*/, bool verbose /*= false*/, bool testRun /*= false*/) :
@@ -138,7 +132,7 @@ void RepRunner::Run()
 		CString cstr, rstr;
 		std::chrono::system_clock::duration dur = endTime - start;
 		std::chrono::seconds runTime = std::chrono::duration_cast<std::chrono::seconds>(dur);
-		StringT runTimeStr = Util::GetDurationString(runTime);
+		StringT runTimeStr = GetDurationString(runTime);
 		StringT endTimeStr = Util::GetIsoTimeString(std::chrono::system_clock::to_time_t(endTime));
 
 		if (!m_abort)
@@ -179,9 +173,11 @@ void RepRunner::Run()
 		WriteLog(Log::LogLevel::Error, result.c_str());
 
 		std::wstring locResult = GetLocalizedString(e.what());
+		if (!locResult.empty())
+			result = locResult;
 
 		Database::PropertyList propList;
-		propList.push_back(Database::Property(TASKS_COL_LASTRUNSTATUS, locResult.empty() ? result : locResult));
+		propList.push_back(Database::Property(TASKS_COL_LASTRUNSTATUS, result));
 		UpdateTaskInDB(m_taskID, propList);
 
 		std::chrono::system_clock::time_point endTime{ std::chrono::system_clock::now() };
@@ -1024,4 +1020,48 @@ void RepRunner::ProcessFolders(WPD::PortableDeviceContent& deviceContent, const 
 			ReplicateFilesToPortableDevice(deviceContent, srcfolder, childFolderObjId, childDest);
 		}
 	}
+}
+
+StringT RepRunner::GetDurationString(const std::chrono::seconds& seconds)
+{
+	StringT str;
+	int day = 0, hour = 0, min = 0, sec = 0;
+
+	sec = static_cast<int>(seconds.count());
+	min = sec / 60;
+	sec %= 60;
+	hour = min / 60;
+	min %= 60;
+	day = hour / 24;
+	hour %= 24;
+
+	CString resStr;
+
+	if (day > 0)
+	{
+		if (resStr.LoadString((day == 1) ? IDS_TIMEFORMAT_DAY : IDS_TIMEFORMAT_DAYS))
+			str += ToStringT(day) + (LPCTSTR)resStr;
+		else
+			str += ToStringT(day) + ((day == 1) ? _T(" day ") : _T(" days "));
+	}
+	if (hour > 0)
+	{
+		if (resStr.LoadString((hour == 1) ? IDS_TIMEFORMAT_HOUR : IDS_TIMEFORMAT_HOURS))
+			str += ToStringT(hour) + (LPCTSTR)resStr;
+		else
+			str += ToStringT(hour) + ((hour == 1) ? _T(" hour ") : _T(" hours "));
+	}
+	if (min > 0)
+	{
+		if (resStr.LoadString((min == 1) ? IDS_TIMEFORMAT_MINUTE : IDS_TIMEFORMAT_MINUTES))
+			str += ToStringT(min) + (LPCTSTR)resStr;
+		else
+			str += ToStringT(min) + ((min == 1) ? _T(" minute ") : _T(" minutes "));
+	}
+	if (resStr.LoadString((sec == 1) ? IDS_TIMEFORMAT_SECOND : IDS_TIMEFORMAT_SECONDS))
+		str += ToStringT(sec) + (LPCTSTR)resStr;
+	else
+		str += ToStringT(sec) + ((sec == 1) ? _T(" second") : _T(" seconds"));
+
+	return str;
 }

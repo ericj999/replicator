@@ -72,9 +72,9 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDR_MAINFRAME           ICON                    "res\\Replicator.ico"
+IDR_MAINFRAME           ICON                    "..\\CommonRes\\Replicator.ico"
 
-IDR_ReplicatorTYPE      ICON                    "res\\ReplicatorDoc.ico"
+IDR_ReplicatorTYPE      ICON                    "..\\CommonRes\\ReplicatorDoc.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -82,9 +82,9 @@ IDR_ReplicatorTYPE      ICON                    "res\\ReplicatorDoc.ico"
 // Bitmap
 //
 
-IDR_MAINFRAME           BITMAP                  "res\\Toolbar.bmp"
+IDR_MAINFRAME           BITMAP                  "..\\CommonRes\\Toolbar.bmp"
 
-IDR_MAINFRAME_256       BITMAP                  "res\\Toolbar256.bmp"
+IDR_MAINFRAME_256       BITMAP                  "..\\CommonRes\\Toolbar256.bmp"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -187,7 +187,7 @@ CAPTION "About Replicator"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,14,14,20,20
-    LTEXT           "Replicator, Version 1.1",IDC_STATIC,42,14,114,8,SS_NOPREFIX
+    LTEXT           "File Replicator, Version 1.1",IDC_STATIC,42,14,114,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2014-2017",IDC_STATIC,42,26,114,8
     DEFPUSHBUTTON   "OK",IDOK,113,41,50,14,WS_GROUP
 END
@@ -239,7 +239,7 @@ CAPTION "New Task"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "Task &Name:",IDC_STATIC,7,10,38,8
-    EDITTEXT        IDC_NEW_TASK_NAME,48,7,275,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_NEW_TASK_NAME,48,7,302,14,ES_AUTOHSCROLL
     CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME,7,27,343,1,WS_EX_STATICEDGE
     LTEXT           "&Replicate files from",IDC_STATIC,7,32,62,8
     LTEXT           "&to",IDC_STATIC,7,62,8,8
@@ -257,21 +257,21 @@ BEGIN
 END
 
 IDD_ADVANCED_OPTIONS DIALOGEX 0, 0, 306, 232
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Advanced Options"
-FONT 10, "MS Shell Dlg", 400, 0, 0x0
+FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    LTEXT           "Files",IDC_STATIC,5,5,18,8
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,25,9,275,1
+    LTEXT           "Source Files",IDC_STATIC,5,5,53,8
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,50,9,250,1
     CONTROL         "&All files",IDC_NEW_TASK_ALL_FILES,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,11,17,33,8
-    CONTROL         "&Include the following file types",IDC_NEW_TASK_INCLUSION,
+    CONTROL         "&Include the following file type(s)",IDC_NEW_TASK_INCLUSION,
                     "Button",BS_AUTORADIOBUTTON,11,30,115,8
-    CONTROL         "&Exclude the following file types",IDC_NEW_TASK_EXCLUSION,
+    CONTROL         "&Exclude the following file type(s)",IDC_NEW_TASK_EXCLUSION,
                     "Button",BS_AUTORADIOBUTTON,11,43,119,8
     EDITTEXT        IDC_AO_FILTERS,18,55,282,12,ES_AUTOHSCROLL | WS_GROUP
     LTEXT           "( Specify one or more file extensions to be included or excluded; separate with semi-colons if more than one. ex. jpg;bmp )",IDC_NEW_TASK_FILTERS_INFO,18,70,282,17
-    LTEXT           "Destination Folders",IDC_STATIC,5,90,38,8
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,45,94,256,1
+    LTEXT           "Destination Folders",IDC_STATIC,5,90,67,8
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,74,94,227,1
     CONTROL         "&Use the same folder structures starting after the selected source folder",IDC_DESTINATION_SAME_FROM_SELECT,
                     "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,11,104,285,8
     CONTROL         "Use the &same folder structures starting from the root of the selected source folder",IDC_DESTINATION_SAME_FROM_ROOT,
@@ -305,7 +305,7 @@ END
 
 IDD_WAITING DIALOGEX 0, 0, 153, 37
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP
-FONT 10, "Microsoft Sans Serif", 400, 0, 0x0
+FONT 8, "Microsoft Sans Serif", 400, 0, 0x0
 BEGIN
     CTEXT           "Waiting...",IDC_STATIC,7,12,139,8
 END
@@ -357,7 +357,7 @@ BEGIN
             VALUE "InternalName", "Replicator.exe"
             VALUE "LegalCopyright", "(c) Eric Chen.  All rights reserved."
             VALUE "OriginalFilename", "Replicator.exe"
-            VALUE "ProductName", "Replicator"
+            VALUE "ProductName", "File Replicator"
             VALUE "ProductVersion", "1.1.0.1"
         END
     END
@@ -635,7 +635,7 @@ BEGIN
     IDS_ALL_FILES           "Include all files"
     IDS_FILES_MATCHING      "Include file types matching "
     IDS_FILES_NOT_MATCHING  "Include file types not matching "
-    IDS_WARN_OVERWRITE      "A custom destination folder format has been specified. Files may be overwriiten by the files from different source folders with same names or not be replicated. Do you want to continue?"
+    IDS_WARN_OVERWRITE      "A custom destination folder format has been specified. Files may be overwritten by the files from different source folders with same names or not be replicated. Do you want to continue?"
 END
 
 STRINGTABLE
@@ -688,6 +688,14 @@ BEGIN
     IDS_FF_YEAR_ALT         "Year in locale's alternative format"
     IDS_FF_WEEK_OF_YEAR     "Week of year in 2-digit numeric format"
     IDS_FF_WEEK_OF_YEAR_ALT "Week of year in locale's format"
+    IDS_TIMEFORMAT_DAYS     " days "
+    IDS_TIMEFORMAT_DAY      " day "
+    IDS_TIMEFORMAT_HOURS    " hours "
+    IDS_TIMEFORMAT_HOUR     " hour "
+    IDS_TIMEFORMAT_MINUTES  " minutes "
+    IDS_TIMEFORMAT_MINUTE   " minute "
+    IDS_TIMEFORMAT_SECONDS  " seconds"
+    IDS_TIMEFORMAT_SECOND   " second"
 END
 
 STRINGTABLE

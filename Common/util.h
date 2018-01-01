@@ -13,7 +13,6 @@ namespace Util
 	PathT GetDatabasePath();
 	PathT GetProgramPath();
 
-	StringT GetDurationString(const std::chrono::seconds& seconds);
 	StringT GetIsoTimeString(time_t tt);
 	StringT FormatTimeString(int year, int month, int day, int hour, int min, int sec);
 

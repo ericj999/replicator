@@ -157,17 +157,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	lstBasicCommands.AddTail(ID_APP_ABOUT);
 
 	CMFCToolBar::SetBasicCommands(lstBasicCommands);
-
-//	try
-//	{
-//		m_server.Start(STR_IPC_NAMED_PIPE_NAME, PIPE_UNLIMITED_INSTANCES, IPC::PipeDirection::both, std::bind(ServerCallback, this, std::placeholders::_1, std::placeholders::_2));
-//	}
-//	catch (IPC::Exception& e)
-//	{
-//		CString str(e.what());
-//		AfxMessageBox(str);
-//	}
-
 	return 0;
 }
 

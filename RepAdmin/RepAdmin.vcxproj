@@ -256,6 +256,10 @@
     <ResourceCompile Include="Replicator.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\CommonRes\Replicator.ico" />
+    <Image Include="..\CommonRes\ReplicatorDoc.ico" />
+    <Image Include="..\CommonRes\Toolbar.bmp" />
+    <Image Include="..\CommonRes\Toolbar256.bmp" />
     <Image Include="res\Replicator.ico" />
     <Image Include="res\ReplicatorDoc.ico" />
     <Image Include="res\Toolbar.bmp" />

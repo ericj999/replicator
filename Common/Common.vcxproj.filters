@@ -57,12 +57,6 @@
     <ClInclude Include="Log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NamedPipe.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PipeServerThread.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GlobDef.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -141,12 +135,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Log.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="NamedPipe.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PipeServerThread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DatePathFormatter.cpp">

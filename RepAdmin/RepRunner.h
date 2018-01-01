@@ -67,6 +67,7 @@ protected:
 	void ReplicateNow(const std::vector<RepSource>& repSources, const PathT& destination);
 	bool GetNewFileName(PathT& destFile, const Util::MD5Hash& md5);
 	void WriteLog(Log::LogLevel level, LPCTSTR format, ...);
+	StringT GetDurationString(const std::chrono::seconds& seconds);
 
 	// from portable devie to filesystem
 	void ReplicateStreamToFile(const StringT& parsingSrc, const PathT& srcPath, const PathT& destination);

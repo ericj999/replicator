@@ -10,6 +10,7 @@
 #include "WinFile.h"
 #include "ShellFolder.h"
 #include "Log.h"
+#include "ComMemObj.h"
 
 namespace Util
 {
@@ -17,10 +18,16 @@ namespace Util
 
 	PathT GetConfigPath()
 	{
-		TCHAR szPath[MAX_PATH];
-		SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA | CSIDL_FLAG_CREATE, NULL, 0, szPath);
+		PathT path;
 
-		PathT path = szPath;
+//		TCHAR szPath[MAX_PATH] = { 0 };
+//		SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA | CSIDL_FLAG_CREATE, NULL, 0, szPath);
+
+		ComMemObj<WCHAR> docPath;
+
+		if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_CREATE, NULL, &docPath)))
+			path = docPath.Get();
+
 		if (!path.empty())
 		{
 			path /= STR_PRODUCT_NAME;
@@ -30,6 +37,7 @@ namespace Util
 		}
 		else
 		{
+			TCHAR szPath[MAX_PATH] = { 0 };
 			GetModuleFileName(NULL, szPath, MAX_PATH);
 			path = szPath;
 			path.remove_filename();
@@ -55,33 +63,6 @@ namespace Util
 			path.remove_filename();
 		}
 		return path;
-	}
-
-	StringT GetDurationString(const std::chrono::seconds& seconds)
-	{
-		StringT str;
-		int day = 0, hour = 0, min = 0, sec = 0;
-
-		sec = static_cast<int>(seconds.count());
-		min = sec / 60;
-		sec %= 60;
-		hour = min / 60;
-		min %= 60;
-		day = hour / 24;
-		hour %= 24;
-
-		if (day > 0)
-			str += ToStringT(day) + ((day == 1) ? _T(" day ") : _T(" days "));
-
-		if (hour > 0)
-			str += ToStringT(hour) + ((hour == 1) ? _T(" hour ") : _T(" hours "));
-
-		if (min > 0)
-			str += ToStringT(min) + ((min == 1) ? _T(" minute ") : _T(" minutes "));
-
-		str += ToStringT(sec) + ((sec == 1) ? _T(" second") : _T(" seconds"));
-
-		return str;
 	}
 
 	StringT GetIsoTimeString(time_t tt)
