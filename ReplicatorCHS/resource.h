@@ -27,7 +27,6 @@
 #define IDS_EDIT_TASK                   308
 #define IDS_UPDATE                      309
 #define IDD_GENERALPAGE                 310
-#define IDD_SETTINGSPAGE                311
 #define IDD_HISTORYPAGE                 312
 #define IDD_NEW_TASK                    313
 #define IDR_TASK_POPUP_MENU             314
@@ -94,6 +93,9 @@
 #define IDS_FILES_MATCHING              2003
 #define IDS_FILES_NOT_MATCHING          2004
 #define IDS_WARN_OVERWRITE              2005
+#define IDS_DESTINATION_SAME_FROM_SELECT 2006
+#define IDS_DESTINATION_SAME_FROM_ROOT  2007
+#define IDS_DESTINATION_GROUP           2008
 #define IDS_UPDATE_ACTION_NEWER         2100
 #define IDS_UPDATE_ACTION_KEEP_BOTH     2101
 #define IDS_UPDATE_ACTION_DO_NOTHING    2102

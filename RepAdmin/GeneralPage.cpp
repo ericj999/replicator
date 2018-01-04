@@ -18,6 +18,7 @@ enum
 	COL_Destination,
 	COL_Flags,
 	COL_Filters,
+	COL_DestFolderFmt,
 	MAX_COLS
 };
 // CGeneralPage dialog
@@ -82,12 +83,11 @@ void CGeneralPage::Refresh(int newTask, bool force)
 			{
 				CString s;
 
-				condition.clear();
 				int flags = rs->GetColumnInt(COL_Flags);
 				if (flags & TASKS_FLAGS_INCLUDE_SUBDIR)
 					s.LoadString(IDS_CHILD_FOLDER);
 
-				condition = s + _T("\r\n");
+				repCondition = s + _T("\r\n");
 
 				if (flags & TASKS_FLAGS_INCLUDE_FILTERS)
 				{
@@ -102,13 +102,26 @@ void CGeneralPage::Refresh(int newTask, bool force)
 				else
 					s.LoadStringW(IDS_ALL_FILES);
 
-				condition += s + _T("\r\n");
+				repCondition += s + _T("\r\n");
+
+				if (flags & TASKS_FLAGS_DEST_START_FROM_ROOT)
+				{
+					s.LoadString(IDS_DESTINATION_SAME_FROM_ROOT);
+				}
+				else if (flags & TASKS_FLAGS_DEST_GROUP_BY_DATE)
+				{
+					s.LoadString(IDS_DESTINATION_GROUP);
+					s += rs->GetColumnStr(COL_DestFolderFmt).c_str();
+				}
+				else
+					s.LoadString(IDS_DESTINATION_SAME_FROM_SELECT);
+
+				repCondition += s;
 
 				name = rs->GetColumnStr(COL_Name);
 				createdTime = String::UTCTimeToLocalTime(rs->GetColumnStr(COL_CreatedTime));
 				sourcePath = rs->GetColumnStr(COL_Source);
 				destPath = rs->GetColumnStr(COL_Destination);
-				repCondition = condition;
 			}
 		}
 

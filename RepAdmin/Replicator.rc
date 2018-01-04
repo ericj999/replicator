@@ -192,16 +192,16 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,113,41,50,14,WS_GROUP
 END
 
-IDD_EASYDUPL_FORM DIALOGEX 0, 0, 424, 275
+IDD_EASYDUPL_FORM DIALOGEX 0, 0, 424, 178
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    CONTROL         "",IDC_TAB_TASK_DETAIL,"SysTabControl32",0x0,0,0,423,274
-    LTEXT           "Static",IDC_TAB_INNER,6,18,409,249,NOT WS_VISIBLE | WS_DISABLED
+    CONTROL         "",IDC_TAB_TASK_DETAIL,"SysTabControl32",0x0,0,0,423,177
+    LTEXT           "Static",IDC_TAB_INNER,6,18,409,152,NOT WS_VISIBLE | WS_DISABLED
 END
 
-IDD_GENERALPAGE DIALOGEX 0, 0, 409, 249
+IDD_GENERALPAGE DIALOGEX 0, 0, 409, 152
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD | WS_DISABLED | WS_SYSMENU
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
@@ -215,22 +215,15 @@ BEGIN
     LTEXT           "",IDC_SOURCE_PATH,54,70,348,19
     LTEXT           "Destination:",IDC_STATIC,7,91,40,8
     LTEXT           "",IDC_DEST_PATH,54,91,348,19
-    LTEXT           "Condition(s):",IDC_STATIC,7,112,42,8
-    LTEXT           "",IDC_CONDITIONS,54,112,348,69
+    LTEXT           "Conditions:",IDC_STATIC,7,112,37,8
+    LTEXT           "",IDC_CONDITIONS,54,111,348,34
 END
 
-IDD_SETTINGSPAGE DIALOGEX 0, 0, 409, 249
+IDD_HISTORYPAGE DIALOGEX 0, 0, 409, 152
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD | WS_DISABLED | WS_SYSMENU
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    LTEXT           "Settings",IDC_STATIC,179,118,27,8
-END
-
-IDD_HISTORYPAGE DIALOGEX 0, 0, 409, 249
-STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD | WS_DISABLED | WS_SYSMENU
-FONT 8, "MS Shell Dlg", 0, 0, 0x0
-BEGIN
-    CONTROL         "",IDC_HISTORY_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | LVS_OWNERDATA | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,7,395,235
+    CONTROL         "",IDC_HISTORY_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | LVS_OWNERDATA | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,7,395,138
 END
 
 IDD_NEW_TASK DIALOGEX 0, 0, 357, 159
@@ -257,7 +250,7 @@ BEGIN
 END
 
 IDD_ADVANCED_OPTIONS DIALOGEX 0, 0, 306, 232
-STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Advanced Options"
 FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
@@ -272,9 +265,9 @@ BEGIN
     LTEXT           "( Specify one or more file extensions to be included or excluded; separate with semi-colons if more than one. ex. jpg;bmp )",IDC_NEW_TASK_FILTERS_INFO,18,70,282,17
     LTEXT           "Destination Folders",IDC_STATIC,5,90,67,8
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,74,94,227,1
-    CONTROL         "&Use the same folder structures starting after the selected source folder",IDC_DESTINATION_SAME_FROM_SELECT,
+    CONTROL         "&Use the same folder structure starting after the selected source folder",IDC_DESTINATION_SAME_FROM_SELECT,
                     "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,11,104,285,8
-    CONTROL         "Use the &same folder structures starting from the root of the selected source folder",IDC_DESTINATION_SAME_FROM_ROOT,
+    CONTROL         "Use the &same folder structure starting from the root of the selected source folder",IDC_DESTINATION_SAME_FROM_ROOT,
                     "Button",BS_AUTORADIOBUTTON,11,117,285,10
     CONTROL         "&Group files by date using the following format",IDC_DESTINATION_GROUP,
                     "Button",BS_AUTORADIOBUTTON,11,132,285,8
@@ -387,7 +380,7 @@ BEGIN
     IDD_EASYDUPL_FORM, DIALOG
     BEGIN
         RIGHTMARGIN, 423
-        BOTTOMMARGIN, 274
+        BOTTOMMARGIN, 177
     END
 
     IDD_GENERALPAGE, DIALOG
@@ -395,15 +388,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 402
         TOPMARGIN, 7
-        BOTTOMMARGIN, 242
-    END
-
-    IDD_SETTINGSPAGE, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 402
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 241
+        BOTTOMMARGIN, 145
     END
 
     IDD_HISTORYPAGE, DIALOG
@@ -411,7 +396,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 402
         TOPMARGIN, 7
-        BOTTOMMARGIN, 242
+        BOTTOMMARGIN, 145
     END
 
     IDD_NEW_TASK, DIALOG
@@ -497,6 +482,11 @@ BEGIN
 END
 
 IDD_GENERALPAGE AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_EASYDUPL_FORM AFX_DIALOG_LAYOUT
 BEGIN
     0
 END
@@ -636,6 +626,11 @@ BEGIN
     IDS_FILES_MATCHING      "Include file types matching "
     IDS_FILES_NOT_MATCHING  "Include file types not matching "
     IDS_WARN_OVERWRITE      "A custom destination folder format has been specified. Files may be overwritten by the files from different source folders with same names or not be replicated. Do you want to continue?"
+    IDS_DESTINATION_SAME_FROM_SELECT 
+                            "Use the same folder structure starting after the selected source folder"
+    IDS_DESTINATION_SAME_FROM_ROOT 
+                            "Use the same folder structure starting from the root of the selected source folder"
+    IDS_DESTINATION_GROUP   "Group files by date using the following format "
 END
 
 STRINGTABLE
