@@ -41,6 +41,7 @@ enum LogLevel
 #define TASKS_FLAGS_UPDATE_SYNC				0x00000100	// remove the file from destination if the file doesn't exist in source
 #define TASKS_FLAGS_DEST_GROUP_BY_DATE		0x00001000
 #define TASKS_FLAGS_DEST_START_FROM_ROOT	0x00002000	// maintain same relative source path in destination folder
+#define TASKS_FLAGS_AUTO_RUN				0x00010000	// auto run when portable device is connected
 #define TASKS_FLAGS_ADV_OPT_MASKS			0x0000FFFF	// TASKS_FLAGS_INCLUDE_FILTERS, .., TASKS_FLAGS_UPDATE_SYNC
 
 #define TASKS_FLAGS_INCLUDE_SUBDIR			0x00010000

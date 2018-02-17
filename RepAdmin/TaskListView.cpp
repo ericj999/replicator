@@ -73,6 +73,7 @@ BEGIN_MESSAGE_MAP(CTaskListView, CListView)
 	ON_MESSAGE(WM_TASK_DONE, &CTaskListView::OnTaskDone)
 	ON_COMMAND(ID_TASK_STOP, &CTaskListView::OnTaskStop)
 	ON_UPDATE_COMMAND_UI(ID_TASK_STOP, &CTaskListView::OnUpdateTaskStop)
+	ON_NOTIFY_REFLECT(NM_DBLCLK, &CTaskListView::OnNMDblclk)
 END_MESSAGE_MAP()
 
 
@@ -267,24 +268,7 @@ void CTaskListView::OnTaskRun()
 	if (pos)
 	{
 		int item = GetListCtrl().GetNextSelectedItem(pos);
-		int taskId = static_cast<int>(GetListCtrl().GetItemData(item));
-
-		Log::logger.info(StringT(_T("Run task ")) + ToStringT(taskId));
-
-		CString state;
-		state.LoadString(IDS_TASK_RUNNING);
-		GetListCtrl().SetItemText(item, LIST_COL_LAST_RUN, state);
-
-		CReplicatorApp* app = static_cast<CReplicatorApp*>(AfxGetApp());
-		bool verbose = app ? app->getVerboseMode() : false;
-		bool testRun = app ? app->getTestRunMode() : false;
-
-		std::lock_guard<std::mutex> lock{m_tasksLock};
-		std::shared_ptr<RepRunner> runner{ new RepRunner{ taskId, std::bind(&CTaskListView::EventCallback, this, taskId, std::placeholders::_1, std::placeholders::_2), verbose, testRun } };
-
-		m_tasks.insert(std::pair<int, std::shared_ptr<RepRunner>>( taskId, runner));
-		runner->AsyncRun();
-//		runner->Run();
+		RunTask(item);
 	}
 }
 
@@ -530,4 +514,35 @@ void CTaskListView::StopAllTasks()
 	{
 		it.second->Abort();
 	}
+}
+
+
+void CTaskListView::OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	if (pNMItemActivate && (pNMItemActivate->iItem != -1))
+		RunTask(pNMItemActivate->iItem);
+
+	*pResult = 0;
+}
+
+void CTaskListView::RunTask(int item)
+{
+	int taskId = static_cast<int>(GetListCtrl().GetItemData(item));
+
+	Log::logger.info(StringT(_T("Run task ")) + ToStringT(taskId));
+
+	CString state;
+	state.LoadString(IDS_TASK_RUNNING);
+	GetListCtrl().SetItemText(item, LIST_COL_LAST_RUN, state);
+
+	CReplicatorApp* app = static_cast<CReplicatorApp*>(AfxGetApp());
+	bool verbose = app ? app->getVerboseMode() : false;
+	bool testRun = app ? app->getTestRunMode() : false;
+
+	std::lock_guard<std::mutex> lock{ m_tasksLock };
+	std::shared_ptr<RepRunner> runner{ new RepRunner{ taskId, std::bind(&CTaskListView::EventCallback, this, taskId, std::placeholders::_1, std::placeholders::_2), verbose, testRun } };
+
+	m_tasks.insert(std::pair<int, std::shared_ptr<RepRunner>>(taskId, runner));
+	runner->AsyncRun();
 }

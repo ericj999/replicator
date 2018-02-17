@@ -70,6 +70,7 @@ public:
 	afx_msg void OnUpdateTaskStop(CCmdUI *pCmdUI);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnToolsSettings();
+	afx_msg void OnHelpViewhelp();
 };
 
 

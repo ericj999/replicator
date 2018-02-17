@@ -2,19 +2,20 @@
 // Microsoft Visual C++ generated include file.
 // Used by ReplicatorCHS.rc
 //
-#define IDP_OLE_INIT_FAILED             100
 #define IDD_ABOUTBOX                    100
-#define IDS_TAB_GENERAL                 101
+#define IDP_OLE_INIT_FAILED             100
 #define IDD_EASYDUPL_FORM               101
+#define IDS_TAB_GENERAL                 101
 #define IDS_TAB_SETTINGS                102
 #define IDS_TAB_HISTORY                 103
+#define IDS_HELP_URL                    104
 #define IDS_STATUS_PANE1                122
 #define IDS_STATUS_PANE2                123
 #define IDS_TOOLBAR_STANDARD            124
 #define IDS_TOOLBAR_CUSTOMIZE           125
 #define IDR_MAINFRAME                   128
-#define IDS_TITLE_TESTRUN               129
 #define IDR_MAINFRAME_256               129
+#define IDS_TITLE_TESTRUN               129
 #define IDR_ReplicatorTYPE              130
 #define IDS_LIST_NAME                   200
 #define IDS_LIST_STATUS                 201
@@ -37,23 +38,23 @@
 #define IDS_HP_COL_START_TIME           400
 #define IDS_HP_COL_END_TIME             401
 #define IDS_HP_COL_RESULT               402
-#define IDS_ERROR_SAME_NAME             1000
 #define IDC_TAB_TASK_DETAIL             1000
-#define IDS_ERROR_CREATE_PROCESS        1001
+#define IDS_ERROR_SAME_NAME             1000
 #define IDC_TAB_INNER                   1001
-#define IDS_FILTER_IS_EMPTY             1002
+#define IDS_ERROR_CREATE_PROCESS        1001
 #define IDC_NEW_TASK_SOURCE             1002
-#define IDS_FOLDER_FORMAT_IS_EMPTY      1003
+#define IDS_FILTER_IS_EMPTY             1002
 #define IDC_NEW_TASK_DESTINATION        1003
+#define IDS_FOLDER_FORMAT_IS_EMPTY      1003
 #define IDS_PROMPT_CANCEL_JOB           1004
-#define IDS_ERROR_SELECT_SOURCE         1005
 #define IDC_NEW_TASK_INCLUDE_SUB        1005
-#define IDS_ERROR_DEVICE_NOT_CONNECTED  1006
+#define IDS_ERROR_SELECT_SOURCE         1005
 #define IDC_NEW_TASK_ALL_FILES          1006
-#define IDS_ERROR_DEVICE_DISCONNECTED   1007
+#define IDS_ERROR_DEVICE_NOT_CONNECTED  1006
 #define IDC_NEW_TASK_INCLUSION          1007
-#define IDS_ERROR_PORTABLE_TO_PORTABLE  1008
+#define IDS_ERROR_DEVICE_DISCONNECTED   1007
 #define IDC_NEW_TASK_EXCLUSION          1008
+#define IDS_ERROR_PORTABLE_TO_PORTABLE  1008
 #define IDC_NEW_TASK_BROWSE_DEST        1010
 #define IDC_NEW_TASK_NAME               1012
 #define IDC_NEW_TASK_CREATE             1015
@@ -141,44 +142,23 @@
 #define IDS_TIMEFORMAT_SECOND           2221
 #define ID_TASK_DELETE                  32771
 #define ID_TASK_NEW                     32772
+#define ID_Menu                         32773
 #define ID_TASK_RUN                     32774
 #define ID_TASK_EDIT                    32778
 #define ID_TASK_STOP                    32780
 #define ID_TOOLS_SETTINGS               32781
-#define AFX_IDS_APP_TITLE               0xE000
-#define AFX_IDS_IDLEMESSAGE             0xE001
+#define ID_HELP_VIEWHELP                32782
 #define IDS_DELETE_CONFIRMATION         57346
 #define IDS_INVALID_TASKID              57347
 #define IDS_STOP_CONFIRMATION           57348
-#define ID_WINDOW_SPLIT                 0xE135
-#define ID_APP_ABOUT                    0xE140
-#define ID_APP_EXIT                     0xE141
-#define ID_NEXT_PANE                    0xE150
-#define ID_PREV_PANE                    0xE151
-#define ID_INDICATOR_EXT                0xE700
-#define ID_INDICATOR_CAPS               0xE701
-#define ID_INDICATOR_NUM                0xE702
-#define ID_INDICATOR_SCRL               0xE703
-#define ID_INDICATOR_OVR                0xE704
-#define ID_INDICATOR_REC                0xE705
-#define ID_VIEW_STATUS_BAR              0xE801
-#define AFX_IDS_SCSIZE                  0xEF00
-#define AFX_IDS_SCMOVE                  0xEF01
-#define AFX_IDS_SCMINIMIZE              0xEF02
-#define AFX_IDS_SCMAXIMIZE              0xEF03
-#define AFX_IDS_SCNEXTWINDOW            0xEF04
-#define AFX_IDS_SCPREVWINDOW            0xEF05
-#define AFX_IDS_SCCLOSE                 0xEF06
-#define AFX_IDS_SCRESTORE               0xEF12
-#define AFX_IDS_SCTASKLIST              0xEF13
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        101
-#define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1001
-#define _APS_NEXT_SYMED_VALUE           101
+#define _APS_NEXT_RESOURCE_VALUE        329
+#define _APS_NEXT_COMMAND_VALUE         32783
+#define _APS_NEXT_CONTROL_VALUE         1053
+#define _APS_NEXT_SYMED_VALUE           313
 #endif
 #endif

@@ -35,9 +35,9 @@
 
 IMPLEMENT_DYNCREATE(CMainFrame, CFrameWndEx)
 
-const int  iMaxUserToolbars = 10;
-const UINT uiFirstUserToolBarId = AFX_IDW_CONTROLBAR_FIRST + 40;
-const UINT uiLastUserToolBarId = uiFirstUserToolBarId + iMaxUserToolbars - 1;
+//const int  iMaxUserToolbars = 10;
+//const UINT uiFirstUserToolBarId = AFX_IDW_CONTROLBAR_FIRST + 40;
+//const UINT uiLastUserToolBarId = uiFirstUserToolBarId + iMaxUserToolbars - 1;
 
 BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_WM_CREATE()
@@ -54,6 +54,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_UPDATE_COMMAND_UI(ID_TASK_STOP, &CMainFrame::OnUpdateTaskStop)
 	ON_WM_TIMER()
 	ON_COMMAND(ID_TOOLS_SETTINGS, &CMainFrame::OnToolsSettings)
+	ON_COMMAND(ID_HELP_VIEWHELP, &CMainFrame::OnHelpViewhelp)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -112,7 +113,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_wndToolBar.SetWindowText(strToolBarName);
 
 	// Allow user-defined toolbars operations:
-	InitUserToolbars(NULL, uiFirstUserToolBarId, uiLastUserToolBarId);
+//	InitUserToolbars(NULL, uiFirstUserToolBarId, uiLastUserToolBarId);
 
 	if (!m_wndStatusBar.Create(this))
 	{
@@ -469,4 +470,11 @@ void CMainFrame::OnToolsSettings()
 		}
 		SetWindowText(title);
 	}
+}
+
+void CMainFrame::OnHelpViewhelp()
+{
+	CString url;
+	url.LoadString(IDS_HELP_URL);
+	ShellExecute(NULL, nullptr, url, nullptr, nullptr, SW_SHOW);
 }

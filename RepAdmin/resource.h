@@ -8,6 +8,7 @@
 #define IDS_TAB_GENERAL                 101
 #define IDS_TAB_SETTINGS                102
 #define IDS_TAB_HISTORY                 103
+#define IDS_HELP_URL                    104
 #define IDS_STATUS_PANE1                122
 #define IDS_STATUS_PANE2                123
 #define IDS_TOOLBAR_STANDARD            124
@@ -146,6 +147,7 @@
 #define ID_TASK_EDIT                    32778
 #define ID_TASK_STOP                    32780
 #define ID_TOOLS_SETTINGS               32781
+#define ID_HELP_VIEWHELP                32782
 #define IDS_DELETE_CONFIRMATION         57346
 #define IDS_INVALID_TASKID              57347
 #define IDS_STOP_CONFIRMATION           57348
@@ -155,7 +157,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        329
-#define _APS_NEXT_COMMAND_VALUE         32782
+#define _APS_NEXT_COMMAND_VALUE         32783
 #define _APS_NEXT_CONTROL_VALUE         1053
 #define _APS_NEXT_SYMED_VALUE           313
 #endif

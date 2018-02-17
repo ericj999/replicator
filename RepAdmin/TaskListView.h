@@ -53,6 +53,7 @@ protected:
 	std::mutex m_tasksLock;
 
 	bool IsTaskRunning(int taskId);
+	void RunTask(int item);
 
 	int GetSelectedTask();
 	void AddNewTask(LPCTSTR taskName);
@@ -79,6 +80,7 @@ public:
 	afx_msg LRESULT OnTaskDone(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnTaskStop();
 	afx_msg void OnUpdateTaskStop(CCmdUI *pCmdUI);
+	afx_msg void OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult);
 };
 
 #ifndef _DEBUG  // debug version in LeftView.cpp

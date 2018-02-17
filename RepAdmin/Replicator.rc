@@ -124,24 +124,25 @@ END
 
 IDR_MAINFRAME MENU
 BEGIN
-    POPUP "&Task"
+    POPUP "Task"
     BEGIN
-        MENUITEM "&Run",                        ID_TASK_RUN
-        MENUITEM "&Stop",                       ID_TASK_STOP
+        MENUITEM "Run",                         ID_TASK_RUN
+        MENUITEM "Stop",                        ID_TASK_STOP
         MENUITEM SEPARATOR
-        MENUITEM "&New...",                     ID_TASK_NEW
-        MENUITEM "&Edit...",                    ID_TASK_EDIT
-        MENUITEM "&Delete",                     ID_TASK_DELETE
+        MENUITEM "New...",                      ID_TASK_NEW
+        MENUITEM "Edit...",                     ID_TASK_EDIT
+        MENUITEM "Delete",                      ID_TASK_DELETE
         MENUITEM SEPARATOR
-        MENUITEM "E&xit",                       ID_APP_EXIT
+        MENUITEM "Exit",                        ID_APP_EXIT
     END
-    POPUP "T&ools"
+    POPUP "Tools"
     BEGIN
-        MENUITEM "&Settings...",                ID_TOOLS_SETTINGS
+        MENUITEM "Settings...",                 ID_TOOLS_SETTINGS
     END
-    POPUP "&Help"
+    POPUP "Help"
     BEGIN
-        MENUITEM "&About Replicator...",        ID_APP_ABOUT
+        MENUITEM "Help",                        ID_HELP_VIEWHELP
+        MENUITEM "About Replicator...",         ID_APP_ABOUT
     END
 END
 
@@ -235,18 +236,18 @@ BEGIN
     EDITTEXT        IDC_NEW_TASK_NAME,48,7,302,14,ES_AUTOHSCROLL
     CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME,7,27,343,1,WS_EX_STATICEDGE
     LTEXT           "&Replicate files from",IDC_STATIC,7,32,62,8
+    EDITTEXT        IDC_NEW_TASK_SOURCE,7,44,316,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    PUSHBUTTON      "...",IDC_NEW_TASK_BROWSE_SOURCE,325,44,25,14
     LTEXT           "&to",IDC_STATIC,7,62,8,8
-    EDITTEXT        IDC_NEW_TASK_DESTINATION,7,75,316,14,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_NEW_TASK_DESTINATION,7,75,316,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
     PUSHBUTTON      "...",IDC_NEW_TASK_BROWSE_DEST,325,75,25,14
-    CONTROL         "Include &sub-folders",IDC_NEW_TASK_INCLUDE_SUB,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,111,81,10
-    PUSHBUTTON      "&Create",IDC_NEW_TASK_CREATE,248,138,50,14,WS_DISABLED
-    PUSHBUTTON      "Cancel",IDCANCEL,301,138,50,14
     LTEXT           "Options",IDC_STATIC,7,96,26,8
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,38,101,312,1
+    CONTROL         "Include &sub-folders",IDC_NEW_TASK_INCLUDE_SUB,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,111,81,10
     PUSHBUTTON      "Advanced options",IDC_NEW_TASK_ADV_OPTIONS,264,108,86,14
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,8,130,342,1
-    EDITTEXT        IDC_NEW_TASK_SOURCE,7,44,316,14,ES_AUTOHSCROLL | ES_READONLY
-    PUSHBUTTON      "...",IDC_NEW_TASK_BROWSE_SOURCE,325,44,25,14
+    PUSHBUTTON      "&Create",IDC_NEW_TASK_CREATE,248,138,50,14,WS_DISABLED
+    PUSHBUTTON      "Cancel",IDCANCEL,301,138,50,14
 END
 
 IDD_ADVANCED_OPTIONS DIALOGEX 0, 0, 306, 232
@@ -503,6 +504,7 @@ BEGIN
     IDS_TAB_GENERAL         "Detail"
     IDS_TAB_SETTINGS        "Settings"
     IDS_TAB_HISTORY         "History"
+    IDS_HELP_URL            "http://www.aqitek.com/en/help"
 END
 
 STRINGTABLE
@@ -593,6 +595,7 @@ BEGIN
     ID_TASK_EDIT            "Configure the selected task\nEdit"
     ID_TASK_STOP            "Stop the selected task\nStop"
     ID_TOOLS_SETTINGS       "Configure program settings...\nSettings"
+    ID_HELP_VIEWHELP        "View help\nHelp"
 END
 
 STRINGTABLE

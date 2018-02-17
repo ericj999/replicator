@@ -606,13 +606,19 @@ void RepRunner::ProcessStreamFolders(ShellWrapper::ShellFolder& folder, const Pa
 		if (SUCCEEDED(hr = SHCreateItemWithParent(nullptr, folder.Get(), *it, IID_IShellItem2, (void**)&shellItem)))
 		{
 			PathT filePath{ srcPath };
+			PathT newDestPath{ destination };
 
 			filePath /= shellItem.GetName();
+			if (!(m_flags & (TASKS_FLAGS_DEST_GROUP_BY_DATE | TASKS_FLAGS_DEST_START_FROM_ROOT)))
+			{
+				newDestPath /= shellItem.GetName();
+			}
+
 			ShellWrapper::ShellFolder childFolder;
 
 			if (SUCCEEDED(hr = folder->BindToObject(*it, nullptr, IID_IShellFolder, (void**)&childFolder)))
 			{
-				ReplicateStreamToFile(childFolder, filePath.wstring().c_str(), destination);
+				ReplicateStreamToFile(childFolder, filePath.wstring().c_str(), newDestPath);
 			}
 		}
 	}
