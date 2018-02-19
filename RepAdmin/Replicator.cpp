@@ -17,6 +17,8 @@
 #include "Table.h"
 #include "LocaleResources.h"
 
+#include "StoreFuncs.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -78,9 +80,6 @@ BOOL CReplicatorApp::InitInstance()
 	Log::logger.setPath(logPath);
 	Log::logger.setLevel(Log::LogLevel::Verbose);
 	Log::logger.info(_T("Program started."));
-
-	// Initialize OLE libraries
-	CoInitialize(NULL);
 
 	AfxEnableControlContainer();
 
@@ -156,6 +155,12 @@ BOOL CReplicatorApp::InitInstance()
 	// app was launched with /RegServer, /Register, /Unregserver or /Unregister.
 	if (!ProcessShellCommand(cmdInfo))
 		return FALSE;
+
+	// Check license
+	StoreIsRegistered(m_pMainWnd->GetSafeHwnd());
+
+	// Initialize OLE libraries
+	CoInitialize(NULL);
 
 	// The one and only window has been initialized, so show and update it
 	((CMainFrame*)m_pMainWnd)->LoadSettings();

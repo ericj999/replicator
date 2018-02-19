@@ -891,9 +891,7 @@ void RepRunner::ReplicateFilesToPortableDevice(WPD::PortableDeviceContent& devic
 				for (DWORD index = 0; (index < numFetched) && (objectIDArray[index] != nullptr); index++)
 				{
 					WPD::PortableDeviceItem item;
-
-					hr = properties.GetItemWithProperties(objectIDArray[index], item);
-					if (SUCCEEDED(hr))
+					if (SUCCEEDED(properties.GetItemWithProperties(objectIDArray[index], item)))
 					{
 						if (IsEqualGUID(item.GetContentType(), WPD_CONTENT_TYPE_FOLDER))
 						{
@@ -927,6 +925,7 @@ void RepRunner::ReplicateFilesToPortableDevice(WPD::PortableDeviceContent& devic
 void RepRunner::ProcessFiles(WPD::PortableDeviceContent& deviceContent, const std::vector<PathT>& srcFileList, const std::wstring& currentFolderObjId,
 	const PathT& currentDestPath, const WPD::PortableDeviceItemMap& destFileMap)
 {
+	WriteLog(Log::LogLevel::Verbose, L"source count = %d, destination count = %d", srcFileList.size(), destFileMap.size());
 	for (auto srcFile : srcFileList)
 	{
 		if (m_abort) { WriteLog(Log::LogLevel::Info, GetLocalizedString(StringResource::aborted).c_str()); return; }
@@ -960,7 +959,7 @@ void RepRunner::ProcessFiles(WPD::PortableDeviceContent& deviceContent, const st
 				else
 				{
 					WriteLog(Log::LogLevel::Error, GetLocalizedString(StringResource::failedToUpdate).c_str(), destFilePath.wstring().c_str());
-					WriteLog(Log::LogLevel::Verbose, L"Error code: %x", hr);
+					WriteLog(Log::LogLevel::Verbose, L"Error code: %x, src = %s", hr, srcFile.c_str());
 				}
 			}
 			else
@@ -978,9 +977,8 @@ void RepRunner::ProcessFiles(WPD::PortableDeviceContent& deviceContent, const st
 				}
 				else
 				{
-					WriteLog(Log::LogLevel::Error, GetLocalizedString(StringResource::failedToAdd).c_str(),
-						currentDestPath.wstring().c_str(), srcFile.wstring().c_str());
-					WriteLog(Log::LogLevel::Verbose, L"Error code: %x", hr);
+					WriteLog(Log::LogLevel::Error, GetLocalizedString(StringResource::failedToAdd).c_str(), destFilePath.wstring().c_str());
+					WriteLog(Log::LogLevel::Verbose, L"Error code: %x, src = %s", hr, srcFile.c_str());
 				}
 			}
 			else

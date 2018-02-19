@@ -45,7 +45,6 @@ protected:  // control bar embedded members
 	CMFCMenuBar       m_wndMenuBar;
 	CMFCToolBar       m_wndToolBar;
 	CMFCStatusBar     m_wndStatusBar;
-	CMFCToolBarImages m_UserImages;
 
 	WaitDialog* m_waitDialog;
 	INT_PTR m_timerId;

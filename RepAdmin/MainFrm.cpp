@@ -137,15 +137,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// set the visual manager used to draw all user interface elements
 	CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerWindows));
 
-	if (CMFCToolBar::GetUserImages() == NULL)
-	{
-		// load user-defined toolbar images
-		if (m_UserImages.Load(_T(".\\UserImages.bmp")))
-		{
-			CMFCToolBar::SetUserImages(&m_UserImages);
-		}
-	}
-
 	// enable menu personalization (most-recently used commands)
 	// TODO: define your own basic commands, ensuring that each pulldown menu has at least one basic command.
 	CList<UINT, UINT> lstBasicCommands;

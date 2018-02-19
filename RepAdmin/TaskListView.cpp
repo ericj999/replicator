@@ -178,6 +178,8 @@ void CTaskListView::AddNewTask(LPCTSTR taskName)
 	StringT condition = TASKS_COL_NAME;
 	condition += _T("='") + String::replace(taskName, _T("'"), _T("''")) + _T("'");
 
+	Log::logger.info(StringT(_T("Create task \"")) + StringT(taskName) + _T("\""));
+
 	Database::PropertyList props;
 	for (int i = LIST_COL_NAME; i < MAX_LIST_COLS; ++i)
 		props.push_back(Database::Property(ColumnDef[i].colDBName, ColumnDef[i].colDBType));
@@ -344,6 +346,7 @@ void CTaskListView::OnTaskEdit()
 
 				CMainFrame* pMain = static_cast<CMainFrame*>(theApp.GetMainWnd());
 				pMain->Refresh(taskId, REFRESH_GENERAL, true);
+				Log::logger.info(StringT(_T("Task ")) + ToStringT(taskId) + _T(" is updated."));
 			}
 		}
 	}
@@ -388,6 +391,7 @@ LRESULT CTaskListView::OnTaskDone(WPARAM wParam, LPARAM lParam)
 		}
 	}
 
+	Log::logger.info(StringT(_T("Task ")) + ToStringT(taskId) + _T(" completed."));
 	CMainFrame* pMain = static_cast<CMainFrame*>(theApp.GetMainWnd());
 	pMain->Refresh(taskId, REFRESH_HISTORY, true);
 	return 0;
