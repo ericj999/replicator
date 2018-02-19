@@ -131,10 +131,20 @@ namespace WPD
 		HRESULT hr = E_FAIL;
 		PortableDeviceValues properties;
 
+		if (FAILED(hr = properties->SetGuidValue(WPD_OBJECT_FORMAT, WPD_OBJECT_FORMAT_PROPERTIES_ONLY)))
+		{
+			Log::logger.error(StringT(L"Failed to set object format for new folder ") + folderName + StringT(L"(") + newFolderId + StringT(L"). Code:") + ToStringT(hr));
+			return hr;
+		}
 		if (FAILED(hr = properties->SetStringValue(WPD_OBJECT_PARENT_ID, parentObjId.c_str())))
 		{
 			Log::logger.error(StringT(L"Failed to set object parent ID ") + parentObjId
 				+ StringT(L" for new folder ") + folderName + StringT(L"(") + newFolderId + StringT(L"). Code:") + ToStringT(hr));
+			return hr;
+		}
+		if (FAILED(hr = properties->SetStringValue(WPD_OBJECT_ORIGINAL_FILE_NAME, folderName.c_str())))
+		{
+			Log::logger.error(StringT(L"Failed to set original object name for new folder ") + folderName + StringT(L"(") + newFolderId + StringT(L"). Code:") + ToStringT(hr));
 			return hr;
 		}
 		if (FAILED(hr = properties->SetStringValue(WPD_OBJECT_NAME, folderName.c_str())))
