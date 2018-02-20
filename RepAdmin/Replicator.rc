@@ -504,7 +504,8 @@ BEGIN
     IDS_TAB_GENERAL         "Detail"
     IDS_TAB_SETTINGS        "Settings"
     IDS_TAB_HISTORY         "History"
-    IDS_HELP_URL            "http://www.aqitek.com/en/help"
+    IDS_HELP_URL            "http://www.aqitek.com/en/support.html"
+    IDS_ERROR_LICENSE       "Could not verify the license. Please make sure that you have valid license to use this software. Please contact support@aqitek.com if there is a problem using the software."
 END
 
 STRINGTABLE

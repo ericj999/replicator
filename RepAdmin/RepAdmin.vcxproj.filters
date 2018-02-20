@@ -90,9 +90,6 @@
     <ClInclude Include="RepSource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ReplicatorDoc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="WaitDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -147,9 +144,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RepSource.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ReplicatorDoc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="WaitDialog.cpp">

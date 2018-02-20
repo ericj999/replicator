@@ -211,7 +211,6 @@
     <ClInclude Include="FolderFormatDialog.h" />
     <ClInclude Include="LocaleResources.h" />
     <ClInclude Include="Replicator.h" />
-    <ClInclude Include="ReplicatorDoc.h" />
     <ClInclude Include="ReplicatorView.h" />
     <ClInclude Include="GeneralPage.h" />
     <ClInclude Include="HistoryPage.h" />
@@ -235,7 +234,6 @@
     <ClCompile Include="FolderFormatDialog.cpp" />
     <ClCompile Include="LocaleResources.cpp" />
     <ClCompile Include="Replicator.cpp" />
-    <ClCompile Include="ReplicatorDoc.cpp" />
     <ClCompile Include="ReplicatorView.cpp" />
     <ClCompile Include="GeneralPage.cpp" />
     <ClCompile Include="HistoryPage.cpp" />

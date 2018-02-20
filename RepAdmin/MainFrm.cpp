@@ -33,7 +33,7 @@
 
 // CMainFrame
 
-IMPLEMENT_DYNCREATE(CMainFrame, CFrameWndEx)
+IMPLEMENT_DYNAMIC(CMainFrame, CFrameWndEx)
 
 //const int  iMaxUserToolbars = 10;
 //const UINT uiFirstUserToolBarId = AFX_IDW_CONTROLBAR_FIRST + 40;
@@ -41,17 +41,17 @@ IMPLEMENT_DYNCREATE(CMainFrame, CFrameWndEx)
 
 BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_WM_CREATE()
-	ON_COMMAND(ID_TASK_DELETE, &CMainFrame::OnTaskDelete)
-	ON_COMMAND(ID_TASK_NEW, &CMainFrame::OnTaskNew)
 	ON_COMMAND(ID_TASK_RUN, &CMainFrame::OnTaskRun)
-	ON_UPDATE_COMMAND_UI(ID_TASK_RUN, &CMainFrame::OnUpdateTaskRun)
-	ON_UPDATE_COMMAND_UI(ID_TASK_DELETE, &CMainFrame::OnUpdateTaskDelete)
+	ON_COMMAND(ID_TASK_STOP, &CMainFrame::OnTaskStop)
+	ON_COMMAND(ID_TASK_NEW, &CMainFrame::OnTaskNew)
 	ON_COMMAND(ID_TASK_EDIT, &CMainFrame::OnTaskEdit)
-	ON_UPDATE_COMMAND_UI(ID_TASK_EDIT, &CMainFrame::OnUpdateTaskEdit)
+	ON_COMMAND(ID_TASK_DELETE, &CMainFrame::OnTaskDelete)
 	ON_WM_DESTROY()
 	ON_WM_CLOSE()
-	ON_COMMAND(ID_TASK_STOP, &CMainFrame::OnTaskStop)
+	ON_UPDATE_COMMAND_UI(ID_TASK_RUN, &CMainFrame::OnUpdateTaskRun)
 	ON_UPDATE_COMMAND_UI(ID_TASK_STOP, &CMainFrame::OnUpdateTaskStop)
+	ON_UPDATE_COMMAND_UI(ID_TASK_EDIT, &CMainFrame::OnUpdateTaskEdit)
+	ON_UPDATE_COMMAND_UI(ID_TASK_DELETE, &CMainFrame::OnUpdateTaskDelete)
 	ON_WM_TIMER()
 	ON_COMMAND(ID_TOOLS_SETTINGS, &CMainFrame::OnToolsSettings)
 	ON_COMMAND(ID_HELP_VIEWHELP, &CMainFrame::OnHelpViewhelp)
@@ -174,12 +174,14 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT /*lpcs*/,
 
 BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 {
-	cs.style &= ~(LONG)FWS_ADDTOTITLE;
-
-	if( !CFrameWndEx::PreCreateWindow(cs) )
+	if (!CFrameWndEx::PreCreateWindow(cs))
 		return FALSE;
 	// TODO: Modify the Window class or styles here by modifying
 	//  the CREATESTRUCT cs
+
+	cs.style = WS_OVERLAPPED | WS_CAPTION | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU;
+	cs.dwExStyle &= ~WS_EX_CLIENTEDGE;
+	cs.lpszClass = AfxRegisterWndClass(0);
 
 	return TRUE;
 }
@@ -241,7 +243,7 @@ void CMainFrame::OnUpdateTaskRun(CCmdUI *pCmdUI)
 	if (pCmdUI)
 	{
 		CTaskListView* pView = static_cast<CTaskListView*>(m_wndSplitter.GetPane(0, 0));
-		pCmdUI->Enable((pView && (pView->GetListCtrl().GetSelectedCount() > 0)) ? TRUE : FALSE);
+		pCmdUI->Enable((pView && (pView->GetListCtrl().GetSelectedCount() > 0) && !pView->IsSelectedTaskRunning()) ? TRUE : FALSE);
 	}
 }
 
@@ -251,7 +253,7 @@ void CMainFrame::OnUpdateTaskDelete(CCmdUI *pCmdUI)
 	if (pCmdUI)
 	{
 		CTaskListView* pView = static_cast<CTaskListView*>(m_wndSplitter.GetPane(0, 0));
-		pCmdUI->Enable((pView && (pView->GetListCtrl().GetSelectedCount() > 0)) ? TRUE : FALSE);
+		pCmdUI->Enable((pView && (pView->GetListCtrl().GetSelectedCount() > 0) && !pView->IsSelectedTaskRunning()) ? TRUE : FALSE);
 	}
 }
 

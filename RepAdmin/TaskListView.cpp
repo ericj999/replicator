@@ -6,7 +6,6 @@
 #include "resource.h"
 #include "Replicator.h"
 #include "MainFrm.h"
-#include "ReplicatorDoc.h"
 #include "TaskListView.h"
 #include "DBDef.h"
 #include "Table.h"
@@ -113,12 +112,6 @@ void CTaskListView::AssertValid() const
 void CTaskListView::Dump(CDumpContext& dc) const
 {
 	CListView::Dump(dc);
-}
-
-CReplicatorDoc* CTaskListView::GetDocument() // non-debug version is inline
-{
-	ASSERT(m_pDocument->IsKindOf(RUNTIME_CLASS(CReplicatorDoc)));
-	return (CReplicatorDoc*)m_pDocument;
 }
 #endif //_DEBUG
 
@@ -240,7 +233,7 @@ int CTaskListView::GetSelectedTask()
 
 void CTaskListView::OnUpdateTaskDelete(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable(GetListCtrl().GetSelectedCount() > 0);
+	pCmdUI->Enable((GetListCtrl().GetSelectedCount() > 0) && !IsSelectedTaskRunning());
 }
 
 
@@ -252,7 +245,7 @@ void CTaskListView::OnUpdateTaskNew(CCmdUI *pCmdUI)
 
 void CTaskListView::OnUpdateTaskRun(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable(GetListCtrl().GetSelectedCount() > 0);
+	pCmdUI->Enable((GetListCtrl().GetSelectedCount() > 0) && !IsSelectedTaskRunning());
 }
 
 

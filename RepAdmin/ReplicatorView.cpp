@@ -9,7 +9,6 @@
 #include "Replicator.h"
 #endif
 
-#include "ReplicatorDoc.h"
 #include "ReplicatorView.h"
 
 #ifdef _DEBUG
@@ -39,7 +38,7 @@ END_MESSAGE_MAP()
 // CReplicatorView construction/destruction
 
 CReplicatorView::CReplicatorView()
-	: CFormView(CReplicatorView::IDD)
+	: CFormView(CReplicatorView::IDD), m_controlsCreated(false)
 {
 	// TODO: add construction code here
 
@@ -70,11 +69,18 @@ void CReplicatorView::OnInitialUpdate()
 	GetParentFrame()->RecalcLayout();
 	ResizeParentToFit();
 
-	for (int i = TAB_GENERAL; i < MAX_TABS; ++i)
+	if (!m_controlsCreated)
 	{
-		CString str;
-		str.LoadString(idsTabs[i]);
-		m_tab.InsertItem(i, str);
+		// OnInitialUpdate is called twice, add check here before finding a way to prevent this
+		m_controlsCreated = true;
+		for (int i = TAB_GENERAL; i < MAX_TABS; ++i)
+		{
+			CString str;
+			str.LoadString(idsTabs[i]);
+			m_tab.InsertItem(i, str);
+		}
+		m_pageGeneral.Create(IDD_GENERALPAGE, this);
+		m_pageHistory.Create(IDD_HISTORYPAGE, this);
 	}
 	m_tab.SetCurSel(TAB_GENERAL);
 
@@ -84,9 +90,7 @@ void CReplicatorView::OnInitialUpdate()
 	ph->GetWindowRect(&rc);
 	ScreenToClient(&rc);
 
-	m_pageGeneral.Create(IDD_GENERALPAGE, this);
 	m_pageGeneral.SetWindowPos(NULL, rc.left, rc.top, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
-	m_pageHistory.Create(IDD_HISTORYPAGE, this);
 	m_pageHistory.SetWindowPos(NULL, rc.left, rc.top, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
 	if (IsAppThemed())
 	{
@@ -121,12 +125,6 @@ void CReplicatorView::AssertValid() const
 void CReplicatorView::Dump(CDumpContext& dc) const
 {
 	CFormView::Dump(dc);
-}
-
-CReplicatorDoc* CReplicatorView::GetDocument() const // non-debug version is inline
-{
-	ASSERT(m_pDocument->IsKindOf(RUNTIME_CLASS(CReplicatorDoc)));
-	return (CReplicatorDoc*)m_pDocument;
 }
 #endif //_DEBUG
 

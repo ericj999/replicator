@@ -5,14 +5,13 @@
 #pragma once
 #include "WaitDialog.h"
 
-class CReplicatorView;
-
 class CMainFrame : public CFrameWndEx
 {
+public:
+	CMainFrame();
 	
 protected: // create from serialization only
-	CMainFrame();
-	DECLARE_DYNCREATE(CMainFrame)
+	DECLARE_DYNAMIC(CMainFrame)
 
 // Attributes
 protected:
@@ -29,7 +28,7 @@ public:
 public:
 	virtual BOOL OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext);
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
-	virtual BOOL LoadFrame(UINT nIDResource, DWORD dwDefaultStyle = WS_OVERLAPPEDWINDOW | FWS_ADDTOTITLE, CWnd* pParentWnd = NULL, CCreateContext* pContext = NULL);
+	virtual BOOL LoadFrame(UINT nIDResource, DWORD dwDefaultStyle = WS_OVERLAPPEDWINDOW, CWnd* pParentWnd = NULL, CCreateContext* pContext = NULL);
 
 // Implementation
 public:

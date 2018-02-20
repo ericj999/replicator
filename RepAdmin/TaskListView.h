@@ -11,30 +11,20 @@
 #include "RepRunner.h"
 
 
-class CReplicatorDoc;
-
 class CTaskListView : public CListView
 {
-protected: // create from serialization only
-	CTaskListView();
 	DECLARE_DYNCREATE(CTaskListView)
 
-// Attributes
-public:
-	CReplicatorDoc* GetDocument();
+protected: // create from serialization only
+	CTaskListView();
+	virtual ~CTaskListView();
 
-// Operations
 public:
-
-// Overrides
-	public:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
-	protected:
+protected:
 	virtual void OnInitialUpdate(); // called first time after construct
 
-// Implementation
 public:
-	virtual ~CTaskListView();
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;
@@ -82,9 +72,4 @@ public:
 	afx_msg void OnUpdateTaskStop(CCmdUI *pCmdUI);
 	afx_msg void OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult);
 };
-
-#ifndef _DEBUG  // debug version in LeftView.cpp
-inline CReplicatorDoc* CTaskListView::GetDocument()
-{ return reinterpret_cast<CReplicatorDoc*>(m_pDocument); }
-#endif
 

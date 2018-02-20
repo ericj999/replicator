@@ -130,7 +130,22 @@ namespace WPD
 	{
 		HRESULT hr = E_FAIL;
 		PortableDeviceValues properties;
+		/*
+			These are the properties used by the WPD Shell Extension to create a folder :
+			WPD_OBJECT_FORMAT = WPD_OBJECT_FORMAT_PROPERTIES_ONLY
+			where : DEFINE_GUID(WPD_OBJECT_FORMAT_PROPERTIES_ONLY, 0x30010000, 0xAE6C, 0x4804, 0x98, 0xBA, 0xC5, 0x7B, 0x46, 0x96, 0x5F, 0xE7);
+			WPD_OBJECT_CONTENT_TYPE = WPD_CONTENT_TYPE_FOLDER
+			where: DEFINE_GUID(WPD_CONTENT_TYPE_FOLDER, 0x27E2E392, 0xA111, 0x48E0, 0xAB, 0x0C, 0xE1, 0x77, 0x05, 0xA0, 0x5F, 0x85);
+			WPD_OBJECT_ORIGINAL_FILE_NAME = <name of the folder>
+			WPD_OBJECT_NAME = <name of the folder>
+			WPD_OBJECT_PARENT_ID = <parent object id>
 
+			These are also set by the WPD Shell Extension but should be optional :
+			WPD_OBJECT_IS_HIDDEN = true if hidden
+			WPD_OBJECT_CAN_DELETE = false if read only
+			WPD_OBJECT_DATE_CREATED = creation date
+			WPD_OBJECT_DATE_MODIFIED = modified date
+		*/
 		if (FAILED(hr = properties->SetGuidValue(WPD_OBJECT_FORMAT, WPD_OBJECT_FORMAT_PROPERTIES_ONLY)))
 		{
 			Log::logger.error(StringT(L"Failed to set object format for new folder ") + folderName + StringT(L"(") + newFolderId + StringT(L"). Code:") + ToStringT(hr));

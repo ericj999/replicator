@@ -12,18 +12,15 @@
 
 class CReplicatorView : public CFormView
 {
+	DECLARE_DYNCREATE(CReplicatorView)
+
 protected: // create from serialization only
 	CReplicatorView();
-	DECLARE_DYNCREATE(CReplicatorView)
+	virtual ~CReplicatorView();
 
 public:
 	enum{ IDD = IDD_EASYDUPL_FORM };
 
-// Attributes
-public:
-	CReplicatorDoc* GetDocument() const;
-
-// Operations
 public:
 	void Refresh(int taskID, DWORD refresh, bool force);
 // Overrides
@@ -35,13 +32,13 @@ protected:
 
 // Implementation
 public:
-	virtual ~CReplicatorView();
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;
 #endif
 
 protected:
+	bool m_controlsCreated;
 	CGeneralPage m_pageGeneral;
 	CHistoryPage m_pageHistory;
 
@@ -57,9 +54,3 @@ public:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSelchangeTabTaskDetail(NMHDR *pNMHDR, LRESULT *pResult);
 };
-
-#ifndef _DEBUG  // debug version in ReplicatorView.cpp
-inline CReplicatorDoc* CReplicatorView::GetDocument() const
-{ return reinterpret_cast<CReplicatorDoc*>(m_pDocument); }
-#endif
-

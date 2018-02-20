@@ -9,7 +9,6 @@
 #include "Replicator.h"
 #include "MainFrm.h"
 
-#include "ReplicatorDoc.h"
 #include "TaskListView.h"
 #include <iostream>
 #include "util.h"
@@ -128,18 +127,15 @@ BOOL CReplicatorApp::InitInstance()
 		return FALSE;
 	}
 
-	// Register the application's document templates.  Document templates
-	//  serve as the connection between documents, frame windows and views
-	CSingleDocTemplate* pDocTemplate;
-	pDocTemplate = new CSingleDocTemplate(
-		IDR_MAINFRAME,
-		RUNTIME_CLASS(CReplicatorDoc),
-		RUNTIME_CLASS(CMainFrame),       // main SDI frame window
-		RUNTIME_CLASS(CTaskListView));
-	if (!pDocTemplate)
+	CMainFrame* pFrame = new CMainFrame;
+	if (!pFrame)
+	{
+		Log::logger.error(_T("Failed to connect to main frame window!"));
 		return FALSE;
-	AddDocTemplate(pDocTemplate);
-
+	}
+	m_pMainWnd = pFrame;
+	// create and load the frame with its resources
+	pFrame->LoadFrame(IDR_MAINFRAME, WS_OVERLAPPEDWINDOW, NULL, NULL);
 
 	// Parse command line for standard shell commands, DDE, file open
 	CRepCommandLineInfo cmdInfo;
@@ -151,15 +147,15 @@ BOOL CReplicatorApp::InitInstance()
 	CMFCMenuBar::SetRecentlyUsedMenus(FALSE);
 	CMFCMenuBar::SetShowAllCommands(TRUE);
 
-	// Dispatch commands specified on the command line.  Will return FALSE if
-	// app was launched with /RegServer, /Register, /Unregserver or /Unregister.
-	if (!ProcessShellCommand(cmdInfo))
-		return FALSE;
-
 	// Check license
-	StoreIsRegistered(m_pMainWnd->GetSafeHwnd());
+	if (!StoreIsRegistered(m_pMainWnd->GetSafeHwnd()))
+	{
+		AfxMessageBox(IDS_ERROR_LICENSE, MB_ICONSTOP | MB_OK);
+		return FALSE;
+	}
 
 	// Initialize OLE libraries
+	// using STA due to the portable device access
 	CoInitialize(NULL);
 
 	// The one and only window has been initialized, so show and update it

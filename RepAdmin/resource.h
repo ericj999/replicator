@@ -9,6 +9,7 @@
 #define IDS_TAB_SETTINGS                102
 #define IDS_TAB_HISTORY                 103
 #define IDS_HELP_URL                    104
+#define IDS_ERROR_LICENSE               105
 #define IDS_STATUS_PANE1                122
 #define IDS_STATUS_PANE2                123
 #define IDS_TOOLBAR_STANDARD            124
