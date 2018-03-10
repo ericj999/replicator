@@ -24,7 +24,7 @@
 
 RepRunner::RepRunner(int taskID, RunnerEventCallback callback /* = nullptr*/, bool verbose /*= false*/, bool testRun /*= false*/) :
 	m_taskID{ taskID }, m_callback{ callback }, m_verbose{ verbose }, m_testRun{ testRun }, m_abort{ false }, m_isRunning{ false },
-	m_fileCount{ 0 }, m_updated{ 0 }, m_skipped{ 0 }, m_added{ 0 }, m_flags{ 0 }, m_matchExtension{ 0 }
+	m_fileCount{ 0 }, m_updated{ 0 }, m_skipped{ 0 }, m_added{ 0 }, m_flags{ 0 }, m_matchExtension{ 0 }, m_doCallBack{ true }
 {
 	PathT dbPath{ Util::GetDatabasePath() };
 	m_db.Connect(dbPath);
@@ -57,7 +57,7 @@ void RepRunner::Run()
 	StringT result;
 	std::chrono::system_clock::time_point start{ std::chrono::system_clock::now() };
 	StringT startTimeStr = Util::GetIsoTimeString(std::chrono::system_clock::to_time_t(start));
-
+	StringT endTimeStr;
 	try
 	{
 		WriteLog(Log::LogLevel::Verbose, _T("==============================="));
@@ -133,7 +133,7 @@ void RepRunner::Run()
 		std::chrono::system_clock::duration dur = endTime - start;
 		std::chrono::seconds runTime = std::chrono::duration_cast<std::chrono::seconds>(dur);
 		StringT runTimeStr = GetDurationString(runTime);
-		StringT endTimeStr = Util::GetIsoTimeString(std::chrono::system_clock::to_time_t(endTime));
+		endTimeStr = Util::GetIsoTimeString(std::chrono::system_clock::to_time_t(endTime));
 
 		if (!m_abort)
 		{
@@ -181,7 +181,7 @@ void RepRunner::Run()
 		UpdateTaskInDB(m_taskID, propList);
 
 		std::chrono::system_clock::time_point endTime{ std::chrono::system_clock::now() };
-		StringT endTimeStr = Util::GetIsoTimeString(std::chrono::system_clock::to_time_t(endTime));
+		endTimeStr = Util::GetIsoTimeString(std::chrono::system_clock::to_time_t(endTime));
 
 		propList.clear();
 		propList.push_back(Database::Property(HISTORY_COL_TASKID, m_taskID));
@@ -189,9 +189,8 @@ void RepRunner::Run()
 		propList.push_back(Database::Property(HISTORY_COL_END_TIME, endTimeStr));
 		propList.push_back(Database::Property(HISTORY_COL_RESULT, result));
 		AddHistory(propList);
-
 	}
-	if (m_callback) m_callback(RunnerState::STOP, result.c_str());
+	if (m_doCallBack && m_callback) m_callback(RunnerState::STOP, result.c_str());
 	m_isRunning = false;
 	WriteLog(Log::LogLevel::Verbose, _T("End replication task ID %d."), m_taskID);
 	WriteLog(Log::LogLevel::Verbose, _T("==============================="));
@@ -362,7 +361,7 @@ void RepRunner::WriteLog(Log::LogLevel level, LPCTSTR format, ...)
 	va_end(args);
 
 	Log::logger.Write(level, szMessage);
-	if (m_callback && (level <= Log::LogLevel::Info)) m_callback(RunnerState::RUNNING, szMessage);
+	if (m_doCallBack && m_callback && (level <= Log::LogLevel::Info)) m_callback(RunnerState::RUNNING, szMessage);
 }
 
 void RepRunner::UpdateTaskInDB(int taskID, Database::PropertyList& propList)
@@ -386,7 +385,7 @@ RepSource RepRunner::GetSource(const PathT& path)
 		RecursiveDirectoryIteratorT dit(srcPath);
 		for (; dit != RecursiveDirectoryIteratorT(); ++dit)
 		{
-			if (m_abort) break;
+			if (m_abort) { WriteLog(Log::LogLevel::Info, GetLocalizedString(StringResource::aborted).c_str()); break; }
 			AddPath(dit->path(), source);
 		}
 	}
@@ -395,7 +394,7 @@ RepSource RepRunner::GetSource(const PathT& path)
 		DirectoryIteratorT dit(srcPath);
 		for (; dit != DirectoryIteratorT(); ++dit)
 		{
-			if (m_abort) break;
+			if (m_abort) { WriteLog(Log::LogLevel::Info, GetLocalizedString(StringResource::aborted).c_str()); break; }
 			AddPath(dit->path(), source);
 		}
 	}
@@ -499,12 +498,14 @@ void RepRunner::ProcessStreamFiles(ShellWrapper::ShellFolder& folder, const Path
 						FileTimeToLocalFileTime(&srcFileTime, &localFT);
 						FileTimeToSystemTime(&localFT, &st);
 
+						memset(&ft, 0, sizeof(ft));
 						ft.tm_year = st.wYear - 1900;
-						ft.tm_mon = st.wMonth;
+						ft.tm_mon = st.wMonth - 1;
 						ft.tm_mday = st.wDay;
 						ft.tm_hour = st.wHour;
 						ft.tm_min = st.wMinute;
 						ft.tm_sec = st.wSecond;
+						ft.tm_wday = st.wDayOfWeek;
 
 						destFile /= m_pathFormatter.GetPath(&ft);
 						destFile /= shellItem.GetName();
@@ -690,6 +691,8 @@ void RepRunner::ProcessFiles(const std::vector<PathT>& fileList, ShellWrapper::S
 
 	for (auto srcFile : fileList)
 	{
+		if (m_abort) { WriteLog(Log::LogLevel::Info, GetLocalizedString(StringResource::aborted).c_str()); return; }
+
 		bool add = false, update = false;
 		std::wstring filename = srcFile.filename().wstring();
 

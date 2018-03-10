@@ -148,7 +148,7 @@ END
 
 IDR_HELP_MENU MENU
 BEGIN
-    MENUITEM "&About Replicator...",        ID_APP_ABOUT
+    MENUITEM "About Replicator...",         ID_APP_ABOUT
 END
 
 IDR_TASK_POPUP_MENU MENU
@@ -232,21 +232,21 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "New Task"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "Task &Name:",IDC_STATIC,7,10,38,8
+    LTEXT           "Task Name:",IDC_STATIC,7,10,38,8
     EDITTEXT        IDC_NEW_TASK_NAME,48,7,302,14,ES_AUTOHSCROLL
     CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME,7,27,343,1,WS_EX_STATICEDGE
-    LTEXT           "&Replicate files from",IDC_STATIC,7,32,62,8
+    LTEXT           "Replicate files from",IDC_STATIC,7,32,62,8
     EDITTEXT        IDC_NEW_TASK_SOURCE,7,44,316,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
     PUSHBUTTON      "...",IDC_NEW_TASK_BROWSE_SOURCE,325,44,25,14
-    LTEXT           "&to",IDC_STATIC,7,62,8,8
+    LTEXT           "to",IDC_STATIC,7,62,8,8
     EDITTEXT        IDC_NEW_TASK_DESTINATION,7,75,316,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
     PUSHBUTTON      "...",IDC_NEW_TASK_BROWSE_DEST,325,75,25,14
     LTEXT           "Options",IDC_STATIC,7,96,26,8
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,38,101,312,1
-    CONTROL         "Include &sub-folders",IDC_NEW_TASK_INCLUDE_SUB,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,111,81,10
+    CONTROL         "Include sub-folders",IDC_NEW_TASK_INCLUDE_SUB,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,111,81,10
     PUSHBUTTON      "Advanced options",IDC_NEW_TASK_ADV_OPTIONS,264,108,86,14
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,8,130,342,1
-    PUSHBUTTON      "&Create",IDC_NEW_TASK_CREATE,248,138,50,14,WS_DISABLED
+    PUSHBUTTON      "Create",IDC_NEW_TASK_CREATE,248,138,50,14,WS_DISABLED
     PUSHBUTTON      "Cancel",IDCANCEL,301,138,50,14
 END
 
@@ -257,23 +257,23 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     LTEXT           "Source Files",IDC_STATIC,5,5,53,8
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,50,9,250,1
-    CONTROL         "&All files",IDC_NEW_TASK_ALL_FILES,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,11,17,33,8
-    CONTROL         "&Include the following file type(s)",IDC_NEW_TASK_INCLUSION,
+    CONTROL         "All files",IDC_NEW_TASK_ALL_FILES,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,11,17,33,8
+    CONTROL         "Include the following file type(s)",IDC_NEW_TASK_INCLUSION,
                     "Button",BS_AUTORADIOBUTTON,11,30,115,8
-    CONTROL         "&Exclude the following file type(s)",IDC_NEW_TASK_EXCLUSION,
+    CONTROL         "Exclude the following file type(s)",IDC_NEW_TASK_EXCLUSION,
                     "Button",BS_AUTORADIOBUTTON,11,43,119,8
     EDITTEXT        IDC_AO_FILTERS,18,55,282,12,ES_AUTOHSCROLL | WS_GROUP
     LTEXT           "( Specify one or more file extensions to be included or excluded; separate with semi-colons if more than one. ex. jpg;bmp )",IDC_NEW_TASK_FILTERS_INFO,18,70,282,17
     LTEXT           "Destination Folders",IDC_STATIC,5,90,67,8
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,74,94,227,1
-    CONTROL         "&Use the same folder structure starting after the selected source folder",IDC_DESTINATION_SAME_FROM_SELECT,
+    CONTROL         "Use the same folder structure starting after the selected source folder",IDC_DESTINATION_SAME_FROM_SELECT,
                     "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,11,104,285,8
-    CONTROL         "Use the &same folder structure starting from the root of the selected source folder",IDC_DESTINATION_SAME_FROM_ROOT,
+    CONTROL         "Use the same folder structure starting from the root of the selected source folder",IDC_DESTINATION_SAME_FROM_ROOT,
                     "Button",BS_AUTORADIOBUTTON,11,117,285,10
-    CONTROL         "&Group files by date using the following format",IDC_DESTINATION_GROUP,
+    CONTROL         "Group files by date using the following format",IDC_DESTINATION_GROUP,
                     "Button",BS_AUTORADIOBUTTON,11,132,285,8
     EDITTEXT        IDC_AO_DESTINATION_FORMAT,18,146,235,12,ES_AUTOHSCROLL | WS_GROUP
-    PUSHBUTTON      "&Edit",IDC_AO_EDIT_FORMAT,258,146,43,12
+    PUSHBUTTON      "Edit",IDC_AO_EDIT_FORMAT,258,146,43,12
     LTEXT           "( Example: Specify $(YYYY)\\$(MMMM) to group the files created in Janurary 2017  into <destination folder>\\2017\\Janurary )",IDC_AO_DESTINATION_FORMAT_EXAMPLE,19,160,280,16
     LTEXT           "&Choose action when file already exists in destination folder",IDC_ACTION_TEXT,18,180,213,8
     COMBOBOX        IDC_AO_UPDATE_OPTION,18,192,282,62,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -293,7 +293,7 @@ BEGIN
     LTEXT           "Static",IDC_AF_FORMAT_EXAMPLE,45,27,266,8
     LTEXT           "Example:",IDC_STATIC,7,27,30,8
     CONTROL         "",IDC_AF_MACROS,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,42,305,154
-    PUSHBUTTON      "&Insert",IDC_AF_INSERT,269,7,44,14,WS_DISABLED
+    PUSHBUTTON      "Insert",IDC_AF_INSERT,269,7,44,14,WS_DISABLED
     LTEXT           "Select the macro from the list to insert the macro at the cursor position of the format string in the edit box. Use '\\' as the folder separator.",IDC_STATIC,7,200,305,20
 END
 
@@ -318,7 +318,7 @@ BEGIN
     LTEXT           "Keep history for:",IDC_STATIC,25,22,55,8
     LTEXT           "Tools",IDC_STATIC,7,44,18,8
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,30,49,218,1
-    CONTROL         "&Test run without replicating the files",IDC_TEST_RUN,
+    CONTROL         "Test run without replicating the files",IDC_TEST_RUN,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,60,131,10
 END
 
@@ -725,6 +725,9 @@ BEGIN
     IDS_EXCEP_OPEN_FOLDER_FAILURE "Could not open the folder on device."
     IDS_EXCEP_ACCESS_PORTABLE_DEVICE_FAILURE 
                             "Could not access the portable device. Please make sure the device being connected to PC in MTP mode."
+    IDS_EXCEPSTR_CREATE_TASK_FAILURE "Failed to create the new task."
+    IDS_EXCEPSTR_EDIT_TASK_FAILURE "Could not edit the selected task."
+    IDS_EXCEPSTR_DELETE_TASK_FAILURE "Could not delete the selected task."
 END
 
 #endif    // English (United States) resources

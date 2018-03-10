@@ -16,6 +16,7 @@
 #include "Property.h"
 
 #include "SettingsDialog.h"
+#include "Log.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -50,11 +51,14 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_WM_CLOSE()
 	ON_UPDATE_COMMAND_UI(ID_TASK_RUN, &CMainFrame::OnUpdateTaskRun)
 	ON_UPDATE_COMMAND_UI(ID_TASK_STOP, &CMainFrame::OnUpdateTaskStop)
+	ON_UPDATE_COMMAND_UI(ID_TASK_NEW, &CMainFrame::OnUpdateTaskNew)
 	ON_UPDATE_COMMAND_UI(ID_TASK_EDIT, &CMainFrame::OnUpdateTaskEdit)
 	ON_UPDATE_COMMAND_UI(ID_TASK_DELETE, &CMainFrame::OnUpdateTaskDelete)
 	ON_WM_TIMER()
 	ON_COMMAND(ID_TOOLS_SETTINGS, &CMainFrame::OnToolsSettings)
 	ON_COMMAND(ID_HELP_VIEWHELP, &CMainFrame::OnHelpViewhelp)
+	ON_WM_QUERYENDSESSION()
+	ON_WM_ENDSESSION()
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -68,7 +72,7 @@ static UINT indicators[] =
 // CMainFrame construction/destruction
 
 CMainFrame::CMainFrame() :
-	m_waitDialog(NULL), m_timerId(0), m_waitExitCounter(0)
+	m_waitDialog(NULL), m_taskView(NULL), m_timerId(0), m_waitExitCounter(0)
 {
 	// TODO: add member initialization code here
 }
@@ -168,7 +172,7 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT /*lpcs*/,
 		m_wndSplitter.DestroyWindow();
 		return FALSE;
 	}
-
+	m_taskView = static_cast<CTaskListView*>(m_wndSplitter.GetPane(0, 0));
 	return TRUE;
 }
 
@@ -179,7 +183,7 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 	// TODO: Modify the Window class or styles here by modifying
 	//  the CREATESTRUCT cs
 
-	cs.style = WS_OVERLAPPED | WS_CAPTION | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU;
+	cs.style = WS_OVERLAPPED | WS_CAPTION | WS_MINIMIZEBOX | WS_SIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU | WS_BORDER;
 	cs.dwExStyle &= ~WS_EX_CLIENTEDGE;
 	cs.lpszClass = AfxRegisterWndClass(0);
 
@@ -218,32 +222,32 @@ BOOL CMainFrame::LoadFrame(UINT nIDResource, DWORD dwDefaultStyle, CWnd* pParent
 
 void CMainFrame::OnTaskDelete()
 {
-	CTaskListView* pView = static_cast<CTaskListView*>(m_wndSplitter.GetPane(0, 0));
-	if (pView)
-		pView->OnTaskDelete();
+	m_taskView->OnTaskDelete();
 }
 
 void CMainFrame::OnTaskNew()
 {
-	CTaskListView* pView = static_cast<CTaskListView*>(m_wndSplitter.GetPane(0, 0));
-	if (pView)
-		pView->OnTaskNew();
+	m_taskView->OnTaskNew();
+}
+
+void CMainFrame::OnUpdateTaskNew(CCmdUI *pCmdUI)
+{
+	if (pCmdUI)
+	{
+		pCmdUI->Enable(TRUE);
+	}
 }
 
 void CMainFrame::OnTaskRun()
 {
-	CTaskListView* pView = static_cast<CTaskListView*>(m_wndSplitter.GetPane(0, 0));
-	if (pView)
-		pView->OnTaskRun();
+	m_taskView->OnTaskRun();
 }
-
 
 void CMainFrame::OnUpdateTaskRun(CCmdUI *pCmdUI)
 {
 	if (pCmdUI)
 	{
-		CTaskListView* pView = static_cast<CTaskListView*>(m_wndSplitter.GetPane(0, 0));
-		pCmdUI->Enable((pView && (pView->GetListCtrl().GetSelectedCount() > 0) && !pView->IsSelectedTaskRunning()) ? TRUE : FALSE);
+		pCmdUI->Enable(((m_taskView->GetListCtrl().GetSelectedCount() > 0) && !m_taskView->IsSelectedTaskRunning()) ? TRUE : FALSE);
 	}
 }
 
@@ -252,8 +256,7 @@ void CMainFrame::OnUpdateTaskDelete(CCmdUI *pCmdUI)
 {
 	if (pCmdUI)
 	{
-		CTaskListView* pView = static_cast<CTaskListView*>(m_wndSplitter.GetPane(0, 0));
-		pCmdUI->Enable((pView && (pView->GetListCtrl().GetSelectedCount() > 0) && !pView->IsSelectedTaskRunning()) ? TRUE : FALSE);
+		pCmdUI->Enable(((m_taskView->GetListCtrl().GetSelectedCount() > 0) && !m_taskView->IsSelectedTaskRunning()) ? TRUE : FALSE);
 	}
 }
 
@@ -268,9 +271,7 @@ void CMainFrame::Refresh(int taskID, DWORD refresh, bool force /*=false*/)
 
 void CMainFrame::OnTaskEdit()
 {
-	CTaskListView* pView = static_cast<CTaskListView*>(m_wndSplitter.GetPane(0, 0));
-	if (pView)
-		pView->OnTaskEdit();
+	m_taskView->OnTaskEdit();
 }
 
 
@@ -278,8 +279,7 @@ void CMainFrame::OnUpdateTaskEdit(CCmdUI *pCmdUI)
 {
 	if (pCmdUI)
 	{
-		CTaskListView* pView = static_cast<CTaskListView*>(m_wndSplitter.GetPane(0, 0));
-		pCmdUI->Enable((pView && (pView->GetListCtrl().GetSelectedCount() > 0)) ? TRUE : FALSE);
+		pCmdUI->Enable(((m_taskView->GetListCtrl().GetSelectedCount() > 0) && !m_taskView->IsSelectedTaskRunning()) ? TRUE : FALSE);
 	}
 }
 
@@ -368,28 +368,25 @@ void CMainFrame::SaveSettings()
 
 void CMainFrame::OnClose()
 {
-	CTaskListView* pView = static_cast<CTaskListView*>(m_wndSplitter.GetPane(0, 0));
-	if (pView)
+	Log::logger.info(_T("Closing window...."));
+	if (m_taskView->IsBusy())
 	{
-		if (pView->IsBusy())
+		if (AfxMessageBox(IDS_PROMPT_CANCEL_JOB, MB_YESNO) == IDNO)
+			return;
+		else
 		{
-			if (AfxMessageBox(IDS_PROMPT_CANCEL_JOB, MB_YESNO) == IDNO)
-				return;
-			else
+			m_waitDialog = new WaitDialog(this);
+
+			EnableWindow(FALSE);
+			m_taskView->StopAllTasks();
+
+			m_timerId = SetTimer(IDT_WAIT_EXIT, ABORT_WAIT_ELAPSE_TIME, NULL);
+			if (m_timerId)
 			{
-				m_waitDialog = new WaitDialog(this);
-
-				EnableWindow(FALSE);
-				pView->StopAllTasks();
-
-				m_timerId = SetTimer(IDT_WAIT_EXIT, ABORT_WAIT_ELAPSE_TIME, NULL);
-				if (m_timerId)
-				{
-					m_waitExitCounter = 0;
-					m_waitDialog->Create(WaitDialog::IDD);
-					m_waitDialog->ShowWindow(SW_SHOWNORMAL);
-					return;
-				}
+				m_waitExitCounter = 0;
+				m_waitDialog->Create(WaitDialog::IDD);
+				m_waitDialog->ShowWindow(SW_SHOWNORMAL);
+				return;
 			}
 		}
 	}
@@ -399,9 +396,7 @@ void CMainFrame::OnClose()
 
 void CMainFrame::OnTaskStop()
 {
-	CTaskListView* pView = static_cast<CTaskListView*>(m_wndSplitter.GetPane(0, 0));
-	if (pView)
-		pView->OnTaskStop();
+	m_taskView->OnTaskStop();
 }
 
 
@@ -409,8 +404,7 @@ void CMainFrame::OnUpdateTaskStop(CCmdUI *pCmdUI)
 {
 	if (pCmdUI)
 	{
-		CTaskListView* pView = static_cast<CTaskListView*>(m_wndSplitter.GetPane(0, 0));
-		pCmdUI->Enable((pView && pView->IsSelectedTaskRunning()) ? TRUE : FALSE);
+		pCmdUI->Enable(m_taskView->IsSelectedTaskRunning() ? TRUE : FALSE);
 	}
 }
 
@@ -420,8 +414,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 	if (nIDEvent == m_timerId)
 	{
 		++m_waitExitCounter;
-		CTaskListView* pView = static_cast<CTaskListView*>(m_wndSplitter.GetPane(0, 0));
-		bool busy = (pView && pView->IsBusy()) ? true : false;
+		bool busy = m_taskView->IsBusy() ? true : false;
 		if(!busy || (m_waitExitCounter > WAIT_EXIT_COUNTER))
 		{
 			KillTimer(m_timerId);
@@ -470,4 +463,18 @@ void CMainFrame::OnHelpViewhelp()
 	CString url;
 	url.LoadString(IDS_HELP_URL);
 	ShellExecute(NULL, nullptr, url, nullptr, nullptr, SW_SHOW);
+}
+
+
+BOOL CMainFrame::OnQueryEndSession()
+{
+	if (m_taskView->IsBusy())
+		m_taskView->StopAllTasks(true);
+
+	return TRUE;
+}
+
+void CMainFrame::OnEndSession(BOOL bEnding)
+{
+	CFrameWndEx::OnEndSession(bEnding);
 }

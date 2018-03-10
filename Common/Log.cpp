@@ -122,7 +122,7 @@ namespace Log
 				std::experimental::filesystem::rename(m_path, log);
 			}
 		}
-		catch (std::exception e)
+		catch (...)
 		{
 
 		}

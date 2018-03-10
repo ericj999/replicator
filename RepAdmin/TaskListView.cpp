@@ -3,6 +3,7 @@
 //
 
 #include "stdafx.h"
+#include <exception>
 #include "resource.h"
 #include "Replicator.h"
 #include "MainFrm.h"
@@ -16,6 +17,7 @@
 
 #include "RepRunner.h"
 #include "Log.h"
+#include "LocaleResources.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -150,7 +152,7 @@ int CTaskListView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		while (rs->Step())
 			InsertItem(rs);
 	}
-	catch (Database::Exception e)
+	catch (Database::Exception& e)
 	{
 		CString msg(e.what());
 		AfxMessageBox(msg, MB_OK | MB_ICONEXCLAMATION);
@@ -251,10 +253,22 @@ void CTaskListView::OnUpdateTaskRun(CCmdUI *pCmdUI)
 
 void CTaskListView::OnTaskNew()
 {
-	CNewTaskDialog dlg(this);
+	try
+	{
+		CNewTaskDialog dlg(this);
 
-	if (dlg.DoModal() == IDOK)
-		AddNewTask(dlg.GetNewTaskName());
+		if (dlg.DoModal() == IDOK)
+			AddNewTask(dlg.GetNewTaskName());
+	}
+	catch (std::exception& e)
+	{
+		Log::logger.error(StringT(_T("New task exception: ")) + String::StringToStringT(e.what()));
+		std::wstring what = GetLocalizedString(e.what());
+		if (what.empty())
+			AfxMessageBox(IDS_EXCEPSTR_CREATE_TASK_FAILURE, MB_OK | MB_ICONSTOP);
+		else
+			AfxMessageBox(what.c_str(), MB_OK | MB_ICONSTOP);
+	}
 }
 
 void CTaskListView::OnTaskRun()
@@ -286,31 +300,18 @@ void CTaskListView::OnTaskDelete()
 				tb.Delete(condition);
 				GetListCtrl().DeleteItem(item);
 			}
-			catch (Database::Exception e)
+			catch (std::exception& e)
 			{
-				CString str(e.what());
-				AfxMessageBox(str, MB_OK | MB_ICONEXCLAMATION);
+				Log::logger.error(StringT(_T("Delete task exception: ")) + String::StringToStringT(e.what()));
+				std::wstring what = GetLocalizedString(e.what());
+				if (what.empty())
+					AfxMessageBox(IDS_EXCEPSTR_DELETE_TASK_FAILURE, MB_OK | MB_ICONSTOP);
+				else
+					AfxMessageBox(what.c_str(), MB_OK | MB_ICONSTOP);
 			}
 		}
 	}
 }
-
-struct tagEditColumnDef
-{
-	LPCTSTR colDBName;
-	Database::PropertyType colDBType;
-} EditColumnDef[] =
-{
-	{ TASKS_COL_TASKID, Database::PT_INT64 },
-	{ TASKS_COL_NAME, Database::PT_TEXT },
-	{ TASKS_COL_SOURCE, Database::PT_TEXT },
-	{ TASKS_COL_SOURCE_PARSING, Database::PT_TEXT },
-	{ TASKS_COL_DESTINATION, Database::PT_TEXT },
-	{ TASKS_COL_DEST_PARSING, Database::PT_TEXT },
-	{ TASKS_COL_FLASGS, Database::PT_INT },
-	{ TASKS_COL_FILTERS, Database::PT_TEXT },
-	{ TASKS_COL_DESTFOLDERFMT, Database::PT_TEXT }
-};
 
 void CTaskListView::OnTaskEdit()
 {
@@ -321,18 +322,9 @@ void CTaskListView::OnTaskEdit()
 		int taskId = static_cast<int>(GetListCtrl().GetItemData(item));
 
 		Log::logger.info(StringT(_T("Edit task ")) + ToStringT(taskId));
-
-		Database::Table tb{ theApp.GetDB(), TASKS_TABLE };
-		StringT condition = _T("TaskID=") + ToStringT(taskId);
-
-		Database::PropertyList props;
-		for (int i = 0; i < (sizeof(EditColumnDef) / sizeof(EditColumnDef[0])); ++i)
-			props.push_back(Database::Property(EditColumnDef[i].colDBName, EditColumnDef[i].colDBType));
-
-		Database::RecordsetPtr rs = tb.Select(props, condition);
-		if (rs->Step())
+		try
 		{
-			CNewTaskDialog dlg(props, this);
+			CNewTaskDialog dlg(taskId, this);
 			if (dlg.DoModal() == IDOK)
 			{
 				GetListCtrl().SetItemText(item, 0, dlg.GetNewTaskName());
@@ -342,12 +334,21 @@ void CTaskListView::OnTaskEdit()
 				Log::logger.info(StringT(_T("Task ")) + ToStringT(taskId) + _T(" is updated."));
 			}
 		}
+		catch (std::exception& e)
+		{
+			Log::logger.error(StringT(_T("Edit task exception: ")) + String::StringToStringT(e.what()));
+			std::wstring what = GetLocalizedString(e.what());
+			if (what.empty())
+				AfxMessageBox(IDS_EXCEPSTR_EDIT_TASK_FAILURE, MB_OK | MB_ICONSTOP);
+			else
+				AfxMessageBox(what.c_str(), MB_OK | MB_ICONSTOP);
+		}
 	}
 }
 
 void CTaskListView::OnUpdateTaskEdit(CCmdUI *pCmdUI)
 {
-	pCmdUI->Enable(GetListCtrl().GetSelectedCount() > 0);
+	pCmdUI->Enable((GetListCtrl().GetSelectedCount() > 0) && !IsSelectedTaskRunning());
 }
 
 void CTaskListView::OnDestroy()
@@ -503,16 +504,16 @@ void CTaskListView::OnUpdateTaskStop(CCmdUI *pCmdUI)
 	pCmdUI->Enable(IsSelectedTaskRunning());
 }
 
-void CTaskListView::StopAllTasks()
+void CTaskListView::StopAllTasks(bool stopCallback /*= false*/)
 {
 	Log::logger.info(_T("Stop all tasks."));
 	std::lock_guard<std::mutex> lock{ m_tasksLock };
 	for (auto&& it : m_tasks)
 	{
-		it.second->Abort();
+		it.second->Abort(stopCallback);
+		Log::logger.info(StringT(_T("Abort task ")) + ToStringT(it.second->GetTaskID()));
 	}
 }
-
 
 void CTaskListView::OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult)
 {

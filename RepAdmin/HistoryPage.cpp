@@ -124,11 +124,11 @@ void CHistoryPage::OnGetdispinfoHistoryList(NMHDR *pNMHDR, LRESULT *pResult)
 	NMLVDISPINFO *pDispInfo = reinterpret_cast<NMLVDISPINFO*>(pNMHDR);
 	LV_ITEM* pItem = &(pDispInfo)->item;
 
-	int iItem = pItem->iItem;
+	size_t iItem = pItem->iItem;
 
 	if ((iItem >= m_cacheOffset) && (iItem < m_cacheOffset + m_cacheItems.size()))
 	{
-		int offset = iItem - m_cacheOffset;
+		size_t offset = iItem - m_cacheOffset;
 		if (pItem->mask & LVIF_TEXT) //valid text buffer?
 		{
 			switch (pItem->iSubItem)

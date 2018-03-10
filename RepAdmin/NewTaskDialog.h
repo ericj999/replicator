@@ -11,7 +11,7 @@ class CNewTaskDialog : public CDialogEx
 
 public:
 	CNewTaskDialog(CWnd* pParent = NULL);   // standard constructor
-	CNewTaskDialog(const Database::PropertyList& propList, CWnd* pParent = NULL);   // standard constructor
+	CNewTaskDialog(int taskId, CWnd* pParent = NULL);   // standard constructor
 	virtual ~CNewTaskDialog();
 
 // Dialog Data

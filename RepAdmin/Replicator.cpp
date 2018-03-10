@@ -121,7 +121,7 @@ BOOL CReplicatorApp::InitInstance()
 
 		MaintainDB();
 	}
-	catch (std::exception e)
+	catch (std::exception& e)
 	{
 		Log::logger.error(_T("Failed to connect to the database!"));
 		return FALSE;
@@ -148,12 +148,13 @@ BOOL CReplicatorApp::InitInstance()
 	CMFCMenuBar::SetShowAllCommands(TRUE);
 
 	// Check license
+/*
 	if (!StoreIsRegistered(m_pMainWnd->GetSafeHwnd()))
 	{
 		AfxMessageBox(IDS_ERROR_LICENSE, MB_ICONSTOP | MB_OK);
 		return FALSE;
 	}
-
+*/
 	// Initialize OLE libraries
 	// using STA due to the portable device access
 	CoInitialize(NULL);

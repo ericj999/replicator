@@ -35,7 +35,7 @@ protected:
 	Database::Table* m_table;
 
 	int m_totalRows;
-	int m_cacheOffset;
+	size_t m_cacheOffset;
 	std::vector<ListItem> m_cacheItems;
 
 	void LoadSettings();

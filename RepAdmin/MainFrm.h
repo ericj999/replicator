@@ -5,6 +5,8 @@
 #pragma once
 #include "WaitDialog.h"
 
+class CTaskListView;
+
 class CMainFrame : public CFrameWndEx
 {
 public:
@@ -45,6 +47,7 @@ protected:  // control bar embedded members
 	CMFCToolBar       m_wndToolBar;
 	CMFCStatusBar     m_wndStatusBar;
 
+	CTaskListView* m_taskView;
 	WaitDialog* m_waitDialog;
 	INT_PTR m_timerId;
 	int m_waitExitCounter;
@@ -55,20 +58,23 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
-	afx_msg void OnTaskDelete();
-	afx_msg void OnTaskNew();
 	afx_msg void OnTaskRun();
-	afx_msg void OnUpdateTaskRun(CCmdUI *pCmdUI);
-	afx_msg void OnUpdateTaskDelete(CCmdUI *pCmdUI);
+	afx_msg void OnTaskStop();
+	afx_msg void OnTaskNew();
 	afx_msg void OnTaskEdit();
-	afx_msg void OnUpdateTaskEdit(CCmdUI *pCmdUI);
+	afx_msg void OnTaskDelete();
 	afx_msg void OnDestroy();
 	afx_msg void OnClose();
-	afx_msg void OnTaskStop();
+	afx_msg void OnUpdateTaskRun(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateTaskStop(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateTaskNew(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateTaskEdit(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateTaskDelete(CCmdUI *pCmdUI);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnToolsSettings();
 	afx_msg void OnHelpViewhelp();
+	afx_msg BOOL OnQueryEndSession();
+	afx_msg void OnEndSession(BOOL bEnding);
 };
 
 

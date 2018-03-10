@@ -30,14 +30,16 @@ public:
 
 	void AsyncRun();
 	void Run();
-	void Abort() { m_abort = true; }
+	void Abort(bool stopCallBack = false) { m_abort = true; if(stopCallBack) m_doCallBack = false;  }
 	bool IsRunning() { return m_isRunning;  }
+	int GetTaskID() { return m_taskID; }
 
 protected:
 	int m_taskID;
 	bool m_verbose;
 	bool m_testRun;
 	bool m_isRunning;
+	bool m_doCallBack;
 	Database::Database m_db;
 	RunnerEventCallback m_callback;
 	DatePathFormatter m_pathFormatter;

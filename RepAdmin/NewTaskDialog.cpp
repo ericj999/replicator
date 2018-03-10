@@ -14,6 +14,23 @@
 #include "AdvancedOptionsDlg.h"
 #include "ComInterface.h"
 
+struct tagEditColumnDef
+{
+	LPCTSTR colDBName;
+	Database::PropertyType colDBType;
+} EditColumnDef[] =
+{
+	{ TASKS_COL_TASKID, Database::PT_INT64 },
+{ TASKS_COL_NAME, Database::PT_TEXT },
+{ TASKS_COL_SOURCE, Database::PT_TEXT },
+{ TASKS_COL_SOURCE_PARSING, Database::PT_TEXT },
+{ TASKS_COL_DESTINATION, Database::PT_TEXT },
+{ TASKS_COL_DEST_PARSING, Database::PT_TEXT },
+{ TASKS_COL_FLASGS, Database::PT_INT },
+{ TASKS_COL_FILTERS, Database::PT_TEXT },
+{ TASKS_COL_DESTFOLDERFMT, Database::PT_TEXT }
+};
+
 // CNewTaskDialog dialog
 
 IMPLEMENT_DYNAMIC(CNewTaskDialog, CDialogEx)
@@ -25,11 +42,21 @@ CNewTaskDialog::CNewTaskDialog(CWnd* pParent /*=NULL*/)
 
 }
 
-CNewTaskDialog::CNewTaskDialog(const Database::PropertyList& props, CWnd* pParent /*=NULL*/)
-	: CDialogEx(CNewTaskDialog::IDD, pParent), m_update{ true }, m_props(props), m_AdvnacedOptionsFlags{ TASKS_FLAGS_UPDATE_NEWER }, 
+CNewTaskDialog::CNewTaskDialog(int taskId, CWnd* pParent /*=NULL*/)
+	: CDialogEx(CNewTaskDialog::IDD, pParent), m_update{ true }, m_AdvnacedOptionsFlags{ TASKS_FLAGS_UPDATE_NEWER }, 
 	m_changed{ false }, m_ready{ false }
 {
+	Database::Table tb{ theApp.GetDB(), TASKS_TABLE };
+	StringT condition = _T("TaskID=") + ToStringT(taskId);
 
+	for (int i = 0; i < (sizeof(EditColumnDef) / sizeof(EditColumnDef[0])); ++i)
+		m_props.push_back(Database::Property(EditColumnDef[i].colDBName, EditColumnDef[i].colDBType));
+
+	Database::RecordsetPtr rs = tb.Select(m_props, condition);
+	if (!rs->Step())
+	{
+		throw std::runtime_error{ EXCEPSTR_EDIT_TASK_FAILURE };
+	}
 }
 
 
@@ -259,7 +286,7 @@ void CNewTaskDialog::OnBnClickedNewTaskCreate()
 		}
 		m_strNewTaskName = strName;
 	}
-	catch (Database::Exception e)
+	catch (Database::Exception& e)
 	{
 		CString msg(e.what());
 		AfxMessageBox(msg, MB_OK | MB_ICONEXCLAMATION);
