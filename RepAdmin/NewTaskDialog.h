@@ -18,6 +18,8 @@ public:
 	enum { IDD = IDD_NEW_TASK };
 
 	LPCTSTR GetNewTaskName() { return m_strNewTaskName; }
+	LPCTSTR GetSrcParsingPath() { return m_strSourceParsing; }
+	LPCTSTR GetDestParsingPath() { return m_strDestParsing;  }
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support

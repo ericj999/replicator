@@ -63,7 +63,7 @@ void RepRunner::Run()
 		WriteLog(Log::LogLevel::Verbose, _T("==============================="));
 		WriteLog(Log::LogLevel::Verbose, _T("Begin replication task ID %d..."), m_taskID);
 		Database::PropertyList propList;
-
+		// set task start time in DB
 		propList.push_back(Database::Property(TASKS_COL_LASTRUN, startTimeStr));
 		propList.push_back(Database::Property(TASKS_COL_LASTRUNSTATUS, _T("Started")));
 
@@ -97,6 +97,19 @@ void RepRunner::Run()
 		m_parsingSrc = task.getParsingSource();
 		m_parsingDestination = task.getParsingDestination();
 
+		if (m_parsingSrc[0] == _T(':'))
+		{
+			std::vector<std::wstring> wpdPath = Util::ParseParsingPath(m_parsingSrc);
+			if (wpdPath.size() > 2)
+				m_protableDevice = wpdPath[1];
+		}
+		else if (m_parsingDestination[0] == _T(':'))
+		{
+			std::vector<std::wstring> wpdPath = Util::ParseParsingPath(m_parsingDestination);
+			if (wpdPath.size() > 2)
+				m_protableDevice = wpdPath[1];
+		}
+
 		if (!m_parsingSrc.empty() && (m_parsingSrc[0] == _T(':')))
 		{
 			// run Shell APIs....
@@ -112,16 +125,16 @@ void RepRunner::Run()
 			// regular file system
 			// discovering....
 			std::vector<RepSource> repSources;
-			repSources.push_back(GetSource(m_srcPath));
+			repSources.push_back(GetSource(m_parsingSrc));	// m_srcPath));
 
 			if (!m_abort)
 			{
 				WriteLog(Log::LogLevel::Verbose, _T("Discoverd total %d file(s)."), m_fileCount);
 
 				// replicating....
-				WriteLog(Log::LogLevel::Verbose, _T("Destination = \"%s\""), m_destination.wstring().c_str());
+				WriteLog(Log::LogLevel::Verbose, _T("Destination = \"%s\""), m_parsingDestination.c_str());
 
-				ReplicateNow(repSources, m_destination);
+				ReplicateNow(repSources, m_parsingDestination);
 			}
 		}
 		// done

@@ -123,7 +123,7 @@ BOOL CReplicatorApp::InitInstance()
 	}
 	catch (std::exception& e)
 	{
-		Log::logger.error(_T("Failed to connect to the database!"));
+		Log::logger.error(StringT(_T("Failed to connect to the database!")) + String::StringToStringT(e.what()));
 		return FALSE;
 	}
 

@@ -35,9 +35,12 @@ enum
 	LIST_COL_LAST_SUCCESSFUL_RUN,
 	LIST_COL_STATUS,
 	LIST_COL_TASKID,
-	MAX_UI_LIST_COLS = LIST_COL_TASKID,
+	LIST_COL_SRC_PARSING_PATH,
+	LIST_COL_DEST_PARSING_PATH,
 	MAX_LIST_COLS
 };
+
+#define MAX_UI_LIST_COLS LIST_COL_TASKID
 
 struct tagColumnDef
 {
@@ -51,7 +54,9 @@ struct tagColumnDef
 	{ IDS_LIST_LAST_RUN, 120, TASKS_COL_LASTRUN, Database::PT_TEXT },
 	{ IDS_LIST_LAST_SUCCESSFUL_RUN, 120, TASKS_COL_LASTSUCCESSRUN, Database::PT_TEXT },
 	{ IDS_LIST_STATUS, 480, TASKS_COL_LASTRUNSTATUS, Database::PT_TEXT },
-	{ IDS_LIST_TASKID, 60, TASKS_COL_TASKID, Database::PT_INT64 }
+	{ -1, 0, TASKS_COL_TASKID, Database::PT_INT64 },
+	{ -1, 0, TASKS_COL_SOURCE_PARSING, Database::PT_TEXT },
+	{ -1, 0, TASKS_COL_DEST_PARSING, Database::PT_TEXT }
 };
 
 // CTaskListView
@@ -173,7 +178,7 @@ void CTaskListView::AddNewTask(LPCTSTR taskName)
 	StringT condition = TASKS_COL_NAME;
 	condition += _T("='") + String::replace(taskName, _T("'"), _T("''")) + _T("'");
 
-	Log::logger.info(StringT(_T("Create task \"")) + StringT(taskName) + _T("\""));
+	Log::logger.info(StringT(_T("Add new task \"")) + StringT(taskName) + _T("\" to list."));
 
 	Database::PropertyList props;
 	for (int i = LIST_COL_NAME; i < MAX_LIST_COLS; ++i)
@@ -202,6 +207,19 @@ int CTaskListView::InsertItem(Database::RecordsetPtr rs)
 					GetListCtrl().SetItemText(item, LIST_COL_LAST_SUCCESSFUL_RUN, String::UTCTimeToLocalTime(rs->GetColumnStr(LIST_COL_LAST_SUCCESSFUL_RUN)).c_str());
 					GetListCtrl().SetItemText(item, LIST_COL_STATUS, rs->GetColumnStr(LIST_COL_STATUS).c_str());
 					GetListCtrl().SetItemData(item, taskId);
+
+					StringT parsingPath;
+					if (!rs->GetColumnStr(LIST_COL_SRC_PARSING_PATH).empty() && rs->GetColumnStr(LIST_COL_SRC_PARSING_PATH).at(0) == L':')
+						parsingPath = rs->GetColumnStr(LIST_COL_SRC_PARSING_PATH);
+					else if(!rs->GetColumnStr(LIST_COL_DEST_PARSING_PATH).empty() && rs->GetColumnStr(LIST_COL_DEST_PARSING_PATH).at(0) == L':')
+						parsingPath = rs->GetColumnStr(LIST_COL_DEST_PARSING_PATH);
+
+					if(!parsingPath.empty())
+					{
+						std::vector<std::wstring> wpdPath = Util::ParseParsingPath(parsingPath);
+						if (wpdPath.size() > 2)
+							m_taskPortableDevice.insert(std::pair<int, StringT>(taskId, wpdPath[1]));
+					}
 				}
 			}
 		}
@@ -309,6 +327,7 @@ void CTaskListView::OnTaskDelete()
 				else
 					AfxMessageBox(what.c_str(), MB_OK | MB_ICONSTOP);
 			}
+			m_taskPortableDevice.erase(taskId);
 		}
 	}
 }
@@ -332,6 +351,23 @@ void CTaskListView::OnTaskEdit()
 				CMainFrame* pMain = static_cast<CMainFrame*>(theApp.GetMainWnd());
 				pMain->Refresh(taskId, REFRESH_GENERAL, true);
 				Log::logger.info(StringT(_T("Task ")) + ToStringT(taskId) + _T(" is updated."));
+
+				// update task portable device
+				m_taskPortableDevice.erase(taskId);
+
+				std::wstring parsingPath;
+				
+				if ((dlg.GetSrcParsingPath()[0] != L'\0') && (dlg.GetSrcParsingPath()[0] == L':'))
+					parsingPath = dlg.GetSrcParsingPath();
+				else if((dlg.GetDestParsingPath()[0] != L'\0') && (dlg.GetDestParsingPath()[0] == L':'))
+					parsingPath = dlg.GetDestParsingPath();
+
+				if (!parsingPath.empty())
+				{
+					std::vector<std::wstring> wpdPath = Util::ParseParsingPath(parsingPath);
+					if (wpdPath.size() > 2)
+						m_taskPortableDevice.insert(std::pair<int, StringT>(taskId, wpdPath[1]));
+				}
 			}
 		}
 		catch (std::exception& e)
@@ -529,6 +565,27 @@ void CTaskListView::RunTask(int item)
 	int taskId = static_cast<int>(GetListCtrl().GetItemData(item));
 
 	Log::logger.info(StringT(_T("Run task ")) + ToStringT(taskId));
+
+	bool portableDeviceInUse = false;
+	auto it = m_taskPortableDevice.find(taskId);
+	if (it != m_taskPortableDevice.end())
+	{
+		std::lock_guard<std::mutex> lock{ m_tasksLock };
+		for(auto itTask = m_tasks.begin(); itTask != m_tasks.end(); ++itTask)
+		{
+			if (itTask->second->usePortableDevice() &&  (itTask->second->getProtableDevice() == it->second))
+			{
+				portableDeviceInUse = true;
+				break;
+			}
+		}
+	}
+
+	if (portableDeviceInUse)
+	{
+		AfxMessageBox(IDS_PORTABLE_DEVICE_IN_USE, MB_OK | MB_ICONEXCLAMATION);
+		return;
+	}
 
 	CString state;
 	state.LoadString(IDS_TASK_RUNNING);

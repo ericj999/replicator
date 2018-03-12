@@ -39,8 +39,10 @@ public:
 	static void EventCallback(CTaskListView* _This, int taskId, RunnerState state, LPCTSTR message);
 
 protected:
-	std::map<int, std::shared_ptr<RepRunner>> m_tasks;
 	std::mutex m_tasksLock;
+	std::map<int, std::shared_ptr<RepRunner>> m_tasks;
+
+	std::map<int, StringT> m_taskPortableDevice;
 
 	bool IsTaskRunning(int taskId);
 	void RunTask(int item);

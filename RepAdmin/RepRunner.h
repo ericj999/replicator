@@ -34,6 +34,9 @@ public:
 	bool IsRunning() { return m_isRunning;  }
 	int GetTaskID() { return m_taskID; }
 
+	bool usePortableDevice() { return !m_protableDevice.empty(); }
+	const StringT& getProtableDevice() const { return m_protableDevice; }
+
 protected:
 	int m_taskID;
 	bool m_verbose;
@@ -54,6 +57,7 @@ protected:
 	PathT m_destination;
 	StringT m_parsingSrc;
 	StringT m_parsingDestination;
+	StringT m_protableDevice;
 
 	// async execution
 	std::atomic_bool m_abort;

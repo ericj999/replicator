@@ -665,6 +665,8 @@ BEGIN
     IDS_MSG_FAILED_TO_ADD   "Failed to add ""%s"""
     IDS_MSG_FAILED_TO_UPDATE "Failed to update ""%s"""
     IDS_MSG_FAILED_TO_CREATE_FOLDER "Failed to create folder ""%s""."
+    IDS_PORTABLE_DEVICE_IN_USE 
+                            "There is a task already running on the same portable device. Please try again later."
 END
 
 STRINGTABLE

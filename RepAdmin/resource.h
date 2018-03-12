@@ -122,6 +122,7 @@
 #define IDS_MSG_FAILED_TO_ADD           2124
 #define IDS_MSG_FAILED_TO_UPDATE        2125
 #define IDS_MSG_FAILED_TO_CREATE_FOLDER 2126
+#define IDS_PORTABLE_DEVICE_IN_USE      2127
 #define IDS_FF_DAY                      2200
 #define IDS_FF_DAY_2D                   2201
 #define IDS_FF_DAY_ALT                  2202
