@@ -189,7 +189,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,14,14,20,20
     LTEXT           "File Replicator, Version 1.1",IDC_STATIC,42,14,114,8,SS_NOPREFIX
-    LTEXT           "Copyright (C) 2014-2017",IDC_STATIC,42,26,114,8
+    LTEXT           "Copyright (C) 2018 AQITEK LLC",IDC_STATIC,42,26,114,8
     DEFPUSHBUTTON   "OK",IDOK,113,41,50,14,WS_GROUP
 END
 
@@ -345,11 +345,11 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "CompanyName", "Eric C."
+            VALUE "CompanyName", "AQITEK LLC"
             VALUE "FileDescription", "File Replicator"
             VALUE "FileVersion", "1.1.0.1"
             VALUE "InternalName", "Replicator.exe"
-            VALUE "LegalCopyright", "(c) Eric Chen.  All rights reserved."
+            VALUE "LegalCopyright", "(c) AQITEK LLC. All rights reserved."
             VALUE "OriginalFilename", "Replicator.exe"
             VALUE "ProductName", "File Replicator"
             VALUE "ProductVersion", "1.1.0.1"
