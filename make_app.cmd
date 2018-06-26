@@ -1,0 +1,1 @@
+DesktopAppConverter.exe -Installer G:\MyWorks\Replicator\Install -AppExecutable Replicator.exe -Destination G:\MyWorks\Replicator\Output -PackageName "FileReplicator" -PackageDisplayName "File Replicator" -AppDescription "File Replication Utility Program" -Publisher "CN=aqitek.com" -MakeAppx -Version 1.0.0.0 -Sign -Verify -Verbose
