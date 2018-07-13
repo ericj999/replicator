@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+	<title>File Replicator Help</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="/css/w3.css" type="text/css" />
+	
+    <body>
+		<div class="w3-top">
+			<div class="w3-bar w3-white w3-wide w3-card">
+				<a href="/zh-cn/index.html" class="w3-bar-item w3-btn w3-hover-none">
+					<img class="w3-image w3-round" src="/images/replicator48.png" alt="Replicator" width="48" height="48"> <h4>File Replicator</h4>
+				</a>
+				<div class="w3-right w3-hide-small">
+					<a href="/zh-cn/index.html" class="w3-bar-item w3-button">首页</a>
+					<a href="#" class="w3-bar-item w3-button">支持</a>
+					<a href="/zh-cn/contact.html" class="w3-bar-item w3-button">联系</a>
+					<div class="w3-dropdown-hover w3-right">
+						<button class="w3-button">&#127760; 中文（简体）</button>
+						<div class="w3-dropdown-content w3-bar-block w3-border" style="right:0">
+							<a href="/en/support.html" class="w3-bar-item w3-button">English</a>
+							<a href="/zh-tw/support.html" class="w3-bar-item w3-button">中文(繁體)</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<br><br><br><br><br><br>
+		
+		<div class="w3-container w3-content w3-text-gray">
+			<h2>逐步快速入门</h2>
+			<div class="w3-button w3-padding-small w3-white w3-hover-none w3-text-gray" onclick="ToggleAll('Photo','PDown','PRight')">
+				<div class="w3-container w3-cell w3-cell-middle"><h3>从智能手机或平板电脑备份照片到个人计算机</h3></div>
+				<div class="w3-container w3-cell w3-cell-middle"><img id="PDown" class="w3-show" src="/images/chevron-d.png"><img id="PRight" class="w3-hide" src="/images/chevron-u.png"></div>
+			</div>
+			<div id="Photo" class="w3-container w3-content w3-hide">
+				<ol>
+				<li class="w3-padding-small">点击菜单上 <span class="w3-tag w3-border w3-light-gray">执行项目</span>&rarr;<span class="w3-tag w3-border w3-light-gray">创建...</span> 选项或工具栏的
+					<span class="w3-tag w3-border w3-light-gray w3-round">+</span> 打开创建执行项目对话框。<br>
+					<img class="w3-padding-small" src="/zh-cn/images/menu_new.png"> 或 <img class="w3-padding-small" src="/zh-cn/images/toolbar_new.png"></li>
+				<li class="w3-padding-small">点击第一个 <span class="w3-tag w3-border w3-light-gray w3-round">…</span> 选择便携设备上的照片文件夹。<br>
+					<img class="w3-padding-small" src="/zh-cn/images/photo_src.png"></li>
+				<li class="w3-padding-small">点击下一个 <span class="w3-tag w3-border w3-light-gray w3-round">…</span> 选择在硬盘上目标文件夹。
+					你也可以点击 <span class="w3-tag w3-border w3-light-gray">新增文件夹</span> 在目前所选的文件夹创建新子文件夹来存储照片。<br>
+					<img class="w3-padding-small" src="/zh-cn/images/photo_dest.png"></li>
+				<li class="w3-padding-small">输入执行项目名称并按下 <span class="w3-tag w3-border w3-light-gray w3-round">创建</span> 建立该任务项目。<br>
+					<img class="w3-padding-small" src="/zh-cn/images/new_photo.png"></li>
+				<li class="w3-padding-small">要执行项目时，点击菜单上 <span class="w3-tag w3-border w3-light-gray">执行项目</span>&rarr;<span class="w3-tag w3-border w3-light-gray">执行</span> 选项或工具栏的
+					<span class="w3-tag w3-border w3-light-gray w3-round">&#9656;</span>。<br>
+					<img class="w3-padding-small" src="/zh-cn/images/photo_run.png"> 或 <img class="w3-padding-small" src="/zh-cn/images/photo_trun.png"></li>
+				</ol>
+			</div>
+			<br>
+			<div class="w3-button w3-padding-small w3-white w3-hover-none w3-text-gray" onclick="ToggleAll('Music','MDown','MRight')">
+				<div class="w3-container w3-cell w3-cell-middle"><h3>将音乐从个人计算机传输到智能手机或平板电脑</h3></div>
+				<div class="w3-container w3-cell w3-cell-middle"><img id="MDown" class="w3-show" src="/images/chevron-d.png"><img id="MRight" class="w3-hide" src="/images/chevron-u.png"></div>
+			</div>
+			<div id="Music" class="w3-container w3-content w3-hide">
+				<ol>
+				<li class="w3-padding-small">点击菜单上 <span class="w3-tag w3-border w3-light-gray">执行项目</span>&rarr;<span class="w3-tag w3-border w3-light-gray">创建...</span> 选项或工具栏的
+					<span class="w3-tag w3-border w3-light-gray w3-round">+</span> 打开创建执行项目对话框。<br>
+					<img class="w3-padding-small" src="/zh-cn/images/menu_new.png"> 或 <img class="w3-padding-small" src="/zh-cn/images/toolbar_new.png"></li>
+				<li class="w3-padding-small">点击第一个 <span class="w3-tag w3-border w3-light-gray w3-round">…</span> 打开文件资源管理器并选择音乐文件夹。<br>
+					<img class="w3-padding-small" src="/zh-cn/images/music_src.png"></li>
+				<li class="w3-padding-small">点击下一个 <span class="w3-tag w3-border w3-light-gray w3-round">…</span> 打开文件资源管理器并选择选择便携设备上的音乐文件夹。<br>
+					<img class="w3-padding-small" src="/zh-cn/images/music_dest.png"></li>
+				<li class="w3-padding-small">[可选步骤] Windows 音乐文件夹可能包含某些无法复制到便携设备上的音乐文件夹的系统文件。 您可以使用高级选项配置文件案类型筛选器仅复制音乐文件。
+					点击 <span class="w3-tag w3-border w3-light-gray w3-round">高级选项</span> 打开"高级选项"对话框。
+					点击 <i class="w3-text-black">包括以下文件类型</i> 单选按钮并在编辑框中输入音乐媒体文件类型并点击 <span class="w3-tag w3-border w3-light-gray w3-round">确认</span>
+					设定该选项。<br>
+					<img class="w3-padding-small" src="/zh-cn/images/music_ft.png"></li>					
+				<li class="w3-padding-small">输入执行项目名称并按下 <span class="w3-tag w3-border w3-light-gray w3-round">创建</span> 建立该任务项目。<br>
+					<img class="w3-padding-small" src="/zh-cn/images/new_music.png"></li>
+				<li class="w3-padding-small">要执行项目时，点击菜单上 <span class="w3-tag w3-border w3-light-gray">执行项目</span>&rarr;<span class="w3-tag w3-border w3-light-gray">执行</span> 选项或工具栏的
+					<span class="w3-tag w3-border w3-light-gray w3-round">&#9656;</span>。<br>
+					<img class="w3-padding-small" src="/zh-cn/images/menu_run.png"> 或 <img class="w3-padding-small" src="/zh-cn/images/toolbar_run.png"></li>
+				</ol>
+				<div class="w3-panel w3-pale-yellow w3-leftbar w3-border-yellow">
+					<p>注意: 音乐传输在苹果设备上无法使用。</p>
+				</div>
+			</div>
+			<br>
+			<h2>更多主题</h2>
+			<div class="w3-button w3-padding-small w3-white w3-hover-none w3-text-gray" onclick="ToggleAll('AdvOpt','AODown','AORight')">
+				<div class="w3-container w3-cell w3-cell-middle"><h3>高级选项</h3></div>
+				<div class="w3-container w3-cell w3-cell-middle"><img id="AODown" class="w3-show" src="/images/chevron-d.png"><img id="AORight" class="w3-hide" src="/images/chevron-u.png"></div>
+			</div>
+			<div id="AdvOpt" class="w3-container w3-content w3-hide">
+				<ul>
+				  <li><h4>选择来源文件的类型</h4>
+					<img src="/zh-cn/images/src_type.png">
+					<ul class="w3-padding-small" style="list-style-type:circle">
+						<li><b>所有文件:</b> 所有文件都将复制到目标文件夹中。</li>
+						<li><b>包括以下文件类型:</b> 只有与指定文件类型匹配的来源文件才会被复制。</li>
+						<li><b>排除下列文件类型:</b> 将复制除指定文件类型之外的所有文件。</li>
+					</ul>
+				  </li>
+				  <li><h4>选择如何在目标文件夹中组织文件</h4>
+					<img src="/zh-cn/images/dest_struct.png">
+					<ul class="w3-padding-small" style="list-style-type:circle">
+						<li><b>与选定的来源文件夹以下的结构相同:</b> 目标文件夹下子档案夹和档案与选定来源文件夹具有相同的布局。
+						例如: 选定来源文件夹是 "This PC\iPad\Internal Storage\DCIM", 目标文件夹是 "C:\My Backups\iPad Photos"。
+						文件在 "This PC\iPad\Internal Storage\DCIM\100APPLE" 文件夹将会被复制到 "C:\My Backups\iPad Photos\100APPLE" 文件夹下。</li>
+						<li><b>使用从来源文件夹根开始的相同结构:</b> 原始文件將以完整的路徑被覆制到目的文件夾下。
+						例如: 选定来源文件夹是 "This PC\iPad\Internal Storage\DCIM", 目标文件夹是 "C:\My Backups\iPad Photos"。
+						文件在 "This PC\iPad\Internal Storage\DCIM\100APPLE" 文件夹将会被复制到 "C:\My Backups\iPad Photos\This PC\iPad\Internal Storage\DCIM\100APPLE" 文件夹下。</li>
+						<li><b>使用以下格式按日期对文件分组:</b> 此选项只适用于目标文件夹位于磁盘驱动器上。 档案将被覆制到目标文件夹中由定义的模板格式化的子档案夹中。
+						例如: 假设定义的模板为 "$(YYYY)\$(MMMM)" 和目标文件夹是 "C:\My Backups\iPad Photos", 2018年2月的照片将复制到 "C:\My Backups\iPad Photos\2018\February" 檔案夾下。</li>
+					</ul>
+				  </li>
+				</ul>			
+			</div>
+			<br>
+			
+			<div class="w3-button w3-padding-small w3-white w3-hover-none w3-text-gray" onclick="ToggleAll('TShoot','TSDown','TSRight')">
+				<div class="w3-container w3-cell w3-cell-middle"><h3>问题诊断</h3></div>
+				<div class="w3-container w3-cell w3-cell-middle"><img id="TSDown" class="w3-show" src="/images/chevron-d.png"><img id="TSRight" class="w3-hide" src="/images/chevron-u.png"></div>
+			</div>			
+			<div id="TShoot" class="w3-container w3-content w3-hide">
+				<ul>
+					<li><b>无法将文件从便携设备复制到硬盘上:</b> 请确保便携设备已连接到个人计算机, 并且启用了媒体传输模式(MTP)模式。</li>
+					<li><b>无法从便携设备中选择文件夹:</b> 请确保显示了便携设备, 并且可以从 Windows 文件资源管理器查看文件夹。</li>
+				</ul>
+			</div>
+			<br>
+			
+			<div class="w3-button w3-padding-small w3-white w3-hover-none w3-text-gray" onclick="ToggleAll('SysReq','SRDown','SRRight')">
+				<div class="w3-container w3-cell w3-cell-middle"><h3>系统要求</h3></div>
+				<div class="w3-container w3-cell w3-cell-middle"><img id="SRDown" class="w3-show" src="/images/chevron-d.png"><img id="SRRight" class="w3-hide" src="/images/chevron-u.png"></div>
+			</div>			
+			<div id="SysReq" class="w3-container w3-content w3-hide">
+				<ul>
+					<li>Windows 10 Desktop version</li>
+				</ul>
+			</div>
+		</div>
+
+		<br><br><br><br>
+        <footer class="w3-white w3-padding w3-bottom w3-border-top">
+			<div class="w3-container">
+            <p>&copy; 2018 aqitek.com 保留所有权利。</p>
+			</div>
+        </footer>
+		
+	<script>
+		function Toggle(id) {
+			var x = document.getElementById(id);
+			if (x.className.indexOf("w3-show") == -1) {
+				x.className = x.className.replace("w3-hide", "w3-show");
+			} else {
+				x.className = x.className.replace("w3-show", "w3-hide");
+			}
+		}
+		
+		function ToggleAll(i1, i2, i3) {
+			Toggle(i1);
+			Toggle(i2);
+			Toggle(i3);
+		}
+	</script>
+		
+    </body>
+</html>

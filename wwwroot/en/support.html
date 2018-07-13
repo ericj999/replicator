@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+
+<html lang="en">
+	<title>File Replicator Help</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="/css/w3.css" type="text/css" />
+	
+    <body>
+		<div class="w3-top">
+			<div class="w3-bar w3-white w3-wide w3-card">
+				<a href="/en/index.html" class="w3-bar-item w3-btn w3-hover-none">
+					<img class="w3-image w3-round" src="/images/replicator48.png" alt="Replicator" width="48" height="48"> <h4>File Replicator</h4>
+				</a>
+				<div class="w3-right w3-hide-small">
+					<a href="/en/index.html" class="w3-bar-item w3-button">Home</a>
+					<a href="#" class="w3-bar-item w3-button">Support</a>
+					<a href="/en/contact.html" class="w3-bar-item w3-button">Contact</a>
+					<div class="w3-dropdown-hover w3-right">
+						<button class="w3-button">&#127760; English</button>
+						<div class="w3-dropdown-content w3-bar-block w3-border" style="right:0">
+							<a href="/zh-cn/support.html" class="w3-bar-item w3-button">中文（简体）</a>
+							<a href="/zh-tw/support.html" class="w3-bar-item w3-button">中文(繁體)</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<br><br><br><br><br><br>
+		
+		<div class="w3-container w3-content w3-text-gray">
+			<h2>Step-by-Step Quick Start</h2>
+			<div class="w3-button w3-padding-small w3-white w3-hover-none w3-text-gray" onclick="ToggleAll('Photo','PDown','PRight')">
+				<div class="w3-container w3-cell w3-cell-middle"><h3>Backup photos from smartphone or tablet to PC</h3></div>
+				<div class="w3-container w3-cell w3-cell-middle"><img id="PDown" class="w3-show" src="/images/chevron-d.png"><img id="PRight" class="w3-hide" src="/images/chevron-u.png"></div>
+			</div>
+			<div id="Photo" class="w3-container w3-content w3-hide">
+				<ol>
+				<li class="w3-padding-small">Click on <span class="w3-tag w3-border w3-light-gray">Task</span>&rarr;<span class="w3-tag w3-border w3-light-gray">New...</span> on menu or
+					<span class="w3-tag w3-border w3-light-gray w3-round">+</span> on the toolbar to open create dialog.<br>
+					<img class="w3-padding-small" src="/en/images/menu_new.png"> or <img class="w3-padding-small" src="/en/images/toolbar_new.png"></li>
+				<li class="w3-padding-small">Click on first <span class="w3-tag w3-border w3-light-gray w3-round">…</span> to select photo files folder on your portable device.<br>
+					<img class="w3-padding-small" src="/en/images/photo_src.png"></li>
+				<li class="w3-padding-small">Click on next <span class="w3-tag w3-border w3-light-gray w3-round">…</span> to select the destination folder on a local drive.
+					You can also right click on a selected folder to create a sub-folder in File Explorer for storing the photos.<br>
+					<img class="w3-padding-small" src="/en/images/photo_dest.png"></li>
+				<li class="w3-padding-small">Enter task name and click on <span class="w3-tag w3-border w3-light-gray w3-round">Create</span> to create the task.<br>
+					<img class="w3-padding-small" src="/en/images/new_photo.png"></li>
+				<li class="w3-padding-small">To run a task, click on <span class="w3-tag w3-border w3-light-gray">Task</span>&rarr;<span class="w3-tag w3-border w3-light-gray">Run</span> on menu or
+					<span class="w3-tag w3-border w3-light-gray w3-round">&#9656;</span> on the toolbar to run the task.<br>
+					<img class="w3-padding-small" src="/en/images/photo_run.png"> or <img class="w3-padding-small" src="/en/images/photo_trun.png"></li>
+				</ol>
+			</div>
+			<br>
+			<div class="w3-button w3-padding-small w3-white w3-hover-none w3-text-gray" onclick="ToggleAll('Music','MDown','MRight')">
+				<div class="w3-container w3-cell w3-cell-middle"><h3>Transfer music from PC to phone or tablet</h3></div>
+				<div class="w3-container w3-cell w3-cell-middle"><img id="MDown" class="w3-show" src="/images/chevron-d.png"><img id="MRight" class="w3-hide" src="/images/chevron-u.png"></div>
+			</div>
+			<div id="Music" class="w3-container w3-content w3-hide">
+				<ol>
+				<li class="w3-padding-small">Click on <span class="w3-tag w3-border w3-light-gray">Task</span>&rarr;<span class="w3-tag w3-border w3-light-gray">New</span> on menu or
+					<span class="w3-tag w3-border w3-light-gray w3-round">+</span> on the toolbar to open create dialog.<br>
+					<img class="w3-padding-small" src="/en/images/menu_new.png"> or <img class="w3-padding-small" src="/en/images/toolbar_new.png"></li>
+				<li class="w3-padding-small">Click on first <span class="w3-tag w3-border w3-light-gray w3-round">…</span> to open File Explorer and select Music folder.<br>
+					<img class="w3-padding-small" src="/en/images/music_src.png"></li>
+				<li class="w3-padding-small">Click on next <span class="w3-tag w3-border w3-light-gray w3-round">…</span> to open the File Explorer and select the Music folder from your portable device.<br>
+					<img class="w3-padding-small" src="/en/images/music_dest.png"></li>
+				<li class="w3-padding-small">[Optional Step] The Windows Music folder may contain some system files that cannot be copied to the music folder on the portable device.
+					You can specify file type filters to only copy the music files using the advanced options.
+					Click on <span class="w3-tag w3-border w3-light-gray w3-round">Advanced Options</span> to open the Advanced Options dialog.
+					Check the <i class="w3-text-black">Include the following file type(s)</i> radio button and enter the music media file types in the edit box and click on <span class="w3-tag w3-border w3-light-gray w3-round">OK</span>
+					to apply the option.<br>
+					<img class="w3-padding-small" src="/en/images/music_ft.png"></li>
+				<li class="w3-padding-small">Enter task name and click on <span class="w3-tag w3-border w3-light-gray w3-round">Create</span> to create the task.<br>
+					<img class="w3-padding-small" src="/en/images/new_music.png"></li>
+				<li class="w3-padding-small">Click on <span class="w3-tag w3-border w3-light-gray">Task</span>&rarr;<span class="w3-tag w3-border w3-light-gray">Run</span> on menu or
+					<span class="w3-tag w3-border w3-light-gray w3-round">&#9656;</span> on the toolbar to run the task.<br>
+					<img class="w3-padding-small" src="/en/images/menu_run.png"> or <img class="w3-padding-small" src="/en/images/toolbar_run.png"></li>
+				</ol>
+				<div class="w3-panel w3-pale-yellow w3-leftbar w3-border-yellow">
+					<p>Note:  Music transfer does not work on Apple devices.</p>
+				</div>
+			</div>
+			<br>
+			<h2>More Topics</h2>
+			<div class="w3-button w3-padding-small w3-white w3-hover-none w3-text-gray" onclick="ToggleAll('AdvOpt','AODown','AORight')">
+				<div class="w3-container w3-cell w3-cell-middle"><h3>Advanced Options</h3></div>
+				<div class="w3-container w3-cell w3-cell-middle"><img id="AODown" class="w3-show" src="/images/chevron-d.png"><img id="AORight" class="w3-hide" src="/images/chevron-u.png"></div>
+			</div>
+			<div id="AdvOpt" class="w3-container w3-content w3-hide">
+				<ul>
+				  <li><h4>Select types of source files</h4>
+					<img src="/en/images/src_type.png">
+					<ul class="w3-padding-small" style="list-style-type:circle">
+						<li><b>All files</b> All the files will be replicated to the destination folder.</li>
+						<li><b>Include the following file types</b> Only the source files matched the specified file types will be replicated.</li>
+						<li><b>Exclude the following file types</b> All the files except the specified file types will be replicated.</li>
+					</ul>
+				  </li>
+				  <li><h4>Select how files are organized in the destination folder</h4>
+					<img src="/en/images/dest_struct.png">
+					<ul class="w3-padding-small" style="list-style-type:circle">
+						<li><b>Use same folder structure starting after the selected source folder</b> The sub-folders under selected source folder will be created under the destination folder with same layouts.
+						e.g. The source folder is "This PC\iPad\Internal Storage\DCIM", the destination folder is "C:\My Backups\iPad Photos".
+						After the replication, files in "This PC\iPad\Internal Storage\DCIM\100APPLE" folder are copied to "C:\My Backups\iPad Photos\100APPLE" folder.</li>
+						<li><b>Use same folder structure starting from the root of the selected source folder</b> The source files are copied to the destination folder with full path of source paths.
+						e.g. The source folder is "This PC\iPad\Internal Storage\DCIM", the destination folder is "C:\My Backups\iPad Photos".
+						After the replication, files in "This PC\iPad\Internal Storage\DCIM\100APPLE" folder are copied to "C:\My Backups\iPad Photos\This PC\iPad\Internal Storage\DCIM\100APPLE" folder.</li>
+						<li><b>Group files by date using the following format</b> This option is only available when the destination folder is on a disk drive.
+						The files will be copied to the sub-folder formatted by the defined template in destination folder.
+						e.g. If the defined template is "$(YYYY)\$(MMMM)" and destination folder is "C:\My Backups\iPad Photos",
+						a photo created in February 2018 will be copied to "C:\My Backups\iPad Photos\2018\February" folder.</li>
+					</ul>
+				  </li>
+				</ul>			
+			</div>
+			<br>
+			
+			<div class="w3-button w3-padding-small w3-white w3-hover-none w3-text-gray" onclick="ToggleAll('TShoot','TSDown','TSRight')">
+				<div class="w3-container w3-cell w3-cell-middle"><h3>Troubleshooting</h3></div>
+				<div class="w3-container w3-cell w3-cell-middle"><img id="TSDown" class="w3-show" src="/images/chevron-d.png"><img id="TSRight" class="w3-hide" src="/images/chevron-u.png"></div>
+			</div>			
+			<div id="TShoot" class="w3-container w3-content w3-hide">
+				<ul>
+					<li><b>Replication failed from portable device to local hard disk:</b> Make sure the portable device is connected to PC and the media transfer mode (MTP) mode is enabled.</li>
+					<li><b>Cannot select folder from a portable device:</b> Make sure the portable device is displayed and the folders can be viewed from Windows File Explorer.</li>
+				</ul>
+			</div>
+			<br>
+			
+			<div class="w3-button w3-padding-small w3-white w3-hover-none w3-text-gray" onclick="ToggleAll('SysReq','SRDown','SRRight')">
+				<div class="w3-container w3-cell w3-cell-middle"><h3>System Requirements</h3></div>
+				<div class="w3-container w3-cell w3-cell-middle"><img id="SRDown" class="w3-show" src="/images/chevron-d.png"><img id="SRRight" class="w3-hide" src="/images/chevron-u.png"></div>
+			</div>			
+			<div id="SysReq" class="w3-container w3-content w3-hide">
+				<ul>
+					<li>Windows 10 Desktop version</li>
+				</ul>
+			</div>
+		</div>
+		
+		<br><br><br><br>
+        <footer class="w3-white w3-padding w3-bottom w3-border-top">
+			<div class="w3-container">
+            <p>&copy; 2018 aqitek.com All Right Reserved.</p>
+			</div>
+        </footer>
+		
+	<script>
+		function Toggle(id) {
+			var x = document.getElementById(id);
+			if (x.className.indexOf("w3-show") == -1) {
+				x.className = x.className.replace("w3-hide", "w3-show");
+			} else {
+				x.className = x.className.replace("w3-show", "w3-hide");
+			}
+		}
+		
+		function ToggleAll(i1, i2, i3) {
+			Toggle(i1);
+			Toggle(i2);
+			Toggle(i3);
+		}
+	</script>
+		
+    </body>
+</html>

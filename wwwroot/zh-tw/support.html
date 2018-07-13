@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+
+<html lang="zh-TW">
+	<title>File Replicator Help</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="/css/w3.css" type="text/css" />
+	
+    <body>
+		<div class="w3-top">
+			<div class="w3-bar w3-white w3-wide w3-card">
+				<a href="/zh-tw/index.html" class="w3-bar-item w3-btn w3-hover-none">
+					<img class="w3-image w3-round" src="/images/replicator48.png" alt="Replicator" width="48" height="48"> <h4>File Replicator</h4>
+				</a>
+				<div class="w3-right w3-hide-small">
+					<a href="/zh-tw/index.html" class="w3-bar-item w3-button">首頁</a>
+					<a href="#" class="w3-bar-item w3-button">支援</a>
+					<a href="/zh-tw/contact.html" class="w3-bar-item w3-button">聯絡</a>
+					<div class="w3-dropdown-hover w3-right">
+						<button class="w3-button">&#127760; 中文(繁體)</button>
+						<div class="w3-dropdown-content w3-bar-block w3-border" style="right:0">
+							<a href="/en/support.html" class="w3-bar-item w3-button">English</a>
+							<a href="/zh-cn/support.html" class="w3-bar-item w3-button">中文（简体）</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<br><br><br><br><br><br>
+		
+		<div class="w3-container w3-content w3-text-gray">
+			<h2>逐步快速入門</h2>
+			<div class="w3-button w3-padding-small w3-white w3-hover-none w3-text-gray" onclick="ToggleAll('Photo','PDown','PRight')">
+				<div class="w3-container w3-cell w3-cell-middle"><h3>從智慧手機或平板電腦備份照片到個人電腦</h3></div>
+				<div class="w3-container w3-cell w3-cell-middle"><img id="PDown" class="w3-show" src="/images/chevron-d.png"><img id="PRight" class="w3-hide" src="/images/chevron-u.png"></div>
+			</div>
+			<div id="Photo" class="w3-container w3-content w3-hide">
+				<ol>
+				<li class="w3-padding-small">點擊功能表上 <span class="w3-tag w3-border w3-light-gray">執行項目</span>&rarr;<span class="w3-tag w3-border w3-light-gray">新建...</span> 選項或工具欄的
+					<span class="w3-tag w3-border w3-light-gray w3-round">+</span>打開新建執行項目對話方塊。<br>
+					<img class="w3-padding-small" src="/zh-tw/images/menu_new.png"> 或 <img class="w3-padding-small" src="/zh-tw/images/toolbar_new.png"></li>
+				<li class="w3-padding-small">點擊第一個 <span class="w3-tag w3-border w3-light-gray w3-round">…</span> 選擇可攜式裝置上的照片資料夾。<br>
+					<img class="w3-padding-small" src="/zh-tw/images/photo_src.png"></li>
+				<li class="w3-padding-small">點擊下一個 <span class="w3-tag w3-border w3-light-gray w3-round">…</span> 選擇在硬碟上目的資料夾。
+					你也可以點擊 <span class="w3-tag w3-border w3-light-gray">新增資料夾</span> 在目前所選的資料夾建立新子資料夾來存儲照片。<br>
+					<img class="w3-padding-small" src="/zh-tw/images/photo_dest.png"></li>
+				<li class="w3-padding-small">輸入執行項目名稱並按下 <span class="w3-tag w3-border w3-light-gray w3-round">建立</span> 建立該任務項目。<br>
+					<img class="w3-padding-small" src="/zh-tw/images/new_photo.png"></li>
+				<li class="w3-padding-small">要執行項目時，點擊功能表上 <span class="w3-tag w3-border w3-light-gray">執行項目</span>&rarr;<span class="w3-tag w3-border w3-light-gray">執行</span> 選項或工具欄的
+					<span class="w3-tag w3-border w3-light-gray w3-round">&#9656;</span>。<br>
+					<img class="w3-padding-small" src="/zh-tw/images/photo_run.png"> 或 <img class="w3-padding-small" src="/zh-tw/images/photo_trun.png"></li>
+				</ol>
+			</div>
+			<br>
+			<div class="w3-button w3-padding-small w3-white w3-hover-none w3-text-gray" onclick="ToggleAll('Music','MDown','MRight')">
+				<div class="w3-container w3-cell w3-cell-middle"><h3>將音樂從個人電腦傳輸到智慧手機或平板電腦</h3></div>
+				<div class="w3-container w3-cell w3-cell-middle"><img id="MDown" class="w3-show" src="/images/chevron-d.png"><img id="MRight" class="w3-hide" src="/images/chevron-u.png"></div>
+			</div>
+			<div id="Music" class="w3-container w3-content w3-hide">
+				<ol>
+				<li class="w3-padding-small">點擊功能表上 <span class="w3-tag w3-border w3-light-gray">執行項目</span>&rarr;<span class="w3-tag w3-border w3-light-gray">新建...</span> 選項或工具欄的
+					<span class="w3-tag w3-border w3-light-gray w3-round">+</span>打開新建執行項目對話方塊。<br>
+					<img class="w3-padding-small" src="/zh-tw/images/menu_new.png"> 或 <img class="w3-padding-small" src="/zh-tw/images/toolbar_new.png"></li>
+				<li class="w3-padding-small">點擊第一個 <span class="w3-tag w3-border w3-light-gray w3-round">…</span> 打開檔案總管並選擇音樂資料夾。<br>
+					<img class="w3-padding-small" src="/zh-tw/images/music_src.png"></li>
+				<li class="w3-padding-small">點擊下一個 <span class="w3-tag w3-border w3-light-gray w3-round">…</span> 打開檔案總管並選擇選擇可攜式裝置上的音樂資料夾。<br>
+					<img class="w3-padding-small" src="/zh-tw/images/music_dest.png"></li>
+				<li class="w3-padding-small">[可選步驟] Windows 音樂資料夾可能包含某些無法複製到可攜式裝置上的音樂資料夾的系統檔。 您可以使用高級選項設定檔案類型篩選器僅複製音樂檔。
+					點擊 <span class="w3-tag w3-border w3-light-gray w3-round">進階選項</span> 打開"進階選項"對話方塊。
+					點擊 <i class="w3-text-black">包括以下檔案類型</i> 選項按鈕並在編輯方塊中輸入音樂媒體檔案類型並點擊 <span class="w3-tag w3-border w3-light-gray w3-round">確定</span>
+					設定該選項。<br>
+					<img class="w3-padding-small" src="/zh-tw/images/music_ft.png"></li>					
+				<li class="w3-padding-small">輸入執行項目名稱並按下 <span class="w3-tag w3-border w3-light-gray w3-round">建立</span> 建立該任務項目。<br>
+					<img class="w3-padding-small" src="/zh-tw/images/new_music.png"></li>
+				<li class="w3-padding-small">要執行項目時，點擊功能表上 <span class="w3-tag w3-border w3-light-gray">執行項目</span>&rarr;<span class="w3-tag w3-border w3-light-gray">執行</span> 選項或工具欄的
+					<span class="w3-tag w3-border w3-light-gray w3-round">&#9656;</span>。<br>
+					<img class="w3-padding-small" src="/zh-tw/images/menu_run.png"> 或 <img class="w3-padding-small" src="/zh-tw/images/toolbar_run.png"></li>
+				</ol>
+				<div class="w3-panel w3-pale-yellow w3-leftbar w3-border-yellow">
+					<p>注意: 音樂傳輸在蘋果設備上無法使用。</p>
+				</div>
+			</div>
+			<br>
+			<h2>更多主題</h2>
+			<div class="w3-button w3-padding-small w3-white w3-hover-none w3-text-gray" onclick="ToggleAll('AdvOpt','AODown','AORight')">
+				<div class="w3-container w3-cell w3-cell-middle"><h3>進階選項</h3></div>
+				<div class="w3-container w3-cell w3-cell-middle"><img id="AODown" class="w3-show" src="/images/chevron-d.png"><img id="AORight" class="w3-hide" src="/images/chevron-u.png"></div>
+			</div>
+			<div id="AdvOpt" class="w3-container w3-content w3-hide">
+				<ul>
+				  <li><h4>選擇原始檔案的類型</h4>
+					<img src="/zh-tw/images/src_type.png">
+					<ul class="w3-padding-small" style="list-style-type:circle">
+						<li><b>所有檔案:</b> 所有檔都將複製到目的資料夾中。</li>
+						<li><b>包括以下檔案類型:</b> 只有與指定檔案類型匹配的原始檔案才會被覆制。</li>
+						<li><b>排除下列檔案類型:</b> 將複製除指定檔案類型之外的所有檔案。</li>
+					</ul>
+				  </li>
+				  <li><h4>選擇如何在目的資料夾中組織檔案</h4>
+					<img src="/zh-tw/images/dest_struct.png">
+					<ul class="w3-padding-small" style="list-style-type:circle">
+						<li><b>與選定原始資料夾以下的結構相同:</b> 目的資料夾下子資料夾和檔案與選定原始資料夾具有相同的佈局。
+						例如: 選定原始資料夾是 "This PC\iPad\Internal Storage\DCIM", 目的資料夾是 "C:\My Backups\iPad Photos"。
+						檔案在 "This PC\iPad\Internal Storage\DCIM\100APPLE" 資料夾將會被複製到 "C:\My Backups\iPad Photos\100APPLE" 資料夾下。</li>
+						<li><b>使用從原始資料夾根目錄開始的相同結構:</b> 原始檔案將以完整的路徑被覆制到目的資料夾下。
+						例如: 選定原始資料夾是 "This PC\iPad\Internal Storage\DCIM", 目的資料夾是 "C:\My Backups\iPad Photos"。
+						檔案在 "This PC\iPad\Internal Storage\DCIM\100APPLE" 資料夾將會被複製到 "C:\My Backups\iPad Photos\This PC\iPad\Internal Storage\DCIM\100APPLE" 資料夾下。</li>
+						<li><b>使用以下格式按日期對檔案分組:</b> 此選項只適用於目的資料夾位於磁碟機上。 檔案將被覆制到目的資料夾中由定義的範本格式化的子資料夾中。
+						例如: 假設定義的範本為 "$(YYYY)\$(MMMM)" 和目的資料夾是 "C:\My Backups\iPad Photos", 2018年2月的照片將複製到 "C:\My Backups\iPad Photos\2018\February" 資料夾下。</li>
+					</ul>
+				  </li>
+				</ul>			
+			</div>
+			<br>
+			
+			<div class="w3-button w3-padding-small w3-white w3-hover-none w3-text-gray" onclick="ToggleAll('TShoot','TSDown','TSRight')">
+				<div class="w3-container w3-cell w3-cell-middle"><h3>問題診斷</h3></div>
+				<div class="w3-container w3-cell w3-cell-middle"><img id="TSDown" class="w3-show" src="/images/chevron-d.png"><img id="TSRight" class="w3-hide" src="/images/chevron-u.png"></div>
+			</div>			
+			<div id="TShoot" class="w3-container w3-content w3-hide">
+				<ul>
+					<li><b>無法將檔從可攜式裝置複製到硬碟上:</b> 請確保可攜式裝置已連接到個人電腦, 並且啟用了媒體傳輸模式(MTP)模式。</li>
+					<li><b>無法從可攜式裝置中選擇資料夾:</b> 請確保顯示了可攜式裝置, 並且可以從 Windows 檔案總管查看資料夾。</li>
+				</ul>
+			</div>
+			<br>
+			
+			<div class="w3-button w3-padding-small w3-white w3-hover-none w3-text-gray" onclick="ToggleAll('SysReq','SRDown','SRRight')">
+				<div class="w3-container w3-cell w3-cell-middle"><h3>系統要求</h3></div>
+				<div class="w3-container w3-cell w3-cell-middle"><img id="SRDown" class="w3-show" src="/images/chevron-d.png"><img id="SRRight" class="w3-hide" src="/images/chevron-u.png"></div>
+			</div>			
+			<div id="SysReq" class="w3-container w3-content w3-hide">
+				<ul>
+					<li>Windows 10 Desktop version</li>
+				</ul>
+			</div>
+		</div>
+		
+		<br><br><br><br>
+        <footer class="w3-white w3-padding w3-bottom w3-border-top">
+			<div class="w3-container">
+            <p>&copy; 2018 aqitek.com 保留一切權利。</p>
+			</div>
+        </footer>
+		
+	<script>
+		function Toggle(id) {
+			var x = document.getElementById(id);
+			if (x.className.indexOf("w3-show") == -1) {
+				x.className = x.className.replace("w3-hide", "w3-show");
+			} else {
+				x.className = x.className.replace("w3-show", "w3-hide");
+			}
+		}
+		
+		function ToggleAll(i1, i2, i3) {
+			Toggle(i1);
+			Toggle(i2);
+			Toggle(i3);
+		}
+	</script>
+		
+    </body>
+</html>
