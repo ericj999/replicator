@@ -98,6 +98,9 @@
     <ResourceCompile>
       <Culture>0x7c04</Culture>
     </ResourceCompile>
+    <PostBuildEvent>
+      <Command>signtool sign /tr http://timestamp.comodoca.com/rfc3161 /td sha256 /fd sha256 /a $(OutDir)$(TargetName)$(TargetExt)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -115,6 +118,9 @@
     <ResourceCompile>
       <Culture>0x7c04</Culture>
     </ResourceCompile>
+    <PostBuildEvent>
+      <Command>signtool sign /tr http://timestamp.comodoca.com/rfc3161 /td sha256 /fd sha256 /a $(OutDir)$(TargetName)$(TargetExt)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -136,6 +142,9 @@
     <ResourceCompile>
       <Culture>0x7c04</Culture>
     </ResourceCompile>
+    <PostBuildEvent>
+      <Command>signtool sign /tr http://timestamp.comodoca.com/rfc3161 /td sha256 /fd sha256 /a $(OutDir)$(TargetName)$(TargetExt)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -157,6 +166,9 @@
     <ResourceCompile>
       <Culture>0x7c04</Culture>
     </ResourceCompile>
+    <PostBuildEvent>
+      <Command>signtool sign /tr http://timestamp.comodoca.com/rfc3161 /td sha256 /fd sha256 /a $(OutDir)$(TargetName)$(TargetExt)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />

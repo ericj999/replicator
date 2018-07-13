@@ -42,6 +42,7 @@ CReplicatorApp::CReplicatorApp() :
 	m_verbose{ false }, m_testRun{ false }, m_historyDays{ DEFAULT_HISTORY_DAYS }
 {
 	m_bHiColorIcons = TRUE;
+	m_bSaveState = FALSE;
 
 	// TODO: replace application ID string below with unique ID string; recommended
 	// format for string is CompanyName.ProductName.SubProduct.VersionInformation

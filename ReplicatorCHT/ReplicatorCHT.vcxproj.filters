@@ -34,7 +34,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="ReplicatorCHS.rc">
+    <ResourceCompile Include="ReplicatorCHT.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

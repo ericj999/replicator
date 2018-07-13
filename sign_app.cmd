@@ -1,0 +1,3 @@
+rem SignTool sign /fd SHA256 /f "G:\MyWorks\Replicator\cert\digitalSigningCertificate.pfx" /p Go49$$$$ /tr http://timestamp.comodoca.com/rfc3161 %1
+rem call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat"
+SignTool sign /fd SHA256 /f "G:\MyWorks\Replicator\cert\digitalSigningCertificate.pfx" /p Go49$$$$ /tr http://timestamp.comodoca.com/rfc3161 "G:\MyWorks\Replicator\output\36879aqitek.com.FileReplicator\36879aqitek.com.FileReplicator.appx"
